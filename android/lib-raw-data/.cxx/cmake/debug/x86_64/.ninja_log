@@ -1,0 +1,11 @@
+# ninja log v5
+6	3117	682679077	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+8	796	682338454	CMakeFiles/apm-plugin-raw-data.dir/src/main/cpp/io_agora_advancedvideo_rawdata_MediaPreProcessing.cpp.o	9756a743af78c633
+17	6147	682946720	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+5	1893	683027927	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+7	1947	683715199	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+8	2539	683817193	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+7	2487	683819686	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+7	2439	683822420	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+9	412	685370608	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4
+10	499	685639166	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/x86_64/libapm-plugin-raw-data.so	12012e8b482931c4

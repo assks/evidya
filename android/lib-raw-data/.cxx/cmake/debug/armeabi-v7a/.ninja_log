@@ -1,0 +1,23 @@
+# ninja log v5
+7	2652	680612827	CMakeFiles/apm-plugin-raw-data.dir/src/main/cpp/io_agora_advancedvideo_rawdata_MediaPreProcessing.cpp.o	eb13b7f1b4e6bcc1
+57	5240	681208386	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+1	23	0	clean	3f49641f42803f57
+10	1906	681214548	CMakeFiles/apm-plugin-raw-data.dir/src/main/cpp/io_agora_advancedvideo_rawdata_MediaPreProcessing.cpp.o	eb13b7f1b4e6bcc1
+1907	6191	681214552	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+7	4713	681216679	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+3	14	0	clean	3f49641f42803f57
+11	3770	682338445	CMakeFiles/apm-plugin-raw-data.dir/src/main/cpp/io_agora_advancedvideo_rawdata_MediaPreProcessing.cpp.o	eb13b7f1b4e6bcc1
+3771	7432	682338448	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+17	7039	682350970	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+40	5429	682421491	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+20	3933	682424742	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+48	7088	682528833	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+9	5477	682679067	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+98	9945	682946703	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+60	5678	683027920	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+149	3920	683715193	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+33	3139	683817184	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+118	4841	683819679	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+11	4970	683821433	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+44	1559	685370606	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7
+191	4086	685639164	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/armeabi-v7a/libapm-plugin-raw-data.so	8d70ce1fb81e7fe7

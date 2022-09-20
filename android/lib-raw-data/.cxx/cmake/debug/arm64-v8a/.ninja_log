@@ -1,0 +1,11 @@
+# ninja log v5
+5	3753	682336026	CMakeFiles/apm-plugin-raw-data.dir/src/main/cpp/io_agora_advancedvideo_rawdata_MediaPreProcessing.cpp.o	281a975b40affee2
+8	3813	682679071	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+12	5993	682946709	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+8	2668	683027923	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+5	1928	683715195	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+7	3556	683817187	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+9	2510	683819681	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+11	4043	683822415	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+9	641	685370607	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae
+28	440	685639165	C:/Users/Aniket/OneDrive/Desktop/evidya/build/lib-raw-data/intermediates/cmake/debug/obj/arm64-v8a/libapm-plugin-raw-data.so	7d1b16cc8853c9ae

@@ -144,7 +144,7 @@ class _messengertabState extends State<messengertab>
     }
   }
 
-  Future<void> downlordimage(String file, String peerid, group, groupname,time,textid) async {
+  Future<void> downlordimage(String file, String peerid, group, groupname,textid,time) async {
     try {
       if (group == "group") {
         dynamic parts = file.split('#@####@#');
@@ -175,7 +175,7 @@ class _messengertabState extends State<messengertab>
        // print('filename' + fileName);
         var path = await ImageDownloader.findPath(imageId);
        // print('path' + path);
-        _insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time,"");
+        _insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time,textid);
         var size = await ImageDownloader.findByteSize(imageId);
        // print('size' + size.toString());
         var mimeType = await ImageDownloader.findMimeType(imageId);
@@ -218,9 +218,7 @@ class _messengertabState extends State<messengertab>
       String messages=parts[0]+"#@####@#"+parts[1]+"#@####@#"+parts[2];
       groupmessagelog.addLog(parts[2]);
       dynamic message_exists = await dbHelper.is_message_exists(parts[4]);
-      if(message_exists!=0){
-        return;
-      }
+
       var time= parts[3].toString().substring(0,16);
       var shortmessage = parts[0] + "#@####@#" + parts[1] + "#@####@#" + parts[2];
       if (isfile) {
@@ -228,6 +226,9 @@ class _messengertabState extends State<messengertab>
           if (smallString == 'group') {
             dynamic parts = message.text.split('#@####@#');
             logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+parts[3]);
+            if(message_exists==1){
+              return;
+            }
             downlordimage(shortmessage, peerId, "group", time,parts[4],parts[3]);
           } else {
             messagelog.addLog(peerId+'#@#&'+time);
@@ -241,10 +242,16 @@ class _messengertabState extends State<messengertab>
                 await  _insert("" + "#@####@#noreplay#@####@#" + video[0]+"#@#&"+video[1], peerId, 'video',time,parts[4]);
               } else{
                 logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"");
+                if(message_exists==1){
+                  return;
+                }
                 await downlordimage(messages, peerId, "single", "",parts[4],time);
               }}on Exception catch (_){
               logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"");
-              await downlordimage(messages, peerId, "single", "",parts[4],time);
+              if(message_exists==1){
+                return;
+              }
+              await downlordimage(messages, peerId, "single", "",time,parts[4]);
             }
           }
         }
@@ -260,6 +267,9 @@ class _messengertabState extends State<messengertab>
             print("messagereceived"+messages);
             messagelog.addLog(peerId+'#@#&'+time);
             logController.addLog(messages + '#@####@#Receive' + '#@####@#text' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"new");
+            if(message_exists){
+              return;
+            }
             await _insert(messages, peerId, 'text',time,parts[4]);
           }
         }

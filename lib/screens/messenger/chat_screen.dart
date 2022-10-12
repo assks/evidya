@@ -1416,7 +1416,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
 
   Future<void> getImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
-    imageapi(pickedFile, "", "image");
+    imageapi(pickedFile, "", "");
     if (replytex != "") {
       var file = replytex + "#@####@#replay#@####@#" +pickedFile.path + '#@####@#send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + "new";
       widget.logController.addLog(file);
@@ -1561,7 +1561,6 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         await widget.client.sendMessageToPeer(replytex + "#@####@#noreplay#@####@#" + widget.rtmpeerid + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid, message, true, false);
          var id = _insert(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, 'text', 'send', widget.rtmpeerid.toString());
         fcmapicall("#@####@#noreplay#@####@#"+_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '',textid);
-
         if(_peerMessage.text.trim()!="") {
            widget.logController.addLog(replytex + '#@####@#noreplay#@####@#' + _peerMessage.text + '#@####@#send' + '#@####@#text' + '#@####@#' + DateTime.now().toString().substring(0, 16) + '#@####@#' + id.toString() + "#@####@#" + widget.rtmpeerid + "#@####@#" + "new");
          }
@@ -1649,7 +1648,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                               widget.client.sendMessageToPeer(joiner != "" ? joiner : widget.rtmpeerid,message,true,false);
                             } else {
                               AgoraRtmMessage message = AgoraRtmMessage.fromText("#@####@#noreplay#@####@#" + value.body.source + "#@####@#" + datetime+ "#@####@#" +textid);
-                              widget.client.sendMessageToPeer(joiner != "" ? joiner : widget.rtmpeerid, message, true, false);
+                              widget.client.sendMessageToPeer(joiner != "" ? joiner: widget.rtmpeerid, message, true, false);
                             }
                             if(joiner=='image') {
                               if (replytex != "") {

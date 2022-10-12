@@ -144,7 +144,7 @@ class _messengertabState extends State<messengertab>
     }
   }
 
-  Future<void> downlordimage(String file, String peerid, group, groupname,time) async {
+  Future<void> downlordimage(String file, String peerid, group, groupname,time,textid) async {
     try {
       if (group == "group") {
         dynamic parts = file.split('#@####@#');
@@ -175,7 +175,7 @@ class _messengertabState extends State<messengertab>
        // print('filename' + fileName);
         var path = await ImageDownloader.findPath(imageId);
        // print('path' + path);
-        _insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time);
+        _insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time,"");
         var size = await ImageDownloader.findByteSize(imageId);
        // print('size' + size.toString());
         var mimeType = await ImageDownloader.findMimeType(imageId);
@@ -199,7 +199,7 @@ class _messengertabState extends State<messengertab>
       await file.writeAsBytes(response.bodyBytes);
      var filepath= file.path;
       logController.addLog("#@####@#noreplay#@####@#" +filepath.toString()+"#@#&"+name + '#@####@#Receive' + '#@####@#doc' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerid+'#@####@#');
-      _insert("" + "#@####@#noreplay#@####@#" + filepath.toString()+"#@#&"+name, peerid, 'doc',time);
+      _insert("" + "#@####@#noreplay#@####@#" + filepath.toString()+"#@#&"+name, peerid, 'doc',time,"");
     } on PlatformException catch (error) {
       print(error);
     }
@@ -213,31 +213,38 @@ class _messengertabState extends State<messengertab>
       dynamic isfile = fileExp.hasMatch(message.text);
       String smallString = message.text.substring(0, 5);
       dynamic parts = message.text.split('#@####@#');
-      String messages= message.text.substring(0,message.text.lastIndexOf("#@####@#"));
+
+      //String messages= message.text.substring(0,message.text.lastIndexOf("#@####@#"));
+      String messages=parts[0]+"#@####@#"+parts[1]+"#@####@#"+parts[2];
       groupmessagelog.addLog(parts[2]);
+      dynamic message_exists = await dbHelper.is_message_exists(parts[4]);
+      if(message_exists!=0){
+        return;
+      }
+      var time= parts[3].toString().substring(0,16);
       var shortmessage = parts[0] + "#@####@#" + parts[1] + "#@####@#" + parts[2];
       if (isfile) {
         if (control_Log) {
           if (smallString == 'group') {
             dynamic parts = message.text.split('#@####@#');
             logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+parts[3]);
-            downlordimage(shortmessage, peerId, "group", parts[3],parts[4]);
+            downlordimage(shortmessage, peerId, "group", time,parts[4],parts[3]);
           } else {
-            messagelog.addLog(peerId+'#@#&'+parts[3]);
+            messagelog.addLog(peerId+'#@#&'+time);
             try{
               if(parts[0]=="doc"){
-                await downlordpdf(parts[2], peerId, "single",parts[3]);
+                await downlordpdf(parts[2], peerId, "single",time);
               }else if(parts[0]=="video"){
                 dynamic video = parts[2].split('#@#&');
                 var file = "" + "#@####@#noreplay#@####@#" + video[0] + "#@#&" + video[1] + '#@####@#Receive' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + peerId+"#@####@#"+"new";
                 logController.addLog(file);
-                await  _insert("" + "#@####@#noreplay#@####@#" + video[0]+"#@#&"+video[1], peerId, 'video',parts[3]);
+                await  _insert("" + "#@####@#noreplay#@####@#" + video[0]+"#@#&"+video[1], peerId, 'video',time,parts[4]);
               } else{
-                logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + parts[3] + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"");
-                await downlordimage(messages, peerId, "single", "",parts[3]);
+                logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"");
+                await downlordimage(messages, peerId, "single", "",parts[4],time);
               }}on Exception catch (_){
               logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"");
-              await downlordimage(messages, peerId, "single", "",parts[3]);
+              await downlordimage(messages, peerId, "single", "",parts[4],time);
             }
           }
         }
@@ -246,14 +253,14 @@ class _messengertabState extends State<messengertab>
           if (smallString == 'group') {
             dynamic parts = message.text.split('#@####@#');
             groupmessagelog.addLog(parts[4]);
-            var shortmessage = parts[0] + '#@####@#' + parts[1] + '#@####@#' + parts[2] + '#@####@#' + parts[3];
+            var shortmessage = parts[0] + '#@####@#' + parts[1] + '#@####@#' + parts[2] + '#@####@#' + time;
             logController.addLog(shortmessage + '#@####@#Receive' + '#@####@#text' + '#@####@#' +parts[5] + '#@####@#' + "" + '#@####@#' + peerId+'#@####@#'+parts[4]);
-            await _insertgroup(shortmessage, peerId, 'text', parts[4],parts[5]);
+            await _insertgroup(shortmessage, peerId, 'text', parts[4],parts[3]);
           } else {
             print("messagereceived"+messages);
-            messagelog.addLog(peerId+'#@#&'+parts[3]);
-            logController.addLog(messages + '#@####@#Receive' + '#@####@#text' + '#@####@#' + parts[3] + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"new");
-            await _insert(messages, peerId, 'text',parts[3]);
+            messagelog.addLog(peerId+'#@#&'+time);
+            logController.addLog(messages + '#@####@#Receive' + '#@####@#text' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+"new");
+            await _insert(messages, peerId, 'text',time,parts[4]);
           }
         }
       }
@@ -270,7 +277,7 @@ class _messengertabState extends State<messengertab>
     };
   }
 
-  _insert(String _peerMessage, String peerid, String type,time) async {
+  _insert(String _peerMessage, String peerid, String type,time,textid) async {
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.Id: null,
@@ -282,12 +289,11 @@ class _messengertabState extends State<messengertab>
       DatabaseHelper.from: userpeerid,
       DatabaseHelper.to: peerid,
       DatabaseHelper.deliveryStatus: "Undelivered",
-      DatabaseHelper.TextId:time
-
+      DatabaseHelper.textId:textid
     };
 
     final id = await dbHelper.insert(row);
-     print('inserted row id: $id');
+     print('tab inserted row id: $id');
     return id;
   }
 

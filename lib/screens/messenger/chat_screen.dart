@@ -393,12 +393,9 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                 print("log098"+log.length.toString()+">=$length");
                                 _scrollDown(log.length);
                                 if(length==0){
-
                                  length=log.length;
-                                }else {
-                                  length++;
                                 }
-
+                                length++;
                               }
                               return Expanded(
                                 child: ListView.separated(
@@ -1250,8 +1247,13 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                               size: 25,
                                             ),
                                             onPressed: () {
-                                              setState(() {message = "";});
-                                              if (_peerMessage.text.trim().isEmpty) {
+                                              setState(() {
+                                                message = "";
+                                              });
+                                              if (_peerMessage.text
+                                                  .trim()
+                                                  .isEmpty) {
+                                                //EasyLoading.showToast('Kya yrr kuch toh likho');
                                               } else {
                                                 _sendPeerMessage();
                                               }
@@ -1497,16 +1499,17 @@ class _Chat_ScreenState extends State<Chat_Screen> {
           duration: const Duration(seconds: 5));
       return;
     }
-    fcmapicall(_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '');
     updatelocaldata(widget.rtmpeerid);
+    var textid = DateTime.now().millisecondsSinceEpoch.toString();
     try {
       if (replytex != "") {
         print("messagereplay"+_peerMessage.text);
-        AgoraRtmMessage message = AgoraRtmMessage.fromText(replytex + "#@####@#replay#@####@#" + _peerMessage.text + "#@####@#" +
-            DateTime.now().toString().substring(0, 16));
+        AgoraRtmMessage message = AgoraRtmMessage.fromText(replytex + "#@####@#replay#@####@#" + _peerMessage.text + "#@####@#" + DateTime.now().toString()+ "#@####@#"+textid);
         await widget.client.sendMessageToPeer(widget.rtmpeerid, message, true, false);
         widget.logController.addLog(replytex + '#@####@#replay#@####@#' + _peerMessage.text + '#@####@#send' + '#@####@#text' + '#@####@#' + DateTime.now().toString().substring(0, 16) + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + "new");
         _insert(replytex + "#@####@#replay#@####@#" + _peerMessage.text, "text", 'send', widget.rtmpeerid.toString());
+        fcmapicall("#@####@#replay#@####@#"+_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '',textid);
+
         updatelocaldata(widget.rtmpeerid);
         _peerMessage.clear();
         setState(() {
@@ -1514,10 +1517,12 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         });
       } else {
         print("message"+_peerMessage.text);
-        AgoraRtmMessage message = AgoraRtmMessage.fromText(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text + "#@####@#" + DateTime.now().toString().substring(0, 16));
+        AgoraRtmMessage message = AgoraRtmMessage.fromText(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text + "#@####@#" + DateTime.now().toString()+ "#@####@#"+textid);
         await widget.client.sendMessageToPeer(widget.rtmpeerid, message, true, false);
         print("message1234"+_peerMessage.text);
         var id = await _insert(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send', widget.rtmpeerid.toString());
+        fcmapicall("#@####@#noreplay#@####@#"+_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '',textid);
+
         if(_peerMessage.text.trim()!="") {
           widget.logController.addLog(
               replytex + '#@####@#noreplay#@####@#' + _peerMessage.text +
@@ -1537,24 +1542,13 @@ class _Chat_ScreenState extends State<Chat_Screen> {
             "#@####@#replay#@####@#" +
             _peerMessage.text +
             "#@####@#" +
-            DateTime.now().toString().substring(0, 16));
+            DateTime.now().toString().substring(0, 16)+ "#@####@#"+textid);
         await widget.client
             .sendMessageToPeer(widget.rtmpeerid, message, true, false);
-        widget.logController.addLog(replytex +
-            '#@####@#replay#@####@#' +
-            _peerMessage.text +
-            '#@####@#send' +
-            '#@####@#text' +
-            '#@####@#' +
-            DateTime.now().toString().substring(0, 16) +
-            "#@####@#" +
-            "" +
-            "#@####@#" +
-            widget.rtmpeerid +
-            "#@####@#" +
-            "new");
-        _insert(replytex + "#@####@#replay#@####@#" + _peerMessage.text, 'text',
-            'send', widget.rtmpeerid.toString());
+        widget.logController.addLog(replytex + '#@####@#replay#@####@#' + _peerMessage.text + '#@####@#send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + "new");
+        _insert(replytex + "#@####@#replay#@####@#" + _peerMessage.text, 'text', 'send', widget.rtmpeerid.toString());
+        fcmapicall("#@####@#replay#@####@#"+_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '',textid);
+
         updatelocaldata(widget.rtmpeerid);
         _peerMessage.clear();
         setState(() {
@@ -1564,15 +1558,12 @@ class _Chat_ScreenState extends State<Chat_Screen> {
       } else {
         print("message123"+_peerMessage.text);
         AgoraRtmMessage message = AgoraRtmMessage.fromText(_peerMessage.text);
-        await widget.client.sendMessageToPeer(replytex + "#@####@#noreplay#@####@#" + widget.rtmpeerid + "#@####@#" + DateTime.now().toString().substring(0, 16), message, true, false);
+        await widget.client.sendMessageToPeer(replytex + "#@####@#noreplay#@####@#" + widget.rtmpeerid + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid, message, true, false);
          var id = _insert(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, 'text', 'send', widget.rtmpeerid.toString());
-         if(_peerMessage.text.trim()!="") {
-           widget.logController.addLog(
-               replytex + '#@####@#noreplay#@####@#' + _peerMessage.text +
-                   '#@####@#send' + '#@####@#text' + '#@####@#' +
-                   DateTime.now().toString().substring(0, 16) + '#@####@#' +
-                   id.toString() + "#@####@#" + widget.rtmpeerid + "#@####@#" +
-                   "new");
+        fcmapicall("#@####@#noreplay#@####@#"+_peerMessage.text, widget.recentchatuserdetails.fcm_token, '', userpeerid.toString(), 'basic_channel', '',textid);
+
+        if(_peerMessage.text.trim()!="") {
+           widget.logController.addLog(replytex + '#@####@#noreplay#@####@#' + _peerMessage.text + '#@####@#send' + '#@####@#text' + '#@####@#' + DateTime.now().toString().substring(0, 16) + '#@####@#' + id.toString() + "#@####@#" + widget.rtmpeerid + "#@####@#" + "new");
          }
          // updatelocaldata(widget.rtmpeerid);
       //  replytex = "";
@@ -1593,10 +1584,11 @@ class _Chat_ScreenState extends State<Chat_Screen> {
       DatabaseHelper.type: type,
       DatabaseHelper.from: rtmpeerid,
       DatabaseHelper.to: userpeerid.toString(),
-      DatabaseHelper.deliveryStatus: "Undelivered"
+      DatabaseHelper.deliveryStatus: "Undelivered",
+      DatabaseHelper.textId:DateTime.now().toString(),
     };
     final id = await dbHelper.insert(row);
-    //  print('inserted row id: $id');
+      print('inserted row id: $id');
     return id;
   }
 
@@ -1649,13 +1641,14 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                     if (mounted) {
                       if (value != null) {
                         if (value.status == "successfull") {
-                          fcmapicall('\u200d🧾 ' + name, widget.recentchatuserdetails.fcm_token, value.body.source, '', 'basic_channel', '');
+                          var textid=  DateTime.now().millisecondsSinceEpoch.toString();
+                          fcmapicall('\u200d🧾 ' + name, widget.recentchatuserdetails.fcm_token, value.body.source, '', 'basic_channel', '',textid);
                           setState(() {
                             if (name != "") {
-                              AgoraRtmMessage message = AgoraRtmMessage.fromText("doc" + "#@####@#noreplay#@####@#" + value.body.source + "#@#&" + name + "#@####@#" + DateTime.now().toString());
+                              AgoraRtmMessage message = AgoraRtmMessage.fromText("doc" + "#@####@#noreplay#@####@#" + value.body.source + "#@#&" + name + "#@####@#" + DateTime.now().toString()+ "#@####@#" +textid);
                               widget.client.sendMessageToPeer(joiner != "" ? joiner : widget.rtmpeerid,message,true,false);
                             } else {
-                              AgoraRtmMessage message = AgoraRtmMessage.fromText("#@####@#noreplay#@####@#" + value.body.source + "#@####@#" + datetime);
+                              AgoraRtmMessage message = AgoraRtmMessage.fromText("#@####@#noreplay#@####@#" + value.body.source + "#@####@#" + datetime+ "#@####@#" +textid);
                               widget.client.sendMessageToPeer(joiner != "" ? joiner : widget.rtmpeerid, message, true, false);
                             }
                             if(joiner=='image') {
@@ -1700,7 +1693,8 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                     if (mounted) {
                       if (value != null) {
                         if (value.status == "successfull") {
-                          fcmapicall(files.name, widget.recentchatuserdetails.fcm_token, value.body.source, '', 'basic_channel', '');
+                        var textid=  DateTime.now().millisecondsSinceEpoch.toString();
+                          fcmapicall(files.name, widget.recentchatuserdetails.fcm_token, value.body.source, '', 'basic_channel', '',textid);
 
                           setState(() {
                             if (replytex != "") {
@@ -1715,7 +1709,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                             print("uplordsucess");
                             loading = false;
                             uplordstatus = 0;
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText("video#@####@#noreplay#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString());
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText("video#@####@#noreplay#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
                             widget.client.sendMessageToPeer(widget.rtmpeerid, message, true, false);
                             updatelocaldata(widget.rtmpeerid);
                           });
@@ -1868,11 +1862,11 @@ class _Chat_ScreenState extends State<Chat_Screen> {
   }
 
   void fcmapicall(
-      String msg, String fcmtoken, image, call_id, type, profileimage) {
+      String msg, String fcmtoken, image, call_id, type, profileimage,textid) {
     Helper.checkConnectivity().then((value) => {
           if (value)
             {
-              ApiRepository().fcmnotifiction(msg, Logindata.name, fcmtoken, image, call_id, type, Logindata.authToken, profileimage,DateTime.now().toString(),userpeerid,widget.recentchatuserdetails.peerId).then((value) async {})
+              ApiRepository().fcmnotifiction(msg, Logindata.name, fcmtoken, image, call_id, type, Logindata.authToken, profileimage,DateTime.now().toString(),userpeerid,widget.recentchatuserdetails.peerId,textid).then((value) async {})
             }
           else
             {Helper.showNoConnectivityDialog(context)}
@@ -1903,7 +1897,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         StringConstant.chatscreen, "chatscreen");
   }
 
-  void videocallapi(String name, String id, String calltype) {
+  void videocallapi(String name, String id, String calltype,textid) {
     ApiRepository().videocallapi(name, id, Logindata.authToken).then((value) {
       EasyLoading.dismiss();
       if (value != null) {
@@ -1914,7 +1908,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
               '',
               value.body.callId,
               'call_channel',
-              widget.recentchatuserdetails.profile_image);
+              widget.recentchatuserdetails.profile_image,textid);
           _callinsert(value.body.calleeName, calltype, 'Dilled_Call');
           if (calltype == 'video') {
             Navigator.of(context).push(
@@ -2325,7 +2319,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
           "#@####@#" +
           joiner.peerId);
       fcmapicall(
-          forwordedmessage, joiner.fcm_token, '', '', 'basic_channel', '');
+          forwordedmessage, joiner.fcm_token, '', '', 'basic_channel', '',"");
       updatelocaldata(widget.rtmpeerid);
     }
   }
@@ -2335,7 +2329,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
    // print("partslength" + parts.length.toString());
     if ((onlinestatus == "Online" ) || parts[8] == "delivered")  {
       processedvalue.add(logindex);
-      if( id!="" ) {
+      if( id!="" /*|| id !="Instance of 'Future<dynamic>'"*/) {
         var val = dbHelper.updatedeliverystatus(msg, int.parse(id), "delivered");
       //  widget.logController.value = [...widget.logController.value, parts];
       } return Icon(

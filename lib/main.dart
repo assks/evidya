@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:evidya/utils/AppErrorWidget.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:awesome_notifications/android_foreground_service.dart';
@@ -19,6 +20,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_downloader/image_downloader.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:sizer/sizer.dart';
@@ -33,8 +35,18 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   var type = message.data['type'];
   if (type == 'basic_channel') {
       LocalNotificationService.showNotification(message);
-  // insert(receivedAction.payload['username'], 'video', 'Missed_Call');
-     insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid']);
+
+
+      if (message.data['image']!="") {
+        await downlordimage("" + "#@####@#replay#@####@#"+message.data['image'], message.data['senderpeerid'],"", 'image',
+            message.data['datetime'], message.data['receiverpeerid'],
+            message.data['textid']);
+      }
+      else{
+        insert(message.data['body'], message.data['senderpeerid'], 'text',
+            message.data['datetime'], message.data['receiverpeerid'],
+            message.data['textid']);
+      }
    } else if (type == 'call_channel') {
     print('listen a background and not terminated message123 ${message.data}');
    // LocalNotificationService.showCallNotification(message.data);
@@ -55,24 +67,38 @@ Future<void> backgroundHandler(RemoteMessage message) async {
     }
   }
 }
+Future<void> downlordimage(String file, String peerid, group, groupname,time,textid,receiverpeerid) async {
+  try {
+      dynamic parts = file.split('#@####@#');
+      var imageId = await ImageDownloader.downloadImage(parts[2]);
+      if (imageId == null) {
+        return;
+      }
+      var path = await ImageDownloader.findPath(imageId);
+      insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time,receiverpeerid,textid);
+  } on PlatformException catch (error) {
+    print(error);
+  }
+}
 
-void insert(String _peerMessage, String senderpeerid, String type,time,receiverpeerid) async {
+
+void insert(String _peerMessage, String senderpeerid, String type,time,receiverpeerid,textid) async {
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.Id: null,
       DatabaseHelper.message: _peerMessage,
-      DatabaseHelper.timestamp: time,
+      DatabaseHelper.timestamp: time.substring(0, 16),
       DatabaseHelper.diraction: 'Receive',
       DatabaseHelper.type: type,
       DatabaseHelper.reply: 'Receive',
-      DatabaseHelper.from: "",
-      DatabaseHelper.to: senderpeerid,
-      DatabaseHelper.deliveryStatus: "Undelivered",
-      DatabaseHelper.TextId:time
+      DatabaseHelper.from: senderpeerid,
+      DatabaseHelper.to: receiverpeerid,
+      DatabaseHelper.deliveryStatus:"Undelivered",
+      DatabaseHelper.textId:textid
     };
     final dbHelper = DatabaseHelper.instance;
     final id = await dbHelper.insert(row);
-    print('inserted row id: $id');
+    print('main inserted  row id: $id');
   }
 
 
@@ -301,7 +327,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
     {
       if (value)
         {
-          ApiRepository().fcmnotifiction(msg, 'Prashant', fcmtoken, image, callId, type, "YnM4cS5SKywCKuAPCKsp8:APA91bEEe51mZfYEX7dMqt-uUgpel4Qbahse2NPFqN1VG3p0SMHxeEKpfrQIj9HLtRqAChV2M8_-I...","users/yS9WcV3LjdpGSKpkcsdw0npvVmTw2lH5TdJk4t6D.jpeg","","senderpeerid","receiverpeerid").then((value)  {
+          ApiRepository().fcmnotifiction(msg, 'Prashant', fcmtoken, image, callId, type, "YnM4cS5SKywCKuAPCKsp8:APA91bEEe51mZfYEX7dMqt-uUgpel4Qbahse2NPFqN1VG3p0SMHxeEKpfrQIj9HLtRqAChV2M8_-I...","users/yS9WcV3LjdpGSKpkcsdw0npvVmTw2lH5TdJk4t6D.jpeg","","senderpeerid","receiverpeerid","textid").then((value)  {
 
           })
         }
@@ -336,7 +362,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         print("FirebaseMessaging.instance.getInitialMessage");
         if (message.data['type'] == 'basic_channel') {
           LocalNotificationService.showNotification(message);
-          insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid']);
+          insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
 
           // PreferenceConnector.getJsonToSharedPreferenceechatscreen(StringConstant.chatscreen).then((value) => {
           //   if (value == null){
@@ -361,9 +387,11 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         //SharedPreferences prefs = await SharedPreferences.getInstance();
        // var chatUserName = prefs.getString('chatUserName') ?? "";
        // print("Chat User Name $chatUserName");
-        print('listen a forground message ${message.data}');
+
+            print('listen a forground message ${message.data}');
         var type = message.data['type'];
         if (type == 'basic_channel') {
+          insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
           LocalNotificationService.showNotification(message);
         }
         else
@@ -387,6 +415,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         print('listen a background and not terminated message ${message.data}');
         if (message.data != null) {
           if (message.data['type'] == 'basic_channel') {
+            insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
+
             LocalNotificationService.showNotification(message);
           } else if (message.data['type'] == 'call_channel') {
             //Vibrate.vibrate();

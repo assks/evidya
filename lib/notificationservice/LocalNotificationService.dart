@@ -18,6 +18,9 @@ class LocalNotificationService{
 
   static int _messageIncrement = 0;
   static Future<void> showNotification(dynamic message) async {
+
+    dynamic name = message.data['body'].split('#@####@#');
+   // print(name[1]);
     _messageIncrement++;
     if(message.data['image']!="") {
       AwesomeNotifications().createNotification(
@@ -25,7 +28,7 @@ class LocalNotificationService{
             id: int.parse(message.from.substring(message.from.length - 3)),
             channelKey: 'basic_channel',
             title: message.data['title']+"      "+_messageIncrement.toString(),
-            body: message.data['body'],
+            body: "image" /*?? message.data['body']*/,
             wakeUpScreen: true,
             fullScreenIntent: false,
             bigPicture: message.data['image'],
@@ -41,7 +44,7 @@ class LocalNotificationService{
           id: int.parse(message.from.substring(message.from.length - 3)),
           channelKey: 'basic_channel',
           title: message.data['title']+"      "+_messageIncrement.toString(),
-          body: message.data['body'],
+          body: name[2] /*?? message.data['body']*/,
             fullScreenIntent: false,
           wakeUpScreen: true,
           payload: {

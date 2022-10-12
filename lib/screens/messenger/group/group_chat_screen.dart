@@ -1903,7 +1903,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
             {
               ApiRepository()
                   .fcmnotifiction(msg, widget.recentchatuserdetails.groupName,
-                      fcmtoken, image, call_id, type, Logindata.authToken,'',DateTime.now().toString(),userpeerid,"")
+                      fcmtoken, image, call_id, type, Logindata.authToken,'',DateTime.now().toString(),userpeerid,"","")
                   .then((value) async {})
             }
           else

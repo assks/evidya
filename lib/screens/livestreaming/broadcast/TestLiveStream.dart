@@ -13,7 +13,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pip_view/pip_view.dart';
 import 'package:sizer/sizer.dart';
@@ -504,7 +503,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
             call_id,
             type,
               widget.devicefcmtoken,
-              widget.userprofileimage,"","senderpeerid","receiverpeerid"
+              widget.userprofileimage,"","senderpeerid","receiverpeerid","textid"
               ).then((value) async {
           })
         }

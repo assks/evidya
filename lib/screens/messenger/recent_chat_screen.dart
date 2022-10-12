@@ -733,8 +733,7 @@ class _RecentChatState extends State<RecentChat> {
       DatabaseHelper.transitallowed: users.transit_allowed
     };
 
-    final transitAllowed =
-        await dbHelper.updatedstatus(users.peerId, users.transit_allowed);
+    final transitAllowed = await dbHelper.updatedstatus(users.peerId, users.transit_allowed);
     if (transitAllowed != users.transit_allowed) {
       final id = await dbHelper.update_transit_allowed(
           users.peerId, users.transit_allowed);

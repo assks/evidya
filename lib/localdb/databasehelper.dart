@@ -16,6 +16,7 @@ class DatabaseHelper {
   static const recentgrouplist = 'recentgrouplist';
   static const calllist = 'calllist';
   static const deliveryStatus = 'deliveryStatus';
+  static const textId ='textid';
   static const Id = 'id';
   static const message = 'message';
   static const reply = 'reply';
@@ -33,7 +34,7 @@ class DatabaseHelper {
   static const calleeName = 'calleeName';
   static const Calldrm = 'Calldrm';
   static const calltype = 'calltype';
-  static const TextId ='textid';
+
   ///Recent list
   static const userid = 'userid';
   static const name = 'NAME';
@@ -59,8 +60,9 @@ class DatabaseHelper {
 
   // this opens the database (and creates it if it doesn't exist)
   _initDatabase() async {
-    Directory documentsDirectory = await getApplicationDocumentsDirectory();
-    String path = join(documentsDirectory.path, _databaseName);
+    /*Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, _databaseName);*/
+    String path = join(await getDatabasesPath(), _databaseName);
     return await openDatabase(path,
         version: _databaseVersion, onCreate: _onCreate);
   }
@@ -78,7 +80,7 @@ class DatabaseHelper {
             $reply TEXT NOT NULL,
             $type TEXT NOT NULL,
             $deliveryStatus TEXT NOT NULL,
-            $TextId TEXT NOT NULL
+            $textId TEXT NOT NULL
           );
           ''');
     await db.execute('''
@@ -142,6 +144,7 @@ class DatabaseHelper {
     return await db.insert(table, row);
   }
 
+
   Future<int> groupinsert(Map<String, dynamic> row) async {
     Database db = await instance.database;
     return await db.insert(grouptable, row);
@@ -172,6 +175,11 @@ class DatabaseHelper {
   Future<int> updatedstatus(userpeerid,status,) async {
     var dbclient = await instance.database;
     int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $blockstatus = '$status' AND $peerid = $userpeerid" ));
+    return count;
+  }
+  Future<int> is_message_exists(textid) async {
+    var dbclient = await instance.database;
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) FROM $table WHERE $textId = '$textid'" ));
     return count;
   }
   Future<int> updated_transit_allowed(userpeerid,transit,) async {

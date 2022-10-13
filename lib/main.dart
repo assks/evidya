@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:evidya/utils/AppErrorWidget.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
@@ -21,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_downloader/image_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:sizer/sizer.dart';
@@ -35,12 +38,19 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   var type = message.data['type'];
   if (type == 'basic_channel') {
       LocalNotificationService.showNotification(message);
-
-
       if (message.data['image']!="") {
-        await downlordimage("" + "#@####@#replay#@####@#"+message.data['image'], message.data['senderpeerid'],"", 'image',
-            message.data['datetime'], message.data['receiverpeerid'],
-            message.data['textid']);
+        var url_length= message.data['image'].length;
+        var  type=  message.data['image'].toString().substring(url_length-3,url_length);
+        if(type!="pdf"||type!="mp4") {
+          await downlordimage(
+              "" + "#@####@#replay#@####@#" + message.data['image'],
+              message.data['senderpeerid'],
+              "",
+              'image',
+              message.data['datetime'],
+              message.data['receiverpeerid'],
+              message.data['textid']);
+        }
       }
       else{
         insert(message.data['body'], message.data['senderpeerid'], 'text',
@@ -49,12 +59,12 @@ Future<void> backgroundHandler(RemoteMessage message) async {
       }
    } else if (type == 'call_channel') {
     print('listen a background and not terminated message123 ${message.data}');
-   // LocalNotificationService.showCallNotification(message.data);
+
     LocalNotificationService.callkitNotification(message);
-   // LocalNotificationService.misscallkitNotification(message);
+
   } else if (type == 'cut') {
     await FlutterCallkitIncoming.endAllCalls();
-   // await prefs.setInt('counter', 10);
+
     SharedPreferencesAndroid.registerWith();{
       final prefs = await SharedPreferences.getInstance();
       PreferenceConnector().setcall("callscreen");
@@ -67,6 +77,24 @@ Future<void> backgroundHandler(RemoteMessage message) async {
     }
   }
 }
+Future<void> downlordpdf(String pdfurl, String peerid, group,time,textid) async {
+  try {
+    dynamic pdffilepath = pdfurl.split('#@#&');
+    var name = pdffilepath[1];
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File('${directory.path}/$name');
+   /* if (await file.exists()) {
+      return file.path;
+    }*/
+    final response = await http.get(Uri.parse(pdffilepath[0]));
+    await file.writeAsBytes(response.bodyBytes);
+    var filepath= file.path;
+    insert("" + "#@####@#noreplay#@####@#" + filepath.toString()+"#@#&"+name, peerid, 'doc',time,"",textid);
+  } on PlatformException catch (error) {
+    print(error);
+  }
+}
+
 Future<void> downlordimage(String file, String peerid, group, groupname,time,textid,receiverpeerid) async {
   try {
       dynamic parts = file.split('#@####@#');
@@ -362,7 +390,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         print("FirebaseMessaging.instance.getInitialMessage");
         if (message.data['type'] == 'basic_channel') {
           LocalNotificationService.showNotification(message);
-          insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
+          downlord(message);
+         // insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
 
           // PreferenceConnector.getJsonToSharedPreferenceechatscreen(StringConstant.chatscreen).then((value) => {
           //   if (value == null){
@@ -391,7 +420,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
             print('listen a forground message ${message.data}');
         var type = message.data['type'];
         if (type == 'basic_channel') {
-          insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
+          downlord(message);
+          //insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
           LocalNotificationService.showNotification(message);
         }
         else
@@ -415,7 +445,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         print('listen a background and not terminated message ${message.data}');
         if (message.data != null) {
           if (message.data['type'] == 'basic_channel') {
-            insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
+            downlord(message);
+
+           // insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
 
             LocalNotificationService.showNotification(message);
           } else if (message.data['type'] == 'call_channel') {
@@ -464,6 +496,29 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
     setState(() {
       _newLocaleDelegate = AppTranslationsDelegate(newLocale: locale);
     });
+  }
+
+  void downlord(RemoteMessage message) async{
+    if (message.data['image']!="") {
+      var url_length= message.data['image'].length;
+  var  type=  message.data['image'].toString().substring(url_length-3,url_length);
+  if(type!="pdf"||type!="mp4") {
+    await downlordimage(
+      "" + "#@####@#replay#@####@#" + message.data['image'],
+      message.data['senderpeerid'],
+      "",
+      'image',
+      message.data['datetime'],
+      message.data['textid'],
+      message.data['receiverpeerid'],
+    );
+  }
+    }
+    else{
+      insert(message.data['body'], message.data['senderpeerid'], 'text',
+          message.data['datetime'],
+          message.data['receiverpeerid'],message.data['textid'],);
+    }
   }
 
 }

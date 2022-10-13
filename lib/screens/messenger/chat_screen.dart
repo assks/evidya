@@ -389,13 +389,18 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                           ValueListenableBuilder(
                             valueListenable: widget.logController,
                             builder: (context, log, wdgt) {
-                              if (log.length >= length) {
+                              if (log.length >
+
+
+
+                               length) {
                                 print("log098"+log.length.toString()+">=$length");
                                 _scrollDown(log.length);
                                 if(length==0){
                                  length=log.length;
+                                }else if(length!=log.length){
+                                  length++;
                                 }
-                                length++;
                               }
                               return Expanded(
                                 child: ListView.separated(
@@ -1652,13 +1657,9 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                             }
                             if(joiner=='image') {
                               if (replytex != "") {
-                                _insert(replytex + "#@####@#replay#@####@#" +
-                                    image.path, 'image', 'send', widget
-                                    .rtmpeerid.toString());
+                                _insert(replytex + "#@####@#replay#@####@#" + image.path, 'image', 'send', widget.rtmpeerid.toString());
                               } else {
-                                _insert(replytex + "#@####@#noreplay#@####@#" +
-                                    image.path, 'image', 'send', widget
-                                    .rtmpeerid.toString());
+                                _insert(replytex + "#@####@#noreplay#@####@#" + image.path, 'image', 'send', widget.rtmpeerid.toString());
                               }
                             }
                             loading = false;
@@ -1860,8 +1861,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         : Text(replytex, style: TextStyle(fontSize: 14.0, color: Colors.black));
   }
 
-  void fcmapicall(
-      String msg, String fcmtoken, image, call_id, type, profileimage,textid) {
+  void fcmapicall ( String msg, String fcmtoken, image, call_id, type, profileimage,textid) {
     Helper.checkConnectivity().then((value) => {
           if (value)
             {

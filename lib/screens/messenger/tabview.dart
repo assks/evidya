@@ -186,20 +186,20 @@ class _messengertabState extends State<messengertab>
     }
   }
 
-  Future<void> downlordpdf(String pdfurl, String peerid, group,time) async {
+  Future<void> downlordpdf(String pdfurl, String peerid, group,time,textid) async {
     try {
      dynamic pdffilepath = pdfurl.split('#@#&');
      var name = pdffilepath[1];
       final directory = await getApplicationDocumentsDirectory();
       final file = File('${directory.path}/$name');
-      if (await file.exists()) {
+      /*if (await file.exists()) {
         return file.path;
-      }
+      }*/
       final response = await http.get(Uri.parse(pdffilepath[0]));
       await file.writeAsBytes(response.bodyBytes);
      var filepath= file.path;
       logController.addLog("#@####@#noreplay#@####@#" +filepath.toString()+"#@#&"+name + '#@####@#Receive' + '#@####@#doc' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerid+'#@####@#');
-      _insert("" + "#@####@#noreplay#@####@#" + filepath.toString()+"#@#&"+name, peerid, 'doc',time,"");
+      _insert("" + "#@####@#noreplay#@####@#" + filepath.toString()+"#@#&"+name, peerid, 'doc',time,textid);
     } on PlatformException catch (error) {
       print(error);
     }
@@ -234,7 +234,7 @@ class _messengertabState extends State<messengertab>
             messagelog.addLog(peerId+'#@#&'+time);
             try{
               if(parts[0]=="doc"){
-                await downlordpdf(parts[2], peerId, "single",time);
+                await downlordpdf(parts[2], peerId, "single",time,parts[4]);
               }else if(parts[0]=="video"){
                 dynamic video = parts[2].split('#@#&');
                 var file = "" + "#@####@#noreplay#@####@#" + video[0] + "#@#&" + video[1] + '#@####@#Receive' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + peerId+"#@####@#"+"new";

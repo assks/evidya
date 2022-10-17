@@ -28,7 +28,7 @@ class LocalNotificationService{
             id: int.parse(message.from.substring(message.from.length - 3)),
             channelKey: 'basic_channel',
             title: message.data['title']+"      "+_messageIncrement.toString(),
-            body: "image" /*?? message.data['body']*/,
+            body:  message.data['body'],
             wakeUpScreen: true,
             fullScreenIntent: false,
             bigPicture: message.data['image'],

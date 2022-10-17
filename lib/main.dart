@@ -57,17 +57,22 @@ Future<void> backgroundHandler(RemoteMessage message) async {
 
   } else if (type == 'cut') {
     await FlutterCallkitIncoming.endAllCalls();
+    callcutSpref();
 
-    SharedPreferencesAndroid.registerWith();{
-      final prefs = await SharedPreferences.getInstance();
-      PreferenceConnector().setcall("callscreen");
-      await prefs.setInt('audiocall', 20);
-    }
-    SharedPreferencesAndroid.registerWith();{
-      final prefs = await SharedPreferences.getInstance();
-      PreferenceConnector().setvideocall("videocall");
-      await prefs.setInt('counter', 10);
-    }
+
+  }
+}
+
+void callcutSpref() async {
+  SharedPreferencesAndroid.registerWith();{
+    final prefs = await SharedPreferences.getInstance();
+    PreferenceConnector().setcall("callscreen");
+    await prefs.setInt('audiocall', 20);
+  }
+  SharedPreferencesAndroid.registerWith();{
+    final prefs = await SharedPreferences.getInstance();
+    PreferenceConnector().setvideocall("videocall");
+    await prefs.setInt('counter', 10);
   }
 }
 Future<void> downlordpdf(String pdfurl, String peerid, group,time,textid) async {
@@ -397,8 +402,8 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           LocalNotificationService.callkitNotification(message);
         //  LocalNotificationService.misscallkitNotification(message);
         } else if (message.data['type'] == 'cut') {
+          callcutSpref();
           await FlutterCallkitIncoming.endAllCalls();
-          PreferenceConnector().setcall("callscreen");
         }
       },
     );
@@ -421,13 +426,12 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           if (type == 'call_channel') {
             Vibrate.vibrate();
             LocalNotificationService.callkitNotification(message);
-          //  LocalNotificationService.misscallkitNotification(message);
-        //  LocalNotificationService.showCallNotification(message.data);
         }
           else
             if (type == 'cut') {
               await FlutterCallkitIncoming.endAllCalls();
-              PreferenceConnector().setcall("callscreen");
+              callcutSpref();
+
         }
       },
     );
@@ -450,7 +454,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           //  LocalNotificationService.misscallkitNotification(message);
           } else if (message.data['type'] == 'cut') {
             await FlutterCallkitIncoming.endAllCalls();
-            PreferenceConnector().setcall("callscreen");
+
+            callcutSpref();
+
           }
         }
       },

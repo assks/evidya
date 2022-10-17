@@ -17,11 +17,18 @@ class Msgvideoplayer extends StatefulWidget {
 class _MsgvideoplayerState extends State<Msgvideoplayer> {
   FlickManager flickManager;
   dynamic uri;
+  var name;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
      uri = widget.videourl.split('#@#&');
+     if(uri.length==1){
+       dynamic part = widget.videourl.split('/');
+       name = part[part.length-1];
+     }else {
+       name = uri[1];
+     }
     flickManager = FlickManager(videoPlayerController: VideoPlayerController.contentUri(Uri.parse(uri[0])));
     flickManager.flickVideoManager.addListener(_videoPlayingListener);
     const FlickTotalDuration(color: Colors.lightBlueAccent);
@@ -54,7 +61,7 @@ class _MsgvideoplayerState extends State<Msgvideoplayer> {
               },
             ),
           ),
-          centerTitle: true,title: Text(uri[1])),
+          centerTitle: true,title: Text(name)),
       body: FlickVideoPlayer(
           flickManager: flickManager,
           preferredDeviceOrientation: [

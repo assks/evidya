@@ -298,6 +298,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                               Row(
                                 children: [
                                   InkWell(
+                                  customBorder: const CircleBorder(),
                                     child: CircleAvatar(
                                       backgroundColor: Colors.white,
                                       radius: 2.2.h,
@@ -329,8 +330,10 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                     },
                                   ),
                                   const SizedBox(width: 10),
+
                                   InkWell(
-                                    child: CircleAvatar(
+                                    customBorder: const CircleBorder(),
+                                  child: CircleAvatar(
                                       backgroundColor: Colors.white,
                                       radius: 2.2.h,
                                       child: Image.asset(
@@ -448,58 +451,37 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                         ),
                                                       const SizedBox(width: 10),
                                                       Container(
-                                                        constraints:
+                                                        /*constraints:
                                                             BoxConstraints(
                                                                 minWidth: 30.w,
-                                                                maxWidth: 60.w),
+                                                                maxWidth: 60.w),*/
                                                         padding:
                                                             const EdgeInsets
                                                                 .all(0),
                                                         decoration: parts[3] !=
                                                                 'send'
                                                             ? const BoxDecoration(
-                                                                color: Colors
-                                                                    .black12,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          10),
+                                                                color: Colors.black12,
+                                                                borderRadius: BorderRadius.only(
+                                                                  topRight: Radius.circular(10),
+                                                                  bottomLeft: Radius.circular(10),
+                                                                  bottomRight: Radius.circular(10),
                                                                 ))
                                                             : const BoxDecoration(
-                                                                gradient:
-                                                                    LinearGradient(
-                                                                  begin: Alignment
-                                                                      .topCenter,
-                                                                  end: Alignment
-                                                                      .bottomCenter,
+                                                                gradient: LinearGradient(
+                                                                  begin: Alignment.topCenter,
+                                                                  end: Alignment.bottomCenter,
                                                                   colors: [
-                                                                    Color(
-                                                                        0xFF901133),
-                                                                    Color(
-                                                                        0xFF5c0e35),
+                                                                    Color(0xFF901133),
+                                                                    Color(0xFF5c0e35),
                                                                   ],
                                                                 ),
                                                                 borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                                  topLeft: Radius
-                                                                      .circular(
-                                                                          10),
+                                                                    BorderRadius.only(
+                                                                  topLeft: Radius.circular(10),
                                                                   //topRight: Radius.circular(10),
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          10),
+                                                                  bottomLeft: Radius.circular(10),
+                                                                  bottomRight: Radius.circular(10),
                                                                 ),
                                                               ),
                                                         child: GestureDetector(
@@ -507,15 +489,11 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                             _popupdialog(
                                                                 parts[4],
                                                                 parts[6],
-                                                                parts[2],
-                                                                i);
+                                                                parts[2],i);
                                                           },
                                                           onTap: () {
-                                                            if (parts[4] ==
-                                                                "doc") {
-                                                              Navigator.of(
-                                                                      context)
-                                                                  .push(
+                                                            if (parts[4] == "doc") {
+                                                              Navigator.of(context).push(
                                                                 MaterialPageRoute(
                                                                   builder: (context) =>
                                                                       Pdfviewer(
@@ -648,9 +626,12 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                                               const IntrinsicHeight(
                                                                                 child: Text("Video", style: TextStyle(color: Colors.yellow, fontStyle: FontStyle.normal, fontWeight: FontWeight.w500)),
                                                                               ),
-                                                                            Padding(
+                                                                            Container(
+                                                                              constraints: BoxConstraints(minWidth: 25.w, maxWidth: 60.w),
                                                                               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 5.0, bottom: 5),
-                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                                                                              child: Row(
+                                                                                mainAxisSize: MainAxisSize.min,
+                                                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
                                                                                 if (parts[4] == "video"||parts[4] == "doc") progressbar(log.length, log[i], i),
                                                                                 textdocview(parts),
                                                                               ]),
@@ -1487,9 +1468,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
       return;
     }
     if (widget.status!="active") {
-      EasyLoading.showToast("unblock a user first" ,
-          toastPosition: EasyLoadingToastPosition.center,
-          duration: const Duration(seconds: 5));
+      EasyLoading.showToast("unblock a user first" , toastPosition: EasyLoadingToastPosition.center, duration: const Duration(seconds: 5));
       return;
     }
     if (widget.recentchatuserdetails.transit_allowed=="No") {

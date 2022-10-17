@@ -250,8 +250,11 @@ class _messengertabState extends State<messengertab>
             if (type == "pdf") {
               logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#doc' + '#@####@#' + parts[4] + "#@####@#" + parts[3] + '#@####@#' + peerId+'#@####@#'+parts[3]);
               await downlordpdf( parts[1], peerId, "group",  parts[4],parts[3]);
-            } else if (type == "video") {
-
+            } else if (type == "mp4") {
+              logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#video' + '#@####@#' + parts[4] + "#@####@#" + parts[3] + '#@####@#' + peerId+'#@####@#'+parts[3]);
+              dynamic part = parts[1].split('/');
+             var name = part[part.length-1];
+              _insertgroup("group" + "#@####@#" +parts[1] + "#@#&" + name+"#@####@#"+"noreplay#@####@#"+parts[4], peerId, 'video', parts[3], parts[4]);
             } else {
               logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+parts[3]);
               downlordimage(shortmessage, peerId, "group", parts[3], "textid", parts[4]);

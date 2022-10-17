@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 textdocview(parts) {
   dynamic doclist = parts[2].split('#@#&');
@@ -9,7 +10,7 @@ textdocview(parts) {
   } else if (parts[4] == "text") {
     value = parts[2];
   }
-  return Expanded(
+  return Flexible(
     child: Text(
       value,
       style: TextStyle(

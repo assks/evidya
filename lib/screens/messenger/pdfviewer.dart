@@ -18,11 +18,19 @@ class Pdfviewer extends StatefulWidget {
 
 class _PdfviewerState extends State<Pdfviewer> {
   dynamic  pdffilepath=[];
+  dynamic name ="";
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
      pdffilepath = widget.pdfpath.split('#@#&');
+
+     if(pdffilepath.length==1){
+       dynamic part = widget.pdfpath.split('/');
+        name = part[part.length-1];
+     }else {
+      name = pdffilepath[1];
+     }
   }
 
   @override
@@ -39,7 +47,7 @@ class _PdfviewerState extends State<Pdfviewer> {
             },
           ),
         ),
-        centerTitle: true,title: Text(pdffilepath[1])),
+        centerTitle: true,title: Text(name)),
         body: PdfView(path: pdffilepath[0]));
   }
 }

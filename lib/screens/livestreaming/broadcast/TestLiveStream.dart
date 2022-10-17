@@ -172,7 +172,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
       await prefs.reload();
       var call = prefs.getString(StringConstant.videoscreen);
       final int counter = prefs.getInt('counter');
-      print("+bac123"+call);
+      // print("+bac123"+call);
       if (counter == 10){
         Navigator.pop(context);
       }

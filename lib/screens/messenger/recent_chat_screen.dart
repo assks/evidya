@@ -101,7 +101,7 @@ class _RecentChatState extends State<RecentChat> {
                     messagePeerId: widget.messageLog,
                     logController: widget.logController,
                     recentchatuserdetails: filterdUsers[index],
-                    //status: filterdnonUsers[index].status,
+                    status: filterdUsers[index].status,
                     userlist: filterdUsers,
                   )));
           break;

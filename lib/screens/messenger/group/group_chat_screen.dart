@@ -33,6 +33,9 @@ import 'package:video_player/video_player.dart';
 
 import '../../../model/GroupListModal.dart';
 import '../../livestreaming/broadcast/audiocallpage.dart';
+import '../fullscreenimage.dart';
+import '../msgvideoplayer.dart';
+import '../pdfviewer.dart';
 import 'group_profile.dart';
 
 class GroupChatScreen extends StatefulWidget {
@@ -371,6 +374,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                 itemBuilder: (context, i) {
                                   dynamic parts = log[i].split('#@####@#');
                                   if (parts[0] == 'group') {
+                                    print("pars$parts");
                                     if (parts[9] == widget.recentchatuserdetails.groupName) {
                                       if (parts.length > 0) {
                                         if (parts[4].trim() != null && parts[5] != 'image') {
@@ -447,20 +451,34 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                   bottomRight: Radius.circular(10),
                                                                 ),
                                                               ),
-                                                        child: InkWell(
-                                                          onTap: () {
-                                                            _askFavColor(
-                                                                parts[6],
-                                                                parts[1],
-                                                                i);
+                                                        child: GestureDetector(
+                                                          onLongPressUp: () {
+                                                            _askFavColor(parts[6], parts[1], i);
+                                                          },
+                                                          onTap: (){
+                                                            if (parts[5] == "doc") {
+                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Pdfviewer(pdfpath: parts[1])),);
+                                                            } else if (parts[5] == "video") {
+                                                              Navigator.of(context).push(
+                                                                MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      Msgvideoplayer(
+                                                                          videourl:
+                                                                          parts[1]),
+                                                                ),
+                                                              );
+                                                            } else if (parts[5] == "image") {
+                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[2]),),);
+                                                            }else if (parts[5] == "network"){
+                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[1]),),);
+
+                                                            }
                                                           },
                                                           child: Padding(
                                                               padding:
                                                                   const EdgeInsets
                                                                       .all(5.0),
-                                                              child: parts[
-                                                                              5] ==
-                                                                          "text" ||
+                                                              child: parts[5] == "text" ||
                                                                       parts[5] ==
                                                                           "doc" ||
                                                                       parts[5] ==
@@ -674,10 +692,12 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             alignment: (parts[4] != 'send'
                                                 ? Alignment.topLeft
                                                 : Alignment.topRight),
-                                            child: InkWell(
-                                              onTap: () {
-                                                _askFavColor(
-                                                    parts[6], parts[1], i);
+                                            child: GestureDetector(
+                                              onLongPressUp: () {
+                                                _askFavColor(parts[6], parts[1], i);
+                                              },
+                                              onTap: (){
+                                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image: parts[1])));
                                               },
                                               child: Padding(
                                                   padding:
@@ -819,10 +839,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                                   : CachedNetworkImage(
                                                                                       imageUrl: parts[1],
                                                                                       fit: BoxFit.cover,
-                                                                                      /*height: 40
-                                                                          .h,
-                                                                      width: 60
-                                                                          .w,*/
                                                                                       placeholder: (context, url) => LinearProgressIndicator(
                                                                                         minHeight: 20.sp,
                                                                                       ),
@@ -834,23 +850,15 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                             ],
                                                                           ),
                                                                           SizedBox(
-                                                                            width:
-                                                                                60.w,
-                                                                            child:
-                                                                                Align(
+                                                                            width: 60.w,
+                                                                            child: Align(
                                                                               alignment: Alignment.bottomRight,
                                                                               child: Row(
                                                                                 mainAxisAlignment: MainAxisAlignment.end,
                                                                                 crossAxisAlignment: CrossAxisAlignment.end,
                                                                                 children: [
-                                                                                  Text(
-                                                                                    DateFormat('hh:mm a').format(DateTime.parse(parts[6].trim())),
-                                                                                    style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
-                                                                                    textAlign: TextAlign.end,
-                                                                                  ),
-                                                                                  SizedBox(
-                                                                                    width: 1.w,
-                                                                                  ),
+                                                                                  Text(DateFormat('hh:mm a').format(DateTime.parse(parts[6].trim())), style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10), textAlign: TextAlign.end,),
+                                                                                  SizedBox(width: 1.w),
                                                                                 ],
                                                                               ),
                                                                             ),
@@ -858,18 +866,13 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                         ],
                                                                       ),
                                                                     )),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 10,
                                                       ),
                                                       if (parts[4] == 'send')
                                                         CircleAvatar(
-                                                          backgroundColor:
-                                                              Color(0xFF901133),
-                                                          child: Text(
-                                                              "${Logindata.name[0]}",
-                                                              style: TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
+                                                          backgroundColor: const Color(0xFF901133),
+                                                          child: Text("${Logindata.name[0]}", style: const TextStyle(color: Colors.white)),
                                                         ),
                                                     ],
                                                   )),
@@ -1386,48 +1389,14 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   _pickVideo() async {
-    FilePickerResult result = await FilePicker.platform
-        .pickFiles(type: FileType.custom, allowedExtensions: ['mp4']);
+    FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['mp4']);
     PlatformFile files = result.files.first;
     final file = XFile(files.path);
     videoAPI(file, files);
     if (replytex != "") {
-      var file = "group" "#@####@#" +
-          files.path +
-          "#@#&" +
-          files.name +
-          '#@####@#' +
-          replytex +
-          "#@####@#replay#@####@#" +
-          'send' +
-          '#@####@#video' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
+      var file = "group" "#@####@#" + files.path + "#@#&" + files.name + '#@####@#' + replytex + "#@####@#replay#@####@#" + 'send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;widget.logController.addLog(file);
     } else {
-      var file = "group" "#@####@#" +
-          files.path +
-          "#@#&" +
-          files.name +
-          '#@####@#' +
-          replytex +
-          "#@####@#noreplay#@####@#" +
-          'send' +
-          '#@####@#video' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
+      var file = "group" "#@####@#" + files.path + "#@#&" + files.name + '#@####@#' + replytex + "#@####@#noreplay#@####@#" + 'send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
     }
   }
@@ -1511,8 +1480,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         Helper.showMessage('catch_else');
       }
       setState(() {
-        _controller.animateTo(_controller.position.maxScrollExtent,
-            duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+        _controller.animateTo(_controller.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
         _peerMessage.clear();
         replytex = "";
         replyvisibility = false;
@@ -1525,19 +1493,14 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.Id: null,
-      DatabaseHelper.message: "group#@####@#" +
-          parts[2] +
-          "#@####@##@####@#" +
-          parts[1] +
-          "#@####@#",
+      DatabaseHelper.message: "group#@####@#" + parts[2] + "#@####@##@####@#" + parts[1] + "#@####@#",
       DatabaseHelper.timestamp: DateTime.now().toString(),
       DatabaseHelper.diraction: diraction,
       DatabaseHelper.reply: replytex,
       DatabaseHelper.type: type,
       DatabaseHelper.from: widget.rtmpeerid.toString(),
       DatabaseHelper.to: userpeerid.toString(),
-      DatabaseHelper.groupname:
-          widget.recentchatuserdetails.groupName.toString()
+      DatabaseHelper.groupname: widget.recentchatuserdetails.groupName.toString()
     };
     final id = await dbHelper.groupinsert(row);
     print('inserted row id: $id');
@@ -1602,13 +1565,12 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                               in widget.recentchatuserdetails.members) {
                             {
                               if (userpeerid != row.pid) {
-                                fcmapicall('Image', row.fcmToken,
-                                    value.body.source, '', 'basic_channel');
+                                fcmapicall(joiner, row.fcmToken, value.body.source, '', 'basic_channel');
                               }
                               print(row);
                             }
                           }
-                          fcmapicall('Image', widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel');
+                          fcmapicall(joiner, widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel');
                           AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
                           for (int i = 0; i < widget.membersList.length; i++) {
                             widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
@@ -1633,44 +1595,23 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                       if (value != null) {
                         if (value.status == "successfull") {
                           if (onlinestatus == 'offline') {
-                            fcmapicall(
-                                'Video',
-                                widget.recentchatuserdetails.groupAdmin,
-                                value.body.source,
-                                '',
-                                'basic_channel');
+                            fcmapicall(files.name, widget.recentchatuserdetails.groupAdmin, value.body.source, "", 'basic_channel');
                           }
-
-                          for (var row
-                              in widget.recentchatuserdetails.members) {
+                          for (var row in widget.recentchatuserdetails.members) {
                             {
                               if (userpeerid != row.pid) {
-                                fcmapicall(files.name, row.fcmToken,
-                                    value.body.source, '', 'basic_channel');
+                                fcmapicall(files.name, row.fcmToken, value.body.source, '', 'basic_channel');
                               }
                               print(row);
                             }
                           }
                           setState(() {
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText(
-                                value.body.source + DateTime.now().toString());
-                            for (int i = 0;
-                                i < widget.membersList.length;
-                                i++) {
-                              widget.client.sendMessageToPeer(
-                                  widget.membersList[i].pid,
-                                  message,
-                                  true,
-                                  false);
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+                           // AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#"+ value.body.source+ "#@####@#"+ DateTime.now().toString());
+                            for (int i = 0; i < widget.membersList.length; i++) {
+                              widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
                             }
-                            _insertgroup(
-                                replytex +
-                                    "#@####@#noreplay#@####@#" +
-                                    files.path +
-                                    "#@#&" +
-                                    files.name,
-                                'video',
-                                'send');
+                            _insertgroup(replytex + "#@####@#noreplay#@####@#" + files.path + "#@#&" + files.name, 'video', 'send');
                           });
                         } else {
                           Helper.showMessage("Unable to send ");

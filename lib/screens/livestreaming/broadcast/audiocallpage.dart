@@ -79,10 +79,9 @@ class _TestLiveStreamState extends State<AudioCallpage> {
   final _stopWatchTimer = StopWatchTimer(
     onChange: (value) {
       final displayTime = StopWatchTimer.getDisplayTime(value);
-      // print('displayTime $displayTime');
+
     },
-   // onChangeRawSecond: (value) => print('onChangeRawSecond $value'),
-   // onChangeRawMinute: (value) => print('onChangeRawMinute $value'),
+
   );
 
   @override
@@ -97,12 +96,6 @@ class _TestLiveStreamState extends State<AudioCallpage> {
     } else {
       callAPI(widget.userCallName, widget.userCallId);
     }
-
-    /*_timer= Timer.periodic(const Duration(seconds: 30), (timer) {
-      if (connectionstatus == "Calling") {
-        Navigator.pop(context);
-      }
-    });*/
   }
 
 
@@ -166,7 +159,6 @@ class _TestLiveStreamState extends State<AudioCallpage> {
     _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.reload();
-        var call = prefs.getString(StringConstant.callscreen);
       final int counter = prefs.getInt('audiocall');
       print(counter.toString()+"ffdii");
         if (counter == 20){

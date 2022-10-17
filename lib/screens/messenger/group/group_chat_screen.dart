@@ -8,6 +8,7 @@ import 'package:evidya/notificationservice/LocalNotificationService.dart';
 import 'package:evidya/screens/bottom_navigation/bottom_navigaction_bar.dart';
 import 'package:evidya/screens/messenger/sender_profile_page.dart';
 import 'package:evidya/sharedpref/preference_connector.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -107,27 +108,34 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   void queryRowCount() async {
-    await PreferenceConnector.getJsonToSharedPreferenceertmuserpeerid(
-            StringConstant.rtmuserpeerid)
+    await PreferenceConnector.getJsonToSharedPreferenceertmuserpeerid(StringConstant.rtmuserpeerid)
         .then((value) => {
               if (value != null)
                 {
-                  // setState(() {
                   userpeerid = value
-                  //  }),
                 }
             });
-    final allRows = await dbHelper.groupqueryRowCount(
-        widget.rtmpeerid.toString(),
-        userpeerid.toString(),
-        widget.recentchatuserdetails.groupName);
+    final allRows = await dbHelper.groupqueryRowCount(widget.rtmpeerid.toString(), userpeerid.toString(), widget.recentchatuserdetails.groupName);
     print('query all rows:$allRows');
     allRows.forEach((row) => {
-          //print(row["reply"] + row["message"] + "#@####@#" + row["diraction"] + "#@####@#" + row['type1'] + row["timestamp"] + "#@####@#" + row["id"].toString() + "#@####@#" + row["from1"].toString(),),
           if (row != null)
             {
-              widget.logController.addLog(row["message"] + row["diraction"] + "#@####@#" + row['type1'] + "#@####@#" + row["timestamp"] + "#@####@#" + row["id"].toString() + "#@####@#" + row["to1"]+ "#@####@#" + row["groupname"]),
-              setState(() { _controller.animateTo(_controller.position.maxScrollExtent, duration: const Duration(milliseconds: 300),curve: Curves.easeOut);
+              widget.logController.addLog(row["message"] +
+                  row["diraction"] +
+                  "#@####@#" +
+                  row['type1'] +
+                  "#@####@#" +
+                  row["timestamp"] +
+                  "#@####@#" +
+                  row["id"].toString() +
+                  "#@####@#" +
+                  row["to1"] +
+                  "#@####@#" +
+                  row["groupname"]),
+              setState(() {
+                _controller.animateTo(_controller.position.maxScrollExtent,
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOut);
               }),
             }
         });
@@ -146,7 +154,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
 
   @override
   void deactivate() {
-    widget.groupmessagelog.removegroupLog(widget.recentchatuserdetails.groupName);
+    widget.groupmessagelog
+        .removegroupLog(widget.recentchatuserdetails.groupName);
     // TODO: implement deactivate
     super.deactivate();
   }
@@ -170,7 +179,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                 child: Column(
                   children: [
                     Container(
-                        padding: EdgeInsets.symmetric(horizontal: 1.h, vertical: 1.h),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 1.h, vertical: 1.h),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -270,7 +280,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            widget.recentchatuserdetails.groupName,
+                                            widget.recentchatuserdetails
+                                                .groupName,
                                             style: TextStyle(
                                                 fontSize: 16.sp,
                                                 color: Colors.white,
@@ -295,15 +306,23 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                              GroupProfilePage(
-                                                  senderName: widget.recentchatuserdetails.groupName,
-                                                  groupmember: widget.recentchatuserdetails.members,
-                                                  groupimage: widget.recentchatuserdetails.image,
-                                                  groupid: widget.recentchatuserdetails.id,
-                                                  self:widget.self,
-                                                  groupadmin: widget.recentchatuserdetails.groupAdmin,
-                                                  logController: widget.logController)),
+                                          builder: (context) => GroupProfilePage(
+                                              senderName: widget
+                                                  .recentchatuserdetails
+                                                  .groupName,
+                                              groupmember: widget
+                                                  .recentchatuserdetails
+                                                  .members,
+                                              groupimage: widget
+                                                  .recentchatuserdetails.image,
+                                              groupid: widget
+                                                  .recentchatuserdetails.id,
+                                              self: widget.self,
+                                              groupadmin: widget
+                                                  .recentchatuserdetails
+                                                  .groupAdmin,
+                                              logController:
+                                                  widget.logController)),
                                     ).then((value) => setState(() {
                                           print("sdsd back");
                                         }));
@@ -332,7 +351,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                 children: <Widget>[
                   Expanded(
                       child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 1.h, vertical: 1.h),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 1.h, vertical: 1.h),
                     child: Column(
                       children: <Widget>[
                         ValueListenableBuilder(
@@ -351,365 +371,270 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                 itemBuilder: (context, i) {
                                   dynamic parts = log[i].split('#@####@#');
                                   if (parts[0] == 'group') {
-                                    if( parts[9]==widget.recentchatuserdetails.groupName) {
+                                    if (parts[9] == widget.recentchatuserdetails.groupName) {
                                       if (parts.length > 0) {
                                         if (parts[4].trim() != null && parts[5] != 'image') {
                                           return SwipeTo(
                                               child: Container(
-                                                  padding: const EdgeInsets.only(right: 0.0, left: 0.0, top: 0, bottom: 0),
-                                                  alignment: (parts[4] != 'send' ? Alignment.topLeft : Alignment.topRight),
-                                                  child: Row(crossAxisAlignment: CrossAxisAlignment.start,
-                                                    mainAxisAlignment: parts[4] != 'send' ? MainAxisAlignment.start : MainAxisAlignment.end,
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 0.0,
+                                                          left: 0.0,
+                                                          top: 0,
+                                                          bottom: 0),
+                                                  alignment: (parts[4] != 'send'
+                                                      ? Alignment.topLeft
+                                                      : Alignment.topRight),
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        parts[4] != 'send'
+                                                            ? MainAxisAlignment
+                                                                .start
+                                                            : MainAxisAlignment
+                                                                .end,
                                                     children: [
-                                                      if (parts[4] == 'Receive')usershort(parts[8]),
+                                                      if (parts[4] == 'Receive')
+                                                        usershort(parts[8]),
                                                       const SizedBox(width: 10),
                                                       Container(
                                                         constraints:
-                                                        BoxConstraints(
-                                                            minWidth: 30.w,
-                                                            maxWidth: 60.w),
+                                                            BoxConstraints(
+                                                                minWidth: 30.w,
+                                                                maxWidth: 60.w),
                                                         padding:
-                                                        const EdgeInsets.all(
-                                                            0),
-                                                        decoration: parts[4] != 'send'
+                                                            const EdgeInsets
+                                                                .all(0),
+                                                        decoration: parts[4] !=
+                                                                'send'
                                                             ? const BoxDecoration(
-                                                            color: Colors
-                                                                .black12,
-                                                            borderRadius:
-                                                            BorderRadius
-                                                                .only(
-                                                              //topLeft: Radius.circular(10),
-                                                              topRight: Radius
-                                                                  .circular(
-                                                                  10),
-                                                              bottomLeft: Radius
-                                                                  .circular(
-                                                                  10),
-                                                              bottomRight:
-                                                              Radius
-                                                                  .circular(
-                                                                  10),
-                                                            ))
+                                                                color: Colors
+                                                                    .black12,
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .only(
+                                                                  //topLeft: Radius.circular(10),
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomLeft: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                  bottomRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                ))
                                                             : const BoxDecoration(
-                                                          gradient:
-                                                          LinearGradient(
-                                                            begin: Alignment
-                                                                .topCenter,
-                                                            end: Alignment
-                                                                .bottomCenter,
-                                                            colors: [
-                                                              Color(
-                                                                  0xFF901133),
-                                                              Color(
-                                                                  0xFF5c0e35),
-                                                            ],
-                                                          ),
-                                                          borderRadius:
-                                                          BorderRadius
-                                                              .only(
-                                                            topLeft: Radius
-                                                                .circular(
-                                                                10),
-                                                            //topRight: Radius.circular(10),
-                                                            bottomLeft: Radius
-                                                                .circular(
-                                                                10),
-                                                            bottomRight:
-                                                            Radius
-                                                                .circular(
-                                                                10),
-                                                          ),
-                                                        ),
+                                                                gradient:
+                                                                    LinearGradient(
+                                                                  begin: Alignment
+                                                                      .topCenter,
+                                                                  end: Alignment
+                                                                      .bottomCenter,
+                                                                  colors: [
+                                                                    Color(
+                                                                        0xFF901133),
+                                                                    Color(
+                                                                        0xFF5c0e35),
+                                                                  ],
+                                                                ),
+                                                                borderRadius: BorderRadius.only(
+                                                                  topLeft: Radius.circular(10),
+
+                                                                  bottomLeft: Radius.circular(10),
+                                                                  bottomRight: Radius.circular(10),
+                                                                ),
+                                                              ),
                                                         child: InkWell(
                                                           onTap: () {
                                                             _askFavColor(
                                                                 parts[6],
-                                                                parts[1], i);
+                                                                parts[1],
+                                                                i);
                                                           },
                                                           child: Padding(
-                                                              padding: const EdgeInsets
-                                                                  .all(5.0),
-                                                              child: parts[5] ==
-                                                                  "text"
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5.0),
+                                                              child: parts[
+                                                                              5] ==
+                                                                          "text" ||
+                                                                      parts[5] ==
+                                                                          "doc" ||
+                                                                      parts[5] ==
+                                                                          "video"
                                                                   ? Stack(
-                                                                children: [
-                                                                  Column(
-                                                                    crossAxisAlignment:
-                                                                    CrossAxisAlignment
-                                                                        .start,
-                                                                    children: <
-                                                                        Widget>[
-                                                                      if (parts[4] ==
-                                                                          "Receive")
-                                                                        sendername(
-                                                                            parts[8],
-                                                                            parts[4]),
-                                                                      parts[3] ==
-                                                                          'replay'
-                                                                          ? Container(
-                                                                        margin: const EdgeInsets
-                                                                            .only(
-                                                                            left: 8.0,
-                                                                            right: 8.0,
-                                                                            top: 8.0),
-                                                                        decoration: BoxDecoration(
-                                                                            color: Colors
-                                                                                .white,
-                                                                            borderRadius: BorderRadius
-                                                                                .circular(
-                                                                                8.0)),
-                                                                        child: IntrinsicHeight(
-                                                                            child: Container(
-                                                                              decoration: BoxDecoration(
-                                                                                color: Color(
-                                                                                    0xFFf8ece8),
-                                                                                borderRadius: BorderRadius
-                                                                                    .circular(
-                                                                                    8.0),
-                                                                              ),
-                                                                              child: Row(
-                                                                                children: [
-                                                                                  Container(
-                                                                                    decoration: BoxDecoration(
-                                                                                      color: parts[4] !=
-                                                                                          'send'
-                                                                                          ? Color(
-                                                                                          0xFF800000)
-                                                                                          : Colors
-                                                                                          .white,
-                                                                                      borderRadius: const BorderRadius
-                                                                                          .only(
-                                                                                        bottomLeft: Radius
-                                                                                            .circular(
-                                                                                            30.0),
-                                                                                        topLeft: Radius
-                                                                                            .circular(
-                                                                                            30.0),
-                                                                                      ),
-                                                                                    ),
-                                                                                    width: 5.0,
-                                                                                  ),
-                                                                                  const SizedBox(
-                                                                                    height: 5,
-                                                                                  ),
-                                                                                  Expanded(
-                                                                                    child: Container(
-                                                                                        padding: const EdgeInsets
-                                                                                            .symmetric(
-                                                                                            vertical: 8,
-                                                                                            horizontal: 8),
-                                                                                        decoration: const BoxDecoration(
-                                                                                          color: Color(
-                                                                                              0xFFf8ece8),
-                                                                                          borderRadius: BorderRadius
-                                                                                              .only(
-                                                                                            bottomRight: Radius
-                                                                                                .circular(
-                                                                                                30.0),
-                                                                                            topRight: Radius
-                                                                                                .circular(
-                                                                                                30.0),
-                                                                                          ),
-                                                                                        ),
-                                                                                        child: Column(
-                                                                                          crossAxisAlignment: CrossAxisAlignment
-                                                                                              .start,
-                                                                                          children: [
-                                                                                            parts[4] !=
-                                                                                                'send'
-                                                                                                ? const Text(
-                                                                                              "You",
-                                                                                              style: TextStyle(
-                                                                                                fontSize: 14.0,
-                                                                                                fontWeight: FontWeight
-                                                                                                    .w600,
-                                                                                                color: Colors
-                                                                                                    .black,
-                                                                                              ),
-                                                                                            )
-                                                                                                : const Text(
-                                                                                              "replay",
-                                                                                              style: TextStyle(
-                                                                                                fontSize: 14.0,
-                                                                                                fontWeight: FontWeight
-                                                                                                    .w600,
-                                                                                                color: Colors
-                                                                                                    .black,),
-                                                                                            ),
-                                                                                            Text(
-                                                                                              parts[2] !=
-                                                                                                  ""
-                                                                                                  ? parts[2]
-                                                                                                  : parts[1],
-                                                                                              style: TextStyle(
-                                                                                                fontSize: 14.0,
-                                                                                                color: AppColors
-                                                                                                    .cardContainerColor,),
-                                                                                            )
-                                                                                          ],
-                                                                                        )),
-                                                                                  ),
-                                                                                ],
-                                                                              ),
-                                                                            )),
-                                                                      )
-                                                                          : Container(),
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            left: 8.0,
-                                                                            right: 8.0,
-                                                                            top: 5.0,
-                                                                            bottom: 5),
-                                                                        child: Row(
-                                                                            mainAxisAlignment: MainAxisAlignment
-                                                                                .spaceBetween,
-                                                                            crossAxisAlignment: CrossAxisAlignment
-                                                                                .end,
-                                                                            children: [
-                                                                              Expanded(
-                                                                                child: Text(
-                                                                                  parts[1]
-                                                                                      .trim(),
-                                                                                  style: TextStyle(
-                                                                                      color: parts[4] !=
-                                                                                          'send'
-                                                                                          ? Colors
-                                                                                          .black
-                                                                                          : Colors
-                                                                                          .white,
-                                                                                      fontSize: 16),
-                                                                                  textAlign: TextAlign
-                                                                                      .left,
-                                                                                ),
-                                                                              ),
-                                                                            ]),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                  Positioned(
-                                                                    bottom:
-                                                                    -3,
-                                                                    right:
-                                                                    1,
-                                                                    child:
-                                                                    Align(
-                                                                      alignment: Alignment
-                                                                          .bottomRight,
-                                                                      child: Row(
-                                                                        mainAxisAlignment: MainAxisAlignment
-                                                                            .end,
-                                                                        crossAxisAlignment: CrossAxisAlignment
-                                                                            .end,
-                                                                        children: [
-                                                                          Text(
-                                                                            DateFormat(
-                                                                                'hh:mm a')
-                                                                                .format(
-                                                                                DateTime
-                                                                                    .parse(
-                                                                                    parts[6]
-                                                                                        .trim())),
-                                                                            style: TextStyle(
-                                                                                color: parts[4] !=
-                                                                                    'send'
-                                                                                    ? Colors
-                                                                                    .black
-                                                                                    : Colors
-                                                                                    .white,
-                                                                                fontSize: 10),
-                                                                            textAlign: TextAlign
-                                                                                .end,
-                                                                          ),
-                                                                          SizedBox(
-                                                                            width: 1
-                                                                                .w,
-                                                                          ),
-                                                                          //  parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  )
-                                                                ],
-                                                              )
-                                                                  : Column(
-                                                                children: [
-                                                                  if (parts[5] ==
-                                                                      "image")
-                                                                    Image.file(
-                                                                        File(
-                                                                            parts[1]),
-                                                                        fit: BoxFit.cover,
-                                                                        errorBuilder: (
-                                                                            context,
-                                                                            url,
-                                                                            error) =>
-                                                                        const Icon(
-                                                                          Icons
-                                                                              .error,
-                                                                          size: 70,
-                                                                          color: Colors
-                                                                              .red,
-                                                                          semanticLabel: "image not found",
-                                                                        ))
-                                                                  else
-                                                                    if (parts[5] ==
-                                                                        "network")
-                                                                      CachedNetworkImage(
-                                                                        imageUrl: parts[1],
-                                                                        fit: BoxFit.cover,
-                                                                        /*height: 40.h,
-                                                                        width: 60.w,*/
-                                                                        placeholder: (
-                                                                            context,
-                                                                            url) =>
-                                                                            LinearProgressIndicator(
-                                                                              minHeight: 20
-                                                                                  .sp,
-                                                                            ),
-                                                                        errorWidget: (
-                                                                            context,
-                                                                            url,
-                                                                            error) =>
-                                                                        const Icon(
-                                                                          Icons
-                                                                              .error,
-                                                                          size: 50,
-                                                                        ),
-                                                                      ),
-                                                                  const SizedBox(
-                                                                      height: 10),
-                                                                  Row(
-                                                                      mainAxisAlignment: MainAxisAlignment
-                                                                          .end,
                                                                       children: [
-                                                                        Text(
-                                                                          DateFormat(
-                                                                              'hh:mm a')
-                                                                              .format(
-                                                                              DateTime
-                                                                                  .parse(
-                                                                                  parts[6]
-                                                                                      .trim())),
-                                                                          style: TextStyle(
-                                                                              color: parts[4] !=
-                                                                                  'send'
-                                                                                  ? Colors
-                                                                                  .black
-                                                                                  : Colors
-                                                                                  .white,
-                                                                              fontSize: 10),
-                                                                          textAlign: TextAlign
-                                                                              .right,
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: <
+                                                                              Widget>[
+                                                                            if (parts[4] ==
+                                                                                "Receive")
+                                                                              sendername(parts[8], parts[4]),
+                                                                            parts[3] == 'replay'
+                                                                                ? Container(
+                                                                                    margin: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
+                                                                                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.0)),
+                                                                                    child: IntrinsicHeight(
+                                                                                        child: Container(
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: Color(0xFFf8ece8),
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                      ),
+                                                                                      child: Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: parts[4] != 'send' ? Color(0xFF800000) : Colors.white,
+                                                                                              borderRadius: const BorderRadius.only(
+                                                                                                bottomLeft: Radius.circular(30.0),
+                                                                                                topLeft: Radius.circular(30.0),
+                                                                                              ),
+                                                                                            ),
+                                                                                            width: 5.0,
+                                                                                          ),
+                                                                                          const SizedBox(
+                                                                                            height: 5,
+                                                                                          ),
+                                                                                          Expanded(
+                                                                                            child: Container(
+                                                                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                decoration: const BoxDecoration(
+                                                                                                  color: Color(0xFFf8ece8),
+                                                                                                  borderRadius: BorderRadius.only(
+                                                                                                    bottomRight: Radius.circular(30.0),
+                                                                                                    topRight: Radius.circular(30.0),
+                                                                                                  ),
+                                                                                                ),
+                                                                                                child: Column(
+                                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  children: [
+                                                                                                    parts[4] != 'send'
+                                                                                                        ? const Text(
+                                                                                                            "You",
+                                                                                                            style: TextStyle(
+                                                                                                              fontSize: 14.0,
+                                                                                                              fontWeight: FontWeight.w600,
+                                                                                                              color: Colors.black,
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        : const Text(
+                                                                                                            "replay",
+                                                                                                            style: TextStyle(
+                                                                                                              fontSize: 14.0,
+                                                                                                              fontWeight: FontWeight.w600,
+                                                                                                              color: Colors.black,
+                                                                                                            ),
+                                                                                                          ),
+                                                                                                    Text(
+                                                                                                      parts[2] != "" ? parts[2] : parts[1],
+                                                                                                      style: TextStyle(
+                                                                                                        fontSize: 14.0,
+                                                                                                        color: AppColors.cardContainerColor,
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                )),
+                                                                                          ),
+                                                                                        ],
+                                                                                      ),
+                                                                                    )),
+                                                                                  )
+                                                                                : Container(),
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 5.0, bottom: 5),
+                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                                                                                Expanded(
+                                                                                  child: parts[2] == "noreplay" ? textwidget(parts[1], parts[5], parts[4],parts): parts[2] != ""  ? textwidget(parts[2], parts[5], parts[4],parts) : textwidget(parts[1], parts[5], parts[4],parts),
+                                                                                ),
+                                                                              ]),
+                                                                            )
+                                                                          ],
                                                                         ),
-                                                                        SizedBox(
-                                                                          width: 1
-                                                                              .w,
-                                                                        ),
-                                                                        // parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
-                                                                      ]),
-                                                                ],
-                                                              )),
+                                                                        Positioned(
+                                                                          bottom:
+                                                                              -3,
+                                                                          right:
+                                                                              1,
+                                                                          child:
+                                                                              Align(
+                                                                            alignment:
+                                                                                Alignment.bottomRight,
+                                                                            child:
+                                                                                Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.end,
+                                                                              crossAxisAlignment: CrossAxisAlignment.end,
+                                                                              children: [
+                                                                                Text(
+                                                                                  DateFormat('hh:mm a').format(DateTime.parse(parts[6]=="noreplay"?parts[3]:parts[6].trim())),
+                                                                                  style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                                  textAlign: TextAlign.end,
+                                                                                ),
+                                                                                SizedBox(
+                                                                                  width: 1.w,
+                                                                                ),
+                                                                                //  parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
+                                                                              ],
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      ],
+                                                                    )
+                                                                  : Column(
+                                                                      children: [
+                                                                        if (parts[5] ==
+                                                                            "image")
+                                                                          Image.file(
+                                                                              File(parts[1]),
+                                                                              fit: BoxFit.cover,
+                                                                              errorBuilder: (context, url, error) => const Icon(
+                                                                                    Icons.error,
+                                                                                    size: 70,
+                                                                                    color: Colors.red,
+                                                                                    semanticLabel: "image not found",
+                                                                                  ))
+                                                                        else if (parts[5] ==
+                                                                            "network")
+                                                                          CachedNetworkImage(
+                                                                            imageUrl:
+                                                                                parts[1],
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            /*height: 40.h,
+                                                                        width: 60.w,*/
+                                                                            placeholder: (context, url) =>
+                                                                                LinearProgressIndicator(
+                                                                              minHeight: 20.sp,
+                                                                            ),
+                                                                            errorWidget: (context, url, error) =>
+                                                                                const Icon(
+                                                                              Icons.error,
+                                                                              size: 50,
+                                                                            ),
+                                                                          ),
+                                                                        const SizedBox(
+                                                                            height:
+                                                                                10),
+                                                                        Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.end,
+                                                                            children: [
+                                                                              Text(
+                                                                                DateFormat('hh:mm a').format(DateTime.parse(parts[6]=="text"?parts[3]:parts[6].trim())),
+                                                                                style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                                textAlign: TextAlign.right,
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: 1.w,
+                                                                              ),
+                                                                              // parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
+                                                                            ]),
+                                                                      ],
+                                                                    )),
                                                         ),
                                                       ),
                                                       const SizedBox(
@@ -718,12 +643,10 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                       if (parts[4] == 'send')
                                                         CircleAvatar(
                                                           backgroundColor:
-                                                          Color(0xFF901133),
+                                                              Color(0xFF901133),
                                                           child: Text(
-                                                              "${Logindata
-                                                                  .name[0]}",
-                                                              style:
-                                                              const TextStyle(
+                                                              "${Logindata.name[0]}",
+                                                              style: const TextStyle(
                                                                   color: Colors
                                                                       .white)),
                                                         ),
@@ -737,9 +660,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                 setState(() {
                                                   replyvisibility = true;
                                                   replytex = parts[1];
-                                                  afile =
-                                                      fileExp.hasMatch(
-                                                          replytex);
+                                                  afile = fileExp.hasMatch(replytex);
                                                   print(afile);
                                                 });
                                               });
@@ -760,260 +681,192 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                               },
                                               child: Padding(
                                                   padding:
-                                                  const EdgeInsets.all(5.0),
+                                                      const EdgeInsets.all(5.0),
                                                   child: Row(
-                                                    crossAxisAlignment: CrossAxisAlignment
-                                                        .start,
-                                                    mainAxisAlignment: parts[4] !=
-                                                        'send'
-                                                        ? MainAxisAlignment
-                                                        .start
-                                                        : MainAxisAlignment.end,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    mainAxisAlignment:
+                                                        parts[4] != 'send'
+                                                            ? MainAxisAlignment
+                                                                .start
+                                                            : MainAxisAlignment
+                                                                .end,
                                                     children: [
                                                       if (parts[4] == 'Receive')
                                                         usershort(parts[8]),
                                                       const SizedBox(
-                                                        width: 10,),
+                                                        width: 10,
+                                                      ),
                                                       Expanded(
                                                           child:
-                                                          parts[4] == "text"
-                                                              ? Column(
-                                                            crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                            children: <
-                                                                Widget>[
-                                                              parts[1] ==
-                                                                  'replay'
-                                                                  ? Container(
-                                                                decoration: BoxDecoration(
-                                                                    color: Colors
-                                                                        .grey,
-                                                                    borderRadius: BorderRadius
-                                                                        .circular(
-                                                                        8.0)),
-                                                                child: Column(
-                                                                  children: [
-                                                                    IntrinsicHeight(
-                                                                      child: Row(
-                                                                        children: [
-                                                                          Container(
-                                                                            decoration: const BoxDecoration(
-                                                                              color: Colors
-                                                                                  .red,
-                                                                              borderRadius: BorderRadius
-                                                                                  .only(
-                                                                                bottomLeft: Radius
-                                                                                    .circular(
-                                                                                    30.0),
-                                                                                topLeft: Radius
-                                                                                    .circular(
-                                                                                    30.0),
-                                                                              ),
-                                                                            ),
-                                                                            width: 5.0,
-                                                                          ),
-                                                                          Expanded(
-                                                                            child: Padding(
-                                                                              padding: const EdgeInsets
-                                                                                  .all(
-                                                                                  7.0),
-                                                                              child: Container(
-                                                                                decoration: BoxDecoration(
-                                                                                  // color: Colors.grey,
-                                                                                  borderRadius: BorderRadius
-                                                                                      .circular(
-                                                                                      8.0),
-                                                                                ),
+                                                              parts[4] == "text"
+                                                                  ? Column(
+                                                                      crossAxisAlignment:
+                                                                          CrossAxisAlignment
+                                                                              .start,
+                                                                      children: <
+                                                                          Widget>[
+                                                                        parts[1] ==
+                                                                                'replay'
+                                                                            ? Container(
+                                                                                decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
                                                                                 child: Column(
-                                                                                  crossAxisAlignment: CrossAxisAlignment
-                                                                                      .start,
                                                                                   children: [
-                                                                                    const Text(
-                                                                                      "Reply",
-                                                                                      style: TextStyle(
-                                                                                        fontSize: 18.0,
-                                                                                        color: Colors
-                                                                                            .red,
+                                                                                    IntrinsicHeight(
+                                                                                      child: Row(
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            decoration: const BoxDecoration(
+                                                                                              color: Colors.red,
+                                                                                              borderRadius: BorderRadius.only(
+                                                                                                bottomLeft: Radius.circular(30.0),
+                                                                                                topLeft: Radius.circular(30.0),
+                                                                                              ),
+                                                                                            ),
+                                                                                            width: 5.0,
+                                                                                          ),
+                                                                                          Expanded(
+                                                                                            child: Padding(
+                                                                                              padding: const EdgeInsets.all(7.0),
+                                                                                              child: Container(
+                                                                                                decoration: BoxDecoration(
+                                                                                                  // color: Colors.grey,
+                                                                                                  borderRadius: BorderRadius.circular(8.0),
+                                                                                                ),
+                                                                                                child: Column(
+                                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  children: [
+                                                                                                    const Text(
+                                                                                                      "Reply",
+                                                                                                      style: TextStyle(
+                                                                                                        fontSize: 18.0,
+                                                                                                        color: Colors.red,
+                                                                                                      ),
+                                                                                                    ),
+                                                                                                    Text(
+                                                                                                      'replayed message' + replytex,
+                                                                                                      style: const TextStyle(
+                                                                                                        fontSize: 14.0,
+                                                                                                        color: Colors.black,
+                                                                                                      ),
+                                                                                                    )
+                                                                                                  ],
+                                                                                                ),
+                                                                                              ),
+                                                                                            ),
+                                                                                          )
+                                                                                        ],
                                                                                       ),
                                                                                     ),
-                                                                                    Text(
-                                                                                      'replayed message' +
-                                                                                          replytex,
-                                                                                      style: const TextStyle(
-                                                                                        fontSize: 14.0,
-                                                                                        color: Colors
-                                                                                            .black,
-                                                                                      ),
-                                                                                    )
                                                                                   ],
                                                                                 ),
-                                                                              ),
-                                                                            ),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              )
-                                                                  : Container(),
-                                                              Text(
-                                                                parts[1]
-                                                                    .trim(),
-                                                                style: TextStyle(
-                                                                    color: parts[4] !=
-                                                                        'send'
-                                                                        ? Colors
-                                                                        .black
-                                                                        : Colors
-                                                                        .white,
-                                                                    fontSize: 16),
-                                                                textAlign:
-                                                                TextAlign.left,
-                                                              )
-                                                            ],
-                                                          )
-                                                              : Container(
-                                                            constraints: BoxConstraints(
-                                                                minWidth: 30.w,
-                                                                maxWidth: 60.w),
-                                                            alignment: (parts[4] !=
-                                                                'send'
-                                                                ? Alignment
-                                                                .topLeft
-                                                                : Alignment
-                                                                .topRight),
-                                                            child: Column(
-                                                              children: [
-                                                                if (parts[4] ==
-                                                                    "Receive")
-                                                                  sendername(
-                                                                      parts[8],
-                                                                      parts[4]),
-                                                                Column(
-                                                                  crossAxisAlignment: CrossAxisAlignment
-                                                                      .start,
-                                                                  children: [
-                                                                    parts[5] ==
-                                                                        "image"
-                                                                        ? ClipRRect(
-                                                                      borderRadius: const BorderRadius
-                                                                          .only(
-                                                                        topLeft: Radius
-                                                                            .circular(
-                                                                            10),
-                                                                        //topRight: Radius.circular(10),
-                                                                        bottomLeft: Radius
-                                                                            .circular(
-                                                                            10),
-                                                                        bottomRight: Radius
-                                                                            .circular(
-                                                                            10),
-                                                                      ),
-                                                                      child: Image
-                                                                          .file(
-                                                                          File(
-                                                                              parts[1]),
-                                                                          height: 40
-                                                                              .h,
-                                                                          width: 60
-                                                                              .w,
-                                                                          fit: BoxFit
-                                                                              .fill,
-                                                                          errorBuilder: (
-                                                                              context,
-                                                                              url,
-                                                                              error) =>
-                                                                          const Icon(
-                                                                            Icons
-                                                                                .error,
-                                                                            size: 70,
-                                                                            color: Colors
-                                                                                .red,
-                                                                            semanticLabel: "image not found",
-                                                                          )),
+                                                                              )
+                                                                            : Container(),
+                                                                        Text(
+                                                                          parts[1]
+                                                                              .trim(),
+                                                                          style: TextStyle(
+                                                                              color: parts[4] != 'send' ? Colors.black : Colors.white,
+                                                                              fontSize: 16),
+                                                                          textAlign:
+                                                                              TextAlign.left,
+                                                                        )
+                                                                      ],
                                                                     )
-                                                                        : CachedNetworkImage(
-                                                                      imageUrl: parts[1],
-                                                                      fit: BoxFit.cover,
-                                                                      /*height: 40
+                                                                  : Container(
+                                                                      constraints: BoxConstraints(
+                                                                          minWidth: 30
+                                                                              .w,
+                                                                          maxWidth:
+                                                                              60.w),
+                                                                      alignment: (parts[4] !=
+                                                                              'send'
+                                                                          ? Alignment
+                                                                              .topLeft
+                                                                          : Alignment
+                                                                              .topRight),
+                                                                      child:
+                                                                          Column(
+                                                                        children: [
+                                                                          if (parts[4] ==
+                                                                              "Receive")
+                                                                            sendername(parts[8],
+                                                                                parts[4]),
+                                                                          Column(
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.start,
+                                                                            children: [
+                                                                              parts[5] == "image"
+                                                                                  ? ClipRRect(
+                                                                                      borderRadius: const BorderRadius.only(
+                                                                                        topLeft: Radius.circular(10),
+                                                                                        //topRight: Radius.circular(10),
+                                                                                        bottomLeft: Radius.circular(10),
+                                                                                        bottomRight: Radius.circular(10),
+                                                                                      ),
+                                                                                      child: Image.file(File(parts[1]),
+                                                                                          height: 40.h,
+                                                                                          width: 60.w,
+                                                                                          fit: BoxFit.fill,
+                                                                                          errorBuilder: (context, url, error) => const Icon(
+                                                                                                Icons.error,
+                                                                                                size: 70,
+                                                                                                color: Colors.red,
+                                                                                                semanticLabel: "image not found",
+                                                                                              )),
+                                                                                    )
+                                                                                  : CachedNetworkImage(
+                                                                                      imageUrl: parts[1],
+                                                                                      fit: BoxFit.cover,
+                                                                                      /*height: 40
                                                                           .h,
                                                                       width: 60
                                                                           .w,*/
-                                                                      placeholder: (
-                                                                          context,
-                                                                          url) =>
-                                                                          LinearProgressIndicator(
-                                                                            minHeight: 20
-                                                                                .sp,
+                                                                                      placeholder: (context, url) => LinearProgressIndicator(
+                                                                                        minHeight: 20.sp,
+                                                                                      ),
+                                                                                      errorWidget: (context, url, error) => const Icon(
+                                                                                        Icons.error,
+                                                                                        size: 50,
+                                                                                      ),
+                                                                                    ),
+                                                                            ],
                                                                           ),
-                                                                      errorWidget: (
-                                                                          context,
-                                                                          url,
-                                                                          error) =>
-                                                                      const Icon(
-                                                                        Icons
-                                                                            .error,
-                                                                        size: 50,
+                                                                          SizedBox(
+                                                                            width:
+                                                                                60.w,
+                                                                            child:
+                                                                                Align(
+                                                                              alignment: Alignment.bottomRight,
+                                                                              child: Row(
+                                                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                                                crossAxisAlignment: CrossAxisAlignment.end,
+                                                                                children: [
+                                                                                  Text(
+                                                                                    DateFormat('hh:mm a').format(DateTime.parse(parts[6].trim())),
+                                                                                    style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                                    textAlign: TextAlign.end,
+                                                                                  ),
+                                                                                  SizedBox(
+                                                                                    width: 1.w,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
                                                                       ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-
-                                                                SizedBox(
-                                                                  width: 60.w,
-                                                                  child: Align(
-                                                                    alignment: Alignment
-                                                                        .bottomRight,
-                                                                    child: Row(
-                                                                      mainAxisAlignment: MainAxisAlignment
-                                                                          .end,
-                                                                      crossAxisAlignment: CrossAxisAlignment
-                                                                          .end,
-                                                                      children: [
-                                                                        Text(
-                                                                          DateFormat(
-                                                                              'hh:mm a')
-                                                                              .format(
-                                                                              DateTime
-                                                                                  .parse(
-                                                                                  parts[6]
-                                                                                      .trim())),
-                                                                          style: TextStyle(
-                                                                              color: parts[4] !=
-                                                                                  'send'
-                                                                                  ? Colors
-                                                                                  .black
-                                                                                  : Colors
-                                                                                  .white,
-                                                                              fontSize: 10),
-                                                                          textAlign: TextAlign
-                                                                              .end,
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width: 1
-                                                                              .w,),
-
-                                                                      ],
-                                                                    ),
-                                                                  ),
-
-                                                                ),
-
-                                                              ],
-                                                            ),
-                                                          )),
+                                                                    )),
                                                       SizedBox(
                                                         width: 10,
                                                       ),
                                                       if (parts[4] == 'send')
                                                         CircleAvatar(
-                                                          backgroundColor: Color(
-                                                              0xFF901133),
+                                                          backgroundColor:
+                                                              Color(0xFF901133),
                                                           child: Text(
-                                                              "${Logindata
-                                                                  .name[0]}",
+                                                              "${Logindata.name[0]}",
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .white)),
@@ -1021,13 +874,12 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                     ],
                                                   )),
                                             ),
-
                                           );
                                         }
                                       } else {
                                         return null;
                                       }
-                                    }else{
+                                    } else {
                                       return null;
                                     }
                                   }
@@ -1044,8 +896,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                         )
                       ],
                     ),
-                  )
-                  ),
+                  )),
                   //SizedBox(height: 10,),
                   Align(
                       alignment: Alignment.bottomCenter,
@@ -1336,57 +1187,97 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundColor: AppColors.appNewDarkThemeColor,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.camera_alt,
-                                  color: Colors.white,
+                            Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor:
+                                      AppColors.appNewDarkThemeColor,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.camera_alt,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        getImage(ImageSource.camera);
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    getImage(ImageSource.camera);
-                                    Navigator.pop(context);
-                                  });
-                                },
-                              ),
+                                const Text("Camera")
+                              ],
                             ),
-                            CircleAvatar(
-                              radius: 25,
-                              backgroundColor: AppColors.appNewDarkThemeColor,
-                              child: IconButton(
-                                icon: const Icon(
-                                  Icons.image,
-                                  color: Colors.white,
+                            Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor:
+                                      AppColors.appNewDarkThemeColor,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.image,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        getImage(ImageSource.gallery);
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    getImage(ImageSource.gallery);
-                                    Navigator.pop(context);
-                                  });
-                                },
-                              ),
+                                const Text("Gallery")
+                              ],
                             ),
-                          /*  CircleAvatar(
-                              radius: 25,
-                              backgroundColor: AppColors.appNewDarkThemeColor,
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.video_collection,
-                                  color: Colors.white,
+                            Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor:
+                                      AppColors.appNewDarkThemeColor,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.videocam,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _pickVideo();
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
                                 ),
-                                onPressed: () {
-                                  setState(() {
-                                    _pickVideo();
-                                    Navigator.pop(context);
-                                  });
-                                },
-                              ),
-                            ),*/
+                                const Text("Video")
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                CircleAvatar(
+                                  radius: 25,
+                                  backgroundColor:
+                                      AppColors.appNewDarkThemeColor,
+                                  child: IconButton(
+                                    icon: const Icon(
+                                      Icons.video_collection,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _pickpdf();
+                                        Navigator.pop(context);
+                                      });
+                                    },
+                                  ),
+                                ),
+                                const Text("Pdf")
+                              ],
+                            ),
                           ],
                         ),
-                     /*   SizedBox(
+                        /*   SizedBox(
                           height: 15,
                         ),
                         Row(
@@ -1452,13 +1343,42 @@ class _GroupChatScreenState extends State<GroupChatScreen>
 
   Future<void> getImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
-    imageapi(pickedFile);
+    imageapi(pickedFile, "", "image");
     if (replytex != "") {
-      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#replay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid+ "#@####@#" + widget.recentchatuserdetails.groupName;
+      var file = "group" "#@####@#" +
+          pickedFile.path +
+          '#@####@#' +
+          replytex +
+          "#@####@#replay#@####@#" +
+          'send' +
+          '#@####@#image' +
+          "#@####@#" +
+          DateTime.now().toString() +
+          "#@####@#" +
+          "" +
+          "#@####@#" +
+          widget.rtmpeerid +
+          "#@####@#" +
+          widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path, 'image', 'send');
+      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path,
+          'image', 'send');
     } else {
-      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#noreplay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid+ "#@####@#" + widget.recentchatuserdetails.groupName;
+      var file = "group" "#@####@#" +
+          pickedFile.path +
+          '#@####@#' +
+          replytex +
+          "#@####@#noreplay#@####@#" +
+          'send' +
+          '#@####@#image' +
+          "#@####@#" +
+          DateTime.now().toString() +
+          "#@####@#" +
+          "" +
+          "#@####@#" +
+          widget.rtmpeerid +
+          "#@####@#" +
+          widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
       _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path,
           'image', 'send');
@@ -1466,94 +1386,50 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   _pickVideo() async {
-    final pickedFile = await picker.getVideo(source: ImageSource.gallery);
-    await videoAPI(pickedFile);
-    _video = File(pickedFile.path);
+    FilePickerResult result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['mp4']);
+    PlatformFile files = result.files.first;
+    final file = XFile(files.path);
+    videoAPI(file, files);
     if (replytex != "") {
-      var file = replytex +
-          "#@####@#replay#@####@#" +
-          pickedFile.path +
-          '#@####@#send' +
-          '#@####@#image' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid;
-      widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path,
-          'video', 'send');
-    } else {
-      var file = replytex +
-          "#@####@#noreplay#@####@#" +
-          pickedFile.path +
-          '#@####@#send' +
-          '#@####@#image' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid;
-      widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path,
-          'video', 'send');
-    }
-    _videoPlayerController = VideoPlayerController.file(_video)
-      ..initialize().then((_) {
-        setState(() {});
-        _videoPlayerController.play();
-      });
-  }
-
-  _pickVideoFromCamera() async {
-    PickedFile pickedFile = await picker.getVideo(source: ImageSource.camera);
-    print("HHello $pickedFile");
-    videoAPI(pickedFile);
-    _video = File(pickedFile.path);
-    if (replytex != "") {
-      var file = "group" +
-          "#@####@#" +
-          pickedFile.path +
+      var file = "group" "#@####@#" +
+          files.path +
+          "#@#&" +
+          files.name +
           '#@####@#' +
           replytex +
           "#@####@#replay#@####@#" +
-          '#@####@#send' +
-          '#@####@#image' +
+          'send' +
+          '#@####@#video' +
           "#@####@#" +
           DateTime.now().toString() +
           "#@####@#" +
           "" +
           "#@####@#" +
-          widget.rtmpeerid+ "#@####@#" + widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path,
-          'video', 'send');
-    } else {
-      var file = "group" +
+          widget.rtmpeerid +
           "#@####@#" +
-          pickedFile.path +
+          widget.recentchatuserdetails.groupName;
+      widget.logController.addLog(file);
+    } else {
+      var file = "group" "#@####@#" +
+          files.path +
+          "#@#&" +
+          files.name +
           '#@####@#' +
           replytex +
           "#@####@#noreplay#@####@#" +
-          '#@####@#send' +
-          '#@####@#image' +
+          'send' +
+          '#@####@#video' +
           "#@####@#" +
           DateTime.now().toString() +
           "#@####@#" +
           "" +
           "#@####@#" +
-          widget.rtmpeerid+ "#@####@#" + widget.recentchatuserdetails.groupName;
+          widget.rtmpeerid +
+          "#@####@#" +
+          widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path,
-          'video', 'send');
     }
-    _videoPlayerController = VideoPlayerController.file(_video)
-      ..initialize().then((_) {
-        setState(() {});
-        _videoPlayerController.play();
-      });
   }
 
   void _sendPeerMessage() async {
@@ -1565,52 +1441,33 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       //  widget.logController.addLog('Please input text to send.');
       return;
     }
-    // if (onlinestatus == 'offline') {
     for (var row in widget.recentchatuserdetails.members) {
       {
         if (userpeerid != row.pid) {
-          fcmapicall(_peerMessage.text, row.fcmToken, '',"group"+widget.recentchatuserdetails.groupName, 'basic_channel');
+          fcmapicall(_peerMessage.text, row.fcmToken, '', "group" + widget.recentchatuserdetails.groupName, 'basic_channel');
         }
         print(row);
       }
     }
-
     try {
       if (replytex != "") {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName+
-            "#@####@#"+DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
         for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
-          //updatelocaldata(widget.rtmpeerid);
+          await widget.client.sendMessageToPeer(
+              widget.membersList[i].pid, message, true, false);
         }
         _insertgroup(replytex + "#@####@#replay#@####@#" + _peerMessage.text, "text", 'send');
-        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid+"#@####@#"+widget.recentchatuserdetails.groupName);
+        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
         replytex = "";
         _peerMessage.clear();
       } else {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName+
-            "#@####@#"+DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
         for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
+          await widget.client.sendMessageToPeer(
+              widget.membersList[i].pid, message, true, false);
         }
         _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
-        widget.logController.addLog('group' +
-            "#@####@#" +
-            _peerMessage.text +
-            "#@####@#" +
-            replytex +
-            '#@####@#noreplay#@####@#' +
-            'send' +
-            '#@####@#text' +
-            '#@####@#' +
-            DateTime.now().toString() +
-            '#@####@#' +
-            "123456" +
-            "#@####@#" +
-            widget.membersList[0].pid+
-            "#@####@#" +
-            widget.recentchatuserdetails.groupName
-        );
+        widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + '#@####@#noreplay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + '#@####@#' + "123456" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
         _peerMessage.clear();
       }
       setState(() {
@@ -1621,9 +1478,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       });
     } catch (errorCode) {
       if (replytex != "") {
-        widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid+ "#@####@#" + widget.recentchatuserdetails.groupName);
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName+
-            "#@####@#"+DateTime.now().toString());
+        widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
         _peerMessage.clear();
         setState(() {
           replyvisibility = false;
@@ -1631,37 +1487,21 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         });
         _insertgroup(replytex + "#@####@#replay#@####@#" + _peerMessage.text, "text", 'send');
         for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
+          await widget.client.sendMessageToPeer( widget.membersList[i].pid, message, true, false);
         }
         setState(() {
           replyvisibility = false;
           replytex = "";
         });
-
         _peerMessage.clear();
       } else {
-        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' +
-            DateTime.now().toString() +
-            "#@####@#" +
-            "" +
-            "#@####@#" +
-            widget.membersList[0].pid+ "#@####@#" +
-            widget.recentchatuserdetails.groupName);
-        _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text,
-            "text", 'send');
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" +
-            "#@####@#" +
-            _peerMessage.text +
-            "#@####@#" +
-            replytex +
-            "#@####@#noreplay#@####@#" +
-            widget.recentchatuserdetails.groupName+
-            "#@####@#"+DateTime.now().toString());
+        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
+        _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
         replytex = "";
         _peerMessage.clear();
         for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(
-              widget.membersList[i].pid, message, true, false);
+          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
         }
         print('catch else-before');
         // }
@@ -1678,7 +1518,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         replyvisibility = false;
       });
     }
-
   }
 
   _insertgroup(String _peerMessage, String type, diraction) async {
@@ -1750,7 +1589,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     print('query all rows:');
   }
 
-  void imageapi(XFile image) {
+  void imageapi(XFile image, name, joiner) {
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.loginData)
         .then((value) => {
               if (value != null)
@@ -1759,44 +1598,21 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                     if (mounted) {
                       if (value != null) {
                         if (value.status == "successfull") {
-                          print("uplordsucess");
-                          // if (onlinestatus == 'offline') {
                           for (var row
                               in widget.recentchatuserdetails.members) {
                             {
                               if (userpeerid != row.pid) {
-                                // fcmapicall(_peerMessage.text, row.fcm_token, '','', 'basic_channel');
                                 fcmapicall('Image', row.fcmToken,
                                     value.body.source, '', 'basic_channel');
                               }
                               print(row);
                             }
                           }
-
-                          fcmapicall(
-                              'Image',
-                              widget.recentchatuserdetails.groupAdmin,
-                              value.body.source,
-                              '',
-                              'basic_channel');
-                          // }
-                          // setState(() {
-                          AgoraRtmMessage message = AgoraRtmMessage.fromText(
-                              "group#@####@#" +
-                                  value.body.source +
-                                  "#@####@#" +
-                                  replytex +
-                                  "#@####@#" +
-                                  widget.recentchatuserdetails.groupName+
-                                  "#@####@#"+DateTime.now().toString());
+                          fcmapicall('Image', widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel');
+                          AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
                           for (int i = 0; i < widget.membersList.length; i++) {
-                            widget.client.sendMessageToPeer(
-                                widget.membersList[i].pid,
-                                message,
-                                true,
-                                false);
+                            widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
                           }
-                          // });
                         } else {
                           Helper.showMessage("Unable to send ");
                         }
@@ -1807,7 +1623,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
             });
   }
 
-  void videoAPI(final video) {
+  void videoAPI(final video, files) {
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.loginData)
         .then((value) => {
               if (value != null)
@@ -1824,11 +1640,37 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                 '',
                                 'basic_channel');
                           }
+
+                          for (var row
+                              in widget.recentchatuserdetails.members) {
+                            {
+                              if (userpeerid != row.pid) {
+                                fcmapicall(files.name, row.fcmToken,
+                                    value.body.source, '', 'basic_channel');
+                              }
+                              print(row);
+                            }
+                          }
                           setState(() {
-                            AgoraRtmMessage message =
-                                AgoraRtmMessage.fromText(value.body.source+DateTime.now().toString());
-                            widget.client.sendMessageToPeer(
-                                widget.rtmpeerid, message, true, false);
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText(
+                                value.body.source + DateTime.now().toString());
+                            for (int i = 0;
+                                i < widget.membersList.length;
+                                i++) {
+                              widget.client.sendMessageToPeer(
+                                  widget.membersList[i].pid,
+                                  message,
+                                  true,
+                                  false);
+                            }
+                            _insertgroup(
+                                replytex +
+                                    "#@####@#noreplay#@####@#" +
+                                    files.path +
+                                    "#@#&" +
+                                    files.name,
+                                'video',
+                                'send');
                           });
                         } else {
                           Helper.showMessage("Unable to send ");
@@ -1861,7 +1703,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                         switch (index) {
                           case 0:
                             Clipboard.setData(ClipboardData(text: message));
-                            Helper.showMessage('Copied');
+                            //  Helper.showMessage('Copied');
                             Navigator.of(context, rootNavigator: true)
                                 .pop('dialog');
                             break;
@@ -1902,8 +1744,19 @@ class _GroupChatScreenState extends State<GroupChatScreen>
           if (value)
             {
               ApiRepository()
-                  .fcmnotifiction(msg, widget.recentchatuserdetails.groupName,
-                      fcmtoken, image, call_id, type, Logindata.authToken,'',DateTime.now().toString(),userpeerid,"","")
+                  .fcmnotifiction(
+                      msg,
+                      widget.recentchatuserdetails.groupName,
+                      fcmtoken,
+                      image,
+                      call_id,
+                      type,
+                      Logindata.authToken,
+                      '',
+                      DateTime.now().toString(),
+                      userpeerid,
+                      "",
+                      "")
                   .then((value) async {})
             }
           else
@@ -1948,21 +1801,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     }
   }
 
-/*  void fcmapicall(String msg, String fcmtoken, image, call_id, type) {
-    Helper.checkConnectivity().then((value) => {
-      if (value)
-        {
-          ApiRepository().fcmnotifiction(msg, Logindata.name, fcmtoken, image, call_id,
-              type, Logindata.authToken)
-              .then((value) async {
-
-          })
-        }
-      else
-        {Helper.showNoConnectivityDialog(context)}
-    });
-  }*/
-
   void _scrollDown(log) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.jumpTo(_controller.position.maxScrollExtent + 10);
@@ -1987,7 +1825,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         ));
   }
 
-   sendername(id, type) {
+  sendername(id, type) {
     var name = "";
     for (var row in widget.recentchatuserdetails.members) {
       {
@@ -1996,6 +1834,93 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         }
       }
     }
-    return Text(name != "" ? name : "", style: const TextStyle(color: Colors.brown));
+    return Text(name != "" ? name : "",
+        style: const TextStyle(color: Colors.brown));
+  }
+
+  _pickpdf() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'doc'],
+    );
+    PlatformFile files = result.files.first;
+    final file = XFile('${files.path}');
+    imageapi(file, files.name, "pdf");
+    if (replytex != "") {
+      var file = "group" "#@####@#" +
+          files.path +
+          "#@#&" +
+          files.name +
+          '#@####@#' +
+          replytex +
+          "#@####@#replay#@####@#" +
+          'send' +
+          '#@####@#doc' +
+          "#@####@#" +
+          DateTime.now().toString() +
+          "#@####@#" +
+          "" +
+          "#@####@#" +
+          widget.rtmpeerid +
+          "#@####@#" +
+          widget.recentchatuserdetails.groupName;
+      widget.logController.addLog(file);
+      _insertgroup(
+        replytex + "#@####@#replay#@####@#" + files.path + "#@#&" + files.name,
+        'doc',
+        'send',
+      );
+    } else {
+      var file = "group" "#@####@#" +
+          files.path +
+          "#@#&" +
+          files.name +
+          '#@####@#' +
+          replytex +
+          "#@####@#noreplay#@####@#" +
+          'send' +
+          '#@####@#doc' +
+          "#@####@#" +
+          DateTime.now().toString() +
+          "#@####@#" +
+          "" +
+          "#@####@#" +
+          widget.rtmpeerid +
+          "#@####@#" +
+          widget.recentchatuserdetails.groupName;
+
+      widget.logController.addLog(file);
+      _insertgroup(
+        replytex +
+            "#@####@#noreplay#@####@#" +
+            files.path +
+            "#@#&" +
+            files.name,
+        'doc',
+        'send',
+      );
+    }
+    updatelocaldata(widget.rtmpeerid);
+  }
+
+  textwidget(textname, type, sendtype,parts) {
+    var texts = textname;
+    if (type == "doc" || type == "video") {
+
+        dynamic text = textname.split('#@#&');
+        if(text.length==1){
+          dynamic text = textname.split('/');
+          texts= text[text.length-1];
+        }else {
+          texts = text[1];
+        }
+
+    }
+
+    return Text(
+      texts.trim(),
+      style: TextStyle(color:sendtype!='send'?Colors.black:Colors.white,fontSize: 16),
+      textAlign: TextAlign.left,
+    );
   }
 }

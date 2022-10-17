@@ -410,7 +410,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                   shrinkWrap: true,
                                   itemBuilder: (context, i) {
                                     dynamic parts = log[i].split('#@####@#');
-                                    print("print233"+log[i].toString());
+                                    //print("print233"+log[i].toString());
                                     if (parts[7] == widget.rtmpeerid) {
                                       if (parts.length > 0) {
                                         if (parts[3].trim() != null &&
@@ -552,16 +552,10 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                             }
                                                           },
                                                           child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5.0),
-                                                              child: parts[
-                                                                              4] ==
-                                                                          "text" ||
-                                                                      parts[4] ==
-                                                                          "doc" ||
-                                                                      parts[4] ==
-                                                                          "video"
+                                                              padding: const EdgeInsets.all(5.0),
+                                                              child: parts[4] == "text" ||
+                                                                      parts[4] == "doc" ||
+                                                                      parts[4] == "video"
                                                                   ? Stack(
                                                                       children: [
                                                                         Column(
@@ -1698,18 +1692,14 @@ class _Chat_ScreenState extends State<Chat_Screen> {
 
                           setState(() {
                             if (replytex != "") {
-                              /* var file = replytex + "#@####@#replay#@####@#" + files.path + "#@#&" + files.name + '#@####@#send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid;
-                              widget.logController.addLog(file);*/
                               _insert(replytex + "#@####@#replay#@####@#" + files.path + "#@#&" + files.name + "#@#&" + value.body.source, 'video', 'send', widget.rtmpeerid.toString());
                             } else {
-                              /* var file = replytex + "#@####@#noreplay#@####@#" + files.path + "#@#&" + files.name + '#@####@#send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid;
-                              widget.logController.addLog(file);*/
                               _insert(replytex + "#@####@#noreplay#@####@#" + files.path + "#@#&" + files.name + "#@#&" + value.body.source,'video', 'send', widget.rtmpeerid.toString());
                             }
                             print("uplordsucess");
                             loading = false;
                             uplordstatus = 0;
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText("video#@####@#noreplay#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
                             widget.client.sendMessageToPeer(widget.rtmpeerid, message, true, false);
                             updatelocaldata(widget.rtmpeerid);
                           });
@@ -1717,10 +1707,6 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                           setState(() {
                             uplordstatus = 2;
                           });
-                          /*EasyLoading.showToast("Unable to send",
-                              toastPosition: EasyLoadingToastPosition.top,
-                              duration: const Duration(seconds: 5));*/
-                          // Helper.showMessage("Unable to send ");
                         }
                       }
                     }

@@ -319,7 +319,6 @@ class DatabaseHelper {
     return await db.rawQuery('SELECT * FROM $table WHERE ($to = $peerid AND $from = $userpeerid) OR ($to = $userpeerid AND $from = $peerid)');
   }
 
-
   Future<List<Map<String, dynamic>>> groupqueryRowCount(String peerid, String userpeerid,groupnam) async {
     Database db = await instance.database;
     return await db.rawQuery('SELECT * FROM $grouptable WHERE $groupname = "$groupnam"');

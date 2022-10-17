@@ -65,8 +65,8 @@ class _RecentChatState extends State<RecentChat> {
   void initState() {
     super.initState();
     SharedPreferencedata();
-    navigatequery();
     _query();
+    navigatequery();
     _fetchrecentchatlist();
   }
 

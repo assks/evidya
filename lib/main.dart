@@ -42,14 +42,7 @@ Future<void> backgroundHandler(RemoteMessage message) async {
         var url_length= message.data['image'].length;
         var  type=  message.data['image'].toString().substring(url_length-3,url_length);
         if(type!="pdf"||type!="mp4") {
-          await downlordimage(
-              "" + "#@####@#replay#@####@#" + message.data['image'],
-              message.data['senderpeerid'],
-              "",
-              'image',
-              message.data['datetime'],
-              message.data['receiverpeerid'],
-              message.data['textid']);
+         // await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
         }
       }
       else{
@@ -503,21 +496,11 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
       var url_length= message.data['image'].length;
   var  type=  message.data['image'].toString().substring(url_length-3,url_length);
   if(type!="pdf"||type!="mp4") {
-    await downlordimage(
-      "" + "#@####@#replay#@####@#" + message.data['image'],
-      message.data['senderpeerid'],
-      "",
-      'image',
-      message.data['datetime'],
-      message.data['textid'],
-      message.data['receiverpeerid'],
-    );
+  //  await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['textid'], message.data['receiverpeerid'],);
   }
     }
     else{
-      insert(message.data['body'], message.data['senderpeerid'], 'text',
-          message.data['datetime'],
-          message.data['receiverpeerid'],message.data['textid'],);
+      insert(message.data['body'], message.data['senderpeerid'], 'text', message.data['datetime'], message.data['receiverpeerid'],message.data['textid'],);
     }
   }
 

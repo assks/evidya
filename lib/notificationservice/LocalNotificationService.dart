@@ -44,7 +44,7 @@ class LocalNotificationService{
           id: int.parse(message.from.substring(message.from.length - 3)),
           channelKey: 'basic_channel',
           title: message.data['title']+"      "+_messageIncrement.toString(),
-          body: name[2] /*?? message.data['body']*/,
+          body: name.length <= 1? name[0]:name[2] /*?? message.data['body']*/,
             fullScreenIntent: false,
           wakeUpScreen: true,
           payload: {

@@ -93,7 +93,7 @@ class DatabaseHelper {
             $to TEXT NOT NULL,
             $reply TEXT NOT NULL,
             $type TEXT NOT NULL,
-            
+             $textId TEXT NOT NULL,
             $groupname TEXT NOT NULL
           );
           ''');

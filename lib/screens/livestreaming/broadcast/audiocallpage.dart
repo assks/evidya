@@ -79,7 +79,6 @@ class _TestLiveStreamState extends State<AudioCallpage> {
   final _stopWatchTimer = StopWatchTimer(
     onChange: (value) {
       final displayTime = StopWatchTimer.getDisplayTime(value);
-
     },
 
   );

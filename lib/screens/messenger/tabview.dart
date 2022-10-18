@@ -155,7 +155,6 @@ class _messengertabState extends State<messengertab>
         var fileName = await ImageDownloader.findName(imageId);
         // print('filename' + fileName);
         var path = await ImageDownloader.findPath(imageId);
-
         _insertgroup("group#@####@#" + path.toString() + "#@####@#noreplay#@####@#", peerid, 'image', groupname, time);
         var size = await ImageDownloader.findByteSize(imageId);
         // print('size' + size.toString());
@@ -374,7 +373,9 @@ class _messengertabState extends State<messengertab>
       DatabaseHelper.reply: 'Receive',
       DatabaseHelper.from: userpeerid,
       DatabaseHelper.to: peerid,
-      DatabaseHelper.groupname: groupname
+      DatabaseHelper.groupname: groupname,
+      DatabaseHelper.textId:""
+
     };
     final id = await dbHelper.groupinsert(row);
     print('inserted row id: $id');

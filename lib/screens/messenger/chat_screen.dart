@@ -537,10 +537,8 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                                   ? Stack(
                                                                       children: [
                                                                         Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: <
-                                                                              Widget>[
+                                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                                          children: <Widget>[
                                                                             parts[1] == 'replay'
                                                                                 ? Container(
                                                                                     margin: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
@@ -960,7 +958,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                                         ],
                                                                       ),
                                                                     )),
-                                                      SizedBox(
+                                                      const SizedBox(
                                                         width: 10,
                                                       ),
                                                       if (parts[3] == 'send')
@@ -1735,7 +1733,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                     )
                   ],
                 ),
-                content: Container(
+                content: SizedBox(
                   width: double.minPositive,
                   child: ListView.builder(
                     shrinkWrap: true,
@@ -1787,9 +1785,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                               } else {
                                 _delete(int.parse(selectedmsgid), i);
                               }
-                              Navigator.of(context, rootNavigator: true)
-                                  .pop('dialog');
-
+                              Navigator.of(context, rootNavigator: true).pop('dialog');
                               break;
                             case 2:
                               if (hidecopy != true) {
@@ -1866,13 +1862,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
       EasyLoading.dismiss();
       if (value != null) {
         if (value.status == "successfull") {
-          fcmapicall(
-              calltype,
-              widget.recentchatuserdetails.fcm_token,
-              '',
-              value.body.callId,
-              'call_channel',
-              widget.recentchatuserdetails.profile_image,textid);
+          fcmapicall(calltype, widget.recentchatuserdetails.fcm_token,'', value.body.callId, 'call_channel', widget.recentchatuserdetails.profile_image,textid);
           _callinsert(value.body.calleeName, calltype, 'Dilled_Call');
           if (calltype == 'video') {
             Navigator.of(context).push(

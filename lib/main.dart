@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:evidya/utils/AppErrorWidget.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +20,7 @@ import 'package:evidya/utils/helper.dart';
 import 'package:evidya/utils/screen_router.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
+
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_downloader/image_downloader.dart';
@@ -38,17 +39,34 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   var type = message.data['type'];
   if (type == 'basic_channel') {
       LocalNotificationService.showNotification(message);
+      if(message.data['call_id']!="group"){
       if (message.data['image']!="") {
         var url_length= message.data['image'].length;
         var  type=  message.data['image'].toString().substring(url_length-3,url_length);
         if(type!="pdf"||type!="mp4") {
          // await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+        }else{
+           await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'],"", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
         }
       }
       else{
-        insert(message.data['body'], message.data['senderpeerid'], 'text',
-            message.data['datetime'], message.data['receiverpeerid'],
-            message.data['textid']);
+         // _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
+          insert(message.data['body'], message.data['senderpeerid'], 'text', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+      }
+      }else{
+        if (message.data['image']!="") {
+          var url_length= message.data['image'].length;
+          var  type=  message.data['image'].toString().substring(url_length-3,url_length);
+          if(type!="pdf"||type!="mp4") {
+            // await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+          }else{
+            await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'],  message.data['call_id'], 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+          }
+        }
+        else{
+          _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
+        }
+
       }
    } else if (type == 'call_channel') {
     print('listen a background and not terminated message123 ${message.data}');
@@ -101,7 +119,11 @@ Future<void> downlordimage(String file, String peerid, group, groupname,time,tex
         return;
       }
       var path = await ImageDownloader.findPath(imageId);
-      insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time,receiverpeerid,textid);
+      if(group!="group") {
+        insert("" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image',time, receiverpeerid, textid);
+      }else{
+        _insertgroup("group" + "#@####@#noreplay#@####@#" + path.toString(), peerid, 'image', "", time, receiverpeerid, textid);
+      }
   } on PlatformException catch (error) {
     print(error);
   }
@@ -126,6 +148,27 @@ void insert(String _peerMessage, String senderpeerid, String type,time,receiverp
     final id = await dbHelper.insert(row);
     print('main inserted  row id: $id');
   }
+_insertgroup(String _peerMessage, String peerid,senderpeerid,type, String datetime,
+    String groupname, textid) async {
+  // row to insert
+  Map<String, dynamic> row = {
+    DatabaseHelper.Id: null,
+    DatabaseHelper.message: _peerMessage,
+    DatabaseHelper.timestamp: datetime,
+    DatabaseHelper.diraction: '#@####@#Receive',
+    DatabaseHelper.type: type,
+    DatabaseHelper.reply: 'Receive',
+    DatabaseHelper.from: senderpeerid,
+    DatabaseHelper.to: peerid,
+    DatabaseHelper.groupname: groupname,
+    DatabaseHelper.textId: textid
+  };
+  final dbHelper = DatabaseHelper.instance;
+  final id = await dbHelper.groupinsert(row);
+  print('main inserted row id: $id');
+  return id;
+}
+
 
 
 Future<void> main() async {
@@ -282,6 +325,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
       }
           break;
         case CallEvent.ACTION_CALL_DECLINE:
+          _callinsert(event.body['extra']['username'], event.body['extra']['calltype'], 'Missed_Call');
          fcmapicall('call_cut', event.body['extra']['fcmtoken'], "W1CFA5GNwGzfX7uItWmL", event.body['extra']['callid'], "cut");
           break;
       }
@@ -397,6 +441,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           //   }
           // });
         } else if (message.data['type'] == 'call_channel') {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('audiocall', 0);
+          await prefs.setInt('counter', 0);
           //Vibrate.vibrate();
          // LocalNotificationService.showCallNotification(message.data);
           LocalNotificationService.callkitNotification(message);
@@ -426,6 +473,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           if (type == 'call_channel') {
             Vibrate.vibrate();
             LocalNotificationService.callkitNotification(message);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt('audiocall', 0);
+            await prefs.setInt('counter', 0);
         }
           else
             if (type == 'cut') {
@@ -451,6 +501,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
             //Vibrate.vibrate();
            // LocalNotificationService.showCallNotification(message.data);
             LocalNotificationService.callkitNotification(message);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.setInt('audiocall', 0);
+            await prefs.setInt('counter', 0);
           //  LocalNotificationService.misscallkitNotification(message);
           } else if (message.data['type'] == 'cut') {
             await FlutterCallkitIncoming.endAllCalls();

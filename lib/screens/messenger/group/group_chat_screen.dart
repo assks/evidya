@@ -229,10 +229,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             backgroundColor:
                                                 AppColors.appNewDarkThemeColor,
                                             child: Center(
-                                                child: widget
-                                                            .recentchatuserdetails
-                                                            .image !=
-                                                        null
+                                                child: widget.recentchatuserdetails.image != null
                                                     ? CachedNetworkImage(
                                                         imageUrl: StringConstant
                                                                 .IMAGE_URL +
@@ -431,22 +428,13 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                           10),
                                                                 ))
                                                             : const BoxDecoration(
-                                                                gradient:
-                                                                    LinearGradient(
-                                                                  begin: Alignment
-                                                                      .topCenter,
-                                                                  end: Alignment
-                                                                      .bottomCenter,
-                                                                  colors: [
-                                                                    Color(
-                                                                        0xFF901133),
-                                                                    Color(
-                                                                        0xFF5c0e35),
-                                                                  ],
+                                                                gradient: LinearGradient(
+                                                                  begin: Alignment.topCenter,
+                                                                  end: Alignment.bottomCenter,
+                                                                  colors: [Color(0xFF901133),Color(0xFF5c0e35)],
                                                                 ),
                                                                 borderRadius: BorderRadius.only(
                                                                   topLeft: Radius.circular(10),
-
                                                                   bottomLeft: Radius.circular(10),
                                                                   bottomRight: Radius.circular(10),
                                                                 ),
@@ -471,98 +459,100 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[2]),),);
                                                             }else if (parts[5] == "network"){
                                                               Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[1]),),);
-
                                                             }
                                                           },
-                                                          child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .all(5.0),
-                                                              child: parts[5] == "text" ||
-                                                                      parts[5] ==
-                                                                          "doc" ||
-                                                                      parts[5] ==
-                                                                          "video"
+                                                          child: Padding(padding: const EdgeInsets.all(5.0),
+                                                              child: parts[5] == "text" || parts[5] == "doc" || parts[5] == "video"
                                                                   ? Stack(
                                                                       children: [
                                                                         Column(
                                                                           crossAxisAlignment:
                                                                               CrossAxisAlignment.start,
-                                                                          children: <
-                                                                              Widget>[
-                                                                            if (parts[4] ==
-                                                                                "Receive")
-                                                                              sendername(parts[8], parts[4]),
-                                                                            parts[3] == 'replay'
-                                                                                ? Container(
+                                                                          children: <Widget>[
+                                                                            Row(
+                                                                                children:[
+                                                                                  if(parts[5]=="doc"||parts[5]=="video")
+                                                                                  typeicons(parts[5]),
+                                                                                  if (parts[4] == "Receive")
+                                                                                    sendername(parts[8], parts[4]),parts[3] == 'replay'
+                                                                                      ? Container(
                                                                                     margin: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
                                                                                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.0)),
                                                                                     child: IntrinsicHeight(
                                                                                         child: Container(
-                                                                                      decoration: BoxDecoration(
-                                                                                        color: Color(0xFFf8ece8),
-                                                                                        borderRadius: BorderRadius.circular(8.0),
-                                                                                      ),
-                                                                                      child: Row(
-                                                                                        children: [
-                                                                                          Container(
-                                                                                            decoration: BoxDecoration(
-                                                                                              color: parts[4] != 'send' ? Color(0xFF800000) : Colors.white,
-                                                                                              borderRadius: const BorderRadius.only(
-                                                                                                bottomLeft: Radius.circular(30.0),
-                                                                                                topLeft: Radius.circular(30.0),
-                                                                                              ),
-                                                                                            ),
-                                                                                            width: 5.0,
+                                                                                          decoration: BoxDecoration(
+                                                                                            color: const Color(0xFFf8ece8),
+                                                                                            borderRadius: BorderRadius.circular(8.0),
                                                                                           ),
-                                                                                          const SizedBox(
-                                                                                            height: 5,
-                                                                                          ),
-                                                                                          Expanded(
-                                                                                            child: Container(
-                                                                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                                decoration: const BoxDecoration(
-                                                                                                  color: Color(0xFFf8ece8),
-                                                                                                  borderRadius: BorderRadius.only(
-                                                                                                    bottomRight: Radius.circular(30.0),
-                                                                                                    topRight: Radius.circular(30.0),
+                                                                                          child: Row(
+                                                                                            children: [
+                                                                                              Container(
+                                                                                                decoration: BoxDecoration(
+                                                                                                  color: parts[4] != 'send' ? const Color(0xFF800000) : Colors.white,
+                                                                                                  borderRadius: const BorderRadius.only(
+                                                                                                    bottomLeft: Radius.circular(30.0),
+                                                                                                    topLeft: Radius.circular(30.0),
                                                                                                   ),
                                                                                                 ),
-                                                                                                child: Column(
-                                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                                  children: [
-                                                                                                    parts[4] != 'send'
-                                                                                                        ? const Text(
-                                                                                                            "You",
-                                                                                                            style: TextStyle(
-                                                                                                              fontSize: 14.0,
-                                                                                                              fontWeight: FontWeight.w600,
-                                                                                                              color: Colors.black,
-                                                                                                            ),
-                                                                                                          )
-                                                                                                        : const Text(
-                                                                                                            "replay",
-                                                                                                            style: TextStyle(
-                                                                                                              fontSize: 14.0,
-                                                                                                              fontWeight: FontWeight.w600,
-                                                                                                              color: Colors.black,
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                    Text(
-                                                                                                      parts[2] != "" ? parts[2] : parts[1],
-                                                                                                      style: TextStyle(
-                                                                                                        fontSize: 14.0,
-                                                                                                        color: AppColors.cardContainerColor,
+                                                                                                width: 5.0,
+                                                                                              ),
+                                                                                              const SizedBox(
+                                                                                                height: 5,
+                                                                                              ),
+                                                                                              Expanded(
+                                                                                                child: Container(
+                                                                                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                    decoration: const BoxDecoration(
+                                                                                                      color: Color(0xFFf8ece8),
+                                                                                                      borderRadius: BorderRadius.only(
+                                                                                                        bottomRight: Radius.circular(30.0),
+                                                                                                        topRight: Radius.circular(30.0),
                                                                                                       ),
-                                                                                                    )
-                                                                                                  ],
-                                                                                                )),
+                                                                                                    ),
+                                                                                                    child: Column(
+                                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                      children: [
+                                                                                                        parts[4] != 'send'
+                                                                                                            ? const Text(
+                                                                                                          "You",
+                                                                                                          style: TextStyle(
+                                                                                                            fontSize: 14.0,
+                                                                                                            fontWeight: FontWeight.w600,
+                                                                                                            color: Colors.black,
+                                                                                                          ),
+                                                                                                        )
+                                                                                                            : const Text(
+                                                                                                          "replay",
+                                                                                                          style: TextStyle(
+                                                                                                            fontSize: 14.0,
+                                                                                                            fontWeight: FontWeight.w600,
+                                                                                                            color: Colors.black,
+                                                                                                          ),
+                                                                                                        ),
+                                                                                                        Row(
+                                                                                                          children: [
+                                                                                                            const Icon(Icons.description_outlined,color: Colors.yellow,),
+                                                                                                            Text(parts[2] != "" ? parts[2] : parts[1],
+                                                                                                              style: TextStyle(
+                                                                                                                fontSize: 14.0,
+                                                                                                                color: AppColors.cardContainerColor,
+                                                                                                              ),
+                                                                                                            ),
+                                                                                                          ],
+                                                                                                        )
+                                                                                                      ],
+                                                                                                    )),
+                                                                                              ),
+                                                                                            ],
                                                                                           ),
-                                                                                        ],
-                                                                                      ),
-                                                                                    )),
+                                                                                        )),
                                                                                   )
-                                                                                : Container(),
+                                                                                      : Container(),
+                                                                                ]
+                                                                            ),
+
+
+
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 5.0, bottom: 5),
                                                                               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -615,8 +605,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                                     color: Colors.red,
                                                                                     semanticLabel: "image not found",
                                                                                   ))
-                                                                        else if (parts[5] ==
-                                                                            "network")
+                                                                        else if (parts[5] == "network")
                                                                           CachedNetworkImage(
                                                                             imageUrl:
                                                                                 parts[1],
@@ -809,10 +798,9 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                       child:
                                                                           Column(
                                                                         children: [
-                                                                          if (parts[4] ==
-                                                                              "Receive")
-                                                                            sendername(parts[8],
-                                                                                parts[4]),
+                                                                          Icon(Icons.error,color:Colors.yellow,size:10.sp,),
+                                                                          if (parts[4] == "Receive")
+                                                                            sendername(parts[8], parts[4]),
                                                                           Column(
                                                                             crossAxisAlignment:
                                                                                 CrossAxisAlignment.start,
@@ -1410,17 +1398,18 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       //  widget.logController.addLog('Please input text to send.');
       return;
     }
+    var textid = DateTime.now().millisecondsSinceEpoch.toString();
     for (var row in widget.recentchatuserdetails.members) {
       {
         if (userpeerid != row.pid) {
-          fcmapicall(_peerMessage.text, row.fcmToken, '', "group" + widget.recentchatuserdetails.groupName, 'basic_channel');
+          fcmapicall(_peerMessage.text, row.fcmToken, '', "group" , 'basic_channel',textid,widget.rtmpeerid.toString(),);
         }
         print(row);
       }
     }
     try {
       if (replytex != "") {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
         for (int i = 0; i < widget.membersList.length; i++) {
           await widget.client.sendMessageToPeer(
               widget.membersList[i].pid, message, true, false);
@@ -1430,25 +1419,23 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         replytex = "";
         _peerMessage.clear();
       } else {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
         for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(
-              widget.membersList[i].pid, message, true, false);
+          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
         }
         _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
         widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + '#@####@#noreplay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + '#@####@#' + "123456" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
         _peerMessage.clear();
       }
       setState(() {
-        _controller.animateTo(_controller.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _controller.animateTo(_controller.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
         _peerMessage.clear();
         replyvisibility = false;
       });
     } catch (errorCode) {
       if (replytex != "") {
         widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
         _peerMessage.clear();
         setState(() {
           replyvisibility = false;
@@ -1466,7 +1453,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       } else {
         widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
         _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
         replytex = "";
         _peerMessage.clear();
         for (int i = 0; i < widget.membersList.length; i++) {
@@ -1500,7 +1487,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       DatabaseHelper.type: type,
       DatabaseHelper.from: widget.rtmpeerid.toString(),
       DatabaseHelper.to: userpeerid.toString(),
-      DatabaseHelper.groupname: widget.recentchatuserdetails.groupName.toString()
+      DatabaseHelper.groupname: widget.recentchatuserdetails.groupName.toString(),
+      DatabaseHelper.textId:DateTime.now().millisecondsSinceEpoch.toString()
     };
     final id = await dbHelper.groupinsert(row);
     print('inserted row id: $id');
@@ -1557,21 +1545,23 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         .then((value) => {
               if (value != null)
                 {
+
                   ApiRepository().uplordchatimage(value, image).then((value) {
                     if (mounted) {
                       if (value != null) {
                         if (value.status == "successfull") {
+                          var textid = DateTime.now().millisecondsSinceEpoch.toString();
                           for (var row
                               in widget.recentchatuserdetails.members) {
                             {
                               if (userpeerid != row.pid) {
-                                fcmapicall(joiner, row.fcmToken, value.body.source, '', 'basic_channel');
+                                fcmapicall(joiner, row.fcmToken, value.body.source, "group", 'basic_channel',textid,"");
                               }
                               print(row);
                             }
                           }
-                          fcmapicall(joiner, widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel');
-                          AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+                          fcmapicall(joiner, widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel',textid,"");
+                          AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#$textid");
                           for (int i = 0; i < widget.membersList.length; i++) {
                             widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
                           }
@@ -1593,20 +1583,21 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                   ApiRepository().uplordchatimage(value, video).then((value) {
                     if (mounted) {
                       if (value != null) {
+                        var textid = DateTime.now().millisecondsSinceEpoch.toString();
                         if (value.status == "successfull") {
                           if (onlinestatus == 'offline') {
-                            fcmapicall(files.name, widget.recentchatuserdetails.groupAdmin, value.body.source, "", 'basic_channel');
+                            fcmapicall(files.name, widget.recentchatuserdetails.groupAdmin, value.body.source, "", 'basic_channel',textid,widget.rtmpeerid.toString(),);
                           }
                           for (var row in widget.recentchatuserdetails.members) {
                             {
                               if (userpeerid != row.pid) {
-                                fcmapicall(files.name, row.fcmToken, value.body.source, '', 'basic_channel');
+                                fcmapicall(files.name, row.fcmToken, value.body.source, '', 'basic_channel',textid,widget.rtmpeerid.toString(),);
                               }
                               print(row);
                             }
                           }
                           setState(() {
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString());
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#$textid");
                            // AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#"+ value.body.source+ "#@####@#"+ DateTime.now().toString());
                             for (int i = 0; i < widget.membersList.length; i++) {
                               widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
@@ -1680,7 +1671,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         : Text(replytex, style: TextStyle(fontSize: 14.0, color: Colors.black));
   }
 
-  void fcmapicall(String msg, String fcmtoken, image, call_id, type) {
+  void fcmapicall(String msg, String fcmtoken, image, call_id, type,textid,senderpeerid) {
     Helper.checkConnectivity().then((value) => {
           if (value)
             {
@@ -1696,8 +1687,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                       '',
                       DateTime.now().toString(),
                       userpeerid,
-                      "",
-                      "")
+                      senderpeerid,
+                      textid)
                   .then((value) async {})
             }
           else
@@ -1788,10 +1779,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     final file = XFile('${files.path}');
     imageapi(file, files.name, "pdf");
     if (replytex != "") {
-      var file = "group" "#@####@#" +
-          files.path +
-          "#@#&" +
-          files.name +
+      var file = "group" "#@####@#" + files.path + "#@#&" + files.name +
           '#@####@#' +
           replytex +
           "#@####@#replay#@####@#" +
@@ -1863,5 +1851,16 @@ class _GroupChatScreenState extends State<GroupChatScreen>
       style: TextStyle(color:sendtype!='send'?Colors.black:Colors.white,fontSize: 16),
       textAlign: TextAlign.left,
     );
+  }
+
+  typeicons(texttype) {
+    if(texttype=="doc") {
+      return Icon(
+        Icons.description_outlined, color: Colors.yellow, size: 15.sp,);
+  }else if(texttype =="video"){
+      return Icon(
+      Icons.play_arrow, color: Colors.yellow, size: 15.sp,);
+    }
+
   }
 }

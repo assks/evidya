@@ -39,35 +39,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   var type = message.data['type'];
   if (type == 'basic_channel') {
       LocalNotificationService.showNotification(message);
-      if(message.data['call_id']!="group"){
-      if (message.data['image']!="") {
-        var url_length= message.data['image'].length;
-        var  type=  message.data['image'].toString().substring(url_length-3,url_length);
-        if(type!="pdf"||type!="mp4") {
-         // await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
-        }else{
-           await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'],"", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
-        }
-      }
-      else{
-         // _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
-          insert(message.data['body'], message.data['senderpeerid'], 'text', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
-      }
-      }else{
-        if (message.data['image']!="") {
-          var url_length= message.data['image'].length;
-          var  type=  message.data['image'].toString().substring(url_length-3,url_length);
-          if(type!="pdf"||type!="mp4") {
-            // await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'], "", 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
-          }else{
-            await downlordimage("" + "#@####@#replay#@####@#" + message.data['image'], message.data['senderpeerid'],  message.data['call_id'], 'image', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
-          }
-        }
-        else{
-          _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
-        }
+      insertlocaldata(message);
 
-      }
    } else if (type == 'call_channel') {
     print('listen a background and not terminated message123 ${message.data}');
 
@@ -77,6 +50,40 @@ Future<void> backgroundHandler(RemoteMessage message) async {
     await FlutterCallkitIncoming.endAllCalls();
     callcutSpref();
 
+
+  }
+}
+
+void insertlocaldata(dynamic message) {
+  if(message.data['call_id']!="group"){
+    if (message.data['image']!="") {
+      var url_length= message.data['image'].length;
+      var  type=  message.data['image'].toString().substring(url_length-3,url_length);
+      dynamic parts = message.data['image'];
+      print("i am here"+parts[2]);
+      if(type!="pdf"||type!="mp4") {
+        insert("" + "#@####@#noreplay#@####@#" + message.data['image'], message.data['senderpeerid'], 'network',message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+      }else{
+        insert("" + "#@####@#noreplay#@####@#" + message.data['image'], message.data['senderpeerid'], type,message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+      }
+    }
+    else{
+      // _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
+      insert(message.data['body'], message.data['senderpeerid'], 'text', message.data['datetime'], message.data['receiverpeerid'], message.data['textid']);
+    }
+  }else{
+    if (message.data['image']!="") {
+      var url_length= message.data['image'].length;
+      var  type=  message.data['image'].toString().substring(url_length-3,url_length);
+      if(type!="pdf"||type!="mp4") {
+        _insertgroup("group#@####@#"+message.data['image']+"#@####@#noreplay#@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'network', message.data['datetime'], message.data['title'], message.data['textid']);
+      }else{
+        _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], type, message.data['datetime'], message.data['title'], message.data['textid']);
+      }
+    }
+    else{
+      _insertgroup("group#@####@#"+message.data['body']+"#@####@##@####@#"+message.data['datetime'], message.data['receiverpeerid'],message.data['senderpeerid'], 'text', message.data['datetime'], message.data['title'], message.data['textid']);
+    }
 
   }
 }
@@ -114,6 +121,7 @@ Future<void> downlordpdf(String pdfurl, String peerid, group,time,textid) async 
 Future<void> downlordimage(String file, String peerid, group, groupname,time,textid,receiverpeerid) async {
   try {
       dynamic parts = file.split('#@####@#');
+      print("i am here"+parts[2]);
       var imageId = await ImageDownloader.downloadImage(parts[2]);
       if (imageId == null) {
         return;
@@ -145,6 +153,8 @@ void insert(String _peerMessage, String senderpeerid, String type,time,receiverp
       DatabaseHelper.textId:textid
     };
     final dbHelper = DatabaseHelper.instance;
+    dynamic message_exists = await dbHelper.is_message_exists(textid);
+    if (message_exists==1) return;
     final id = await dbHelper.insert(row);
     print('main inserted  row id: $id');
   }
@@ -164,13 +174,12 @@ _insertgroup(String _peerMessage, String peerid,senderpeerid,type, String dateti
     DatabaseHelper.textId: textid
   };
   final dbHelper = DatabaseHelper.instance;
+  dynamic message_exists = await dbHelper.is_message_exists(textid);
+  if (message_exists==1) return;
   final id = await dbHelper.groupinsert(row);
   print('main inserted row id: $id');
   return id;
 }
-
-
-
 Future<void> main() async {
   // In dev mode, show error details
   // In release builds, show a only custom error message
@@ -466,6 +475,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         var type = message.data['type'];
         if (type == 'basic_channel') {
           downlord(message);
+          final prefs = await SharedPreferences.getInstance();
+          final String action = prefs.getString('action');
+          if(action==message.data["senderpeerid"]) return;
           //insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
           LocalNotificationService.showNotification(message);
         }
@@ -476,6 +488,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
             final prefs = await SharedPreferences.getInstance();
             await prefs.setInt('audiocall', 0);
             await prefs.setInt('counter', 0);
+
         }
           else
             if (type == 'cut') {
@@ -493,7 +506,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         if (message.data != null) {
           if (message.data['type'] == 'basic_channel') {
             downlord(message);
-
+            insertlocaldata(message);
            // insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
 
             LocalNotificationService.showNotification(message);
@@ -502,6 +515,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
            // LocalNotificationService.showCallNotification(message.data);
             LocalNotificationService.callkitNotification(message);
             final prefs = await SharedPreferences.getInstance();
+            final String action = prefs.getString('action');
             await prefs.setInt('audiocall', 0);
             await prefs.setInt('counter', 0);
           //  LocalNotificationService.misscallkitNotification(message);

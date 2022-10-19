@@ -159,7 +159,6 @@ class _TestLiveStreamState extends State<AudioCallpage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.reload();
       final int counter = prefs.getInt('audiocall');
-      print(counter.toString()+"ffdii");
         if (counter == 20){
           Navigator.pop(context);
         }
@@ -194,15 +193,16 @@ class _TestLiveStreamState extends State<AudioCallpage> {
 
   @override
   void dispose() async {
-    super.dispose();
+
     player.stop();
     _engine.leaveChannel();
     _engine.destroy();
     _timer.cancel();
     _stopWatchTimer.onExecute.add(StopWatchExecute.stop);
     final prefs = await SharedPreferences.getInstance();
-    final success = await prefs.remove('audiocall');
+    await prefs.setInt('audiocall',0);
     await _stopWatchTimer.dispose();
+    super.dispose();
   }
 
   @override

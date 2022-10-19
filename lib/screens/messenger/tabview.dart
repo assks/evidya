@@ -155,7 +155,7 @@ class _messengertabState extends State<messengertab>
         var fileName = await ImageDownloader.findName(imageId);
         // print('filename' + fileName);
         var path = await ImageDownloader.findPath(imageId);
-        _insertgroup("group#@####@#" + path.toString() + "#@####@#noreplay#@####@#", peerid, 'image', groupname, time);
+        _insertgroup("group#@####@#" + path.toString() + "#@####@#noreplay#@####@#", peerid, 'image', groupname, time,textid);
         var size = await ImageDownloader.findByteSize(imageId);
         // print('size' + size.toString());
         var mimeType = await ImageDownloader.findMimeType(imageId);
@@ -209,7 +209,7 @@ class _messengertabState extends State<messengertab>
       if(group=="group"){
 
       //  logController.addLog("group"+"#@####@#"+pdfurl + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + "" + "#@####@#" + time + '#@####@#' + peerid+'#@####@#'+time+'#@####@#'+groupname);
-        _insertgroup("group"+"#@####@#" + filepath.toString() + "#@#&" + name+"#@####@#noreplay#@####@#", peerid, 'doc',groupname, time, );
+        _insertgroup("group"+"#@####@#" + filepath.toString() + "#@#&" + name+"#@####@#noreplay#@####@#", peerid, 'doc',groupname, time,"" );
       }else{
         logController.addLog("#@####@#noreplay#@####@#" + filepath.toString() + "#@#&" + name + '#@####@#Receive' + '#@####@#doc' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerid + '#@####@#');
         _insert("" + "#@####@#noreplay#@####@#" + filepath.toString() + "#@#&" + name, peerid, 'doc', time, groupname);
@@ -253,10 +253,10 @@ class _messengertabState extends State<messengertab>
               logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#video' + '#@####@#' + parts[4] + "#@####@#" + parts[3] + '#@####@#' + peerId+'#@####@#'+parts[3]);
               dynamic part = parts[1].split('/');
              var name = part[part.length-1];
-              _insertgroup("group" + "#@####@#" +parts[1] + "#@#&" + name+"#@####@#"+"noreplay#@####@#"+parts[4], peerId, 'video', parts[3], parts[4]);
+              _insertgroup("group" + "#@####@#" +parts[1] + "#@#&" + name+"#@####@#"+"noreplay#@####@#"+parts[4], peerId, 'video', parts[3], parts[4],part[5]);
             } else {
               logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+parts[3]);
-              downlordimage(shortmessage, peerId, "group", parts[3], "textid", parts[4]);
+              downlordimage(shortmessage, peerId, "group", parts[3], parts[5], parts[4]);
             }
           } else {
             messagelog.addLog(peerId + '#@#&' + time);
@@ -276,22 +276,11 @@ class _messengertabState extends State<messengertab>
                 await downlordimage(messages, peerId, "single", "", parts[4], time);
               }
             } on Exception catch (_) {
-              logController.addLog(messages +
-                  '#@####@#Receive' +
-                  '#@####@#network' +
-                  '#@####@#' +
-                  DateTime.now().toString() +
-                  "#@####@#" +
-                  "" +
-                  '#@####@#' +
-                  peerId +
-                  '#@####@#' +
-                  "");
+              logController.addLog(messages + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId + '#@####@#' + "");
               if (message_exists == 1) {
                 return;
               }
-              await downlordimage(
-                  messages, peerId, "single", "", time, parts[4]);
+              await downlordimage( messages, peerId, "single", "", time, parts[4]);
             }
           }
         }
@@ -302,8 +291,7 @@ class _messengertabState extends State<messengertab>
             groupmessagelog.addLog(parts[4]);
             var shortmessage = parts[0] + '#@####@#' + parts[1] + '#@####@#' + parts[2] + '#@####@#' + time;
             logController.addLog(shortmessage + '#@####@#Receive' + '#@####@#text' + '#@####@#' + parts[5] + '#@####@#' + "" + '#@####@#' + peerId + '#@####@#' + parts[4]);
-            await _insertgroup(
-                shortmessage, peerId, 'text', parts[4], parts[3]);
+            await _insertgroup(shortmessage, peerId, 'text', parts[4], parts[3],"");
           } else {
             messagelog.addLog(peerId + '#@#&' + time);
             logController.addLog(messages +
@@ -362,7 +350,7 @@ class _messengertabState extends State<messengertab>
   }
 
   _insertgroup(String _peerMessage, String peerid, String type,
-      String groupname, time) async {
+      String groupname, time,textid) async {
     // row to insert
     Map<String, dynamic> row = {
       DatabaseHelper.Id: null,
@@ -374,7 +362,7 @@ class _messengertabState extends State<messengertab>
       DatabaseHelper.from: userpeerid,
       DatabaseHelper.to: peerid,
       DatabaseHelper.groupname: groupname,
-      DatabaseHelper.textId:""
+      DatabaseHelper.textId:textid
 
     };
     final id = await dbHelper.groupinsert(row);

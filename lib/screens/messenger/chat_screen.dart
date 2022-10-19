@@ -14,6 +14,7 @@ import 'package:evidya/notificationservice/LocalNotificationService.dart';
 import 'package:evidya/screens/bottom_navigation/bottom_navigaction_bar.dart';
 import 'package:evidya/screens/messenger/sender_profile_page.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -31,6 +32,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:video_player/video_player.dart';
@@ -99,6 +101,9 @@ class _Chat_ScreenState extends State<Chat_Screen> {
       // print("Timer");
       _isUserOnline();
     });
+// Obtain shared preferences.
+
+
     queryRowCount();
     localdata();
     super.initState();
@@ -108,9 +113,6 @@ class _Chat_ScreenState extends State<Chat_Screen> {
 
   /// this fun call on deleting a msg from sqlfite localdata
   void _delete(msgid, index) async {
-
-    var  rowsDeleted = await dbHelper.deletemsg(msgid);
-    // print(rowsDeleted.toString() + 'row deleted' + index.toString());
     widget.logController.removeLog(index);
   }
 
@@ -682,6 +684,8 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                                                                                     placeholder: (context, url) => LinearProgressIndicator(
                                                                                       minHeight: 20.sp,
                                                                                     ),
+                                                                                        width: 50.w,
+                                                                                        height: 30.h,
                                                                                     errorWidget: (context, url, error) => const Icon(
                                                                                       Icons.error,
                                                                                       size: 50,
@@ -1833,7 +1837,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
         });
   }
 
-  void localdata() {
+  void localdata() async{
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.Userdata)
         .then((value) => {
               if (value != null)
@@ -1852,9 +1856,11 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                   devicefcmtoken = value,
                 }
             });
-    PreferenceConnector().setScreen("chatscreen");
-    PreferenceConnector.setJsonToSharedPreferencechatscreen(
-        StringConstant.chatscreen, "chatscreen");
+
+    PreferenceConnector.setJsonToSharedPreferencechatscreen(StringConstant.chatscreen, "chatscreen");
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('action', widget.recentchatuserdetails.peerId);
+
   }
 
   void videocallapi(String name, String id, String calltype,textid) {

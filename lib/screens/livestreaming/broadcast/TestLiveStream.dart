@@ -243,7 +243,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
     _timer.cancel();
 
     final prefs = await SharedPreferences.getInstance();
-    final success = await prefs.remove('counter');
+    await prefs.setInt('counter',0);
     super.dispose();
   }
 

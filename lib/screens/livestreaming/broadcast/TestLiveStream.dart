@@ -79,6 +79,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
   @override
   void initState() {
     super.initState();
+
     localData();
     if(widget.userFcmToken!=null){
       audioply();
@@ -153,7 +154,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
     Helper.showMessage('joinChannel ${Token}${channalname}');
     await engine.joinChannel(Token, channalname, null, 0);
   }
-  void localData() {
+  void localData() async{
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.Userdata)
         .then((value) =>
 
@@ -165,13 +166,14 @@ class _TestLiveStreamState extends State<TestLiveStream> {
         })
       }
     });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter',0);
 
     _timer= Timer.periodic(const Duration(seconds: 2), (timer) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.reload();
-      var call = prefs.getString(StringConstant.videoscreen);
       final int counter = prefs.getInt('counter');
-      // print("+bac123"+call);
+       print("+bac123: $counter");
       if (counter == 10){
         Navigator.pop(context);
       }
@@ -198,7 +200,7 @@ class _TestLiveStreamState extends State<TestLiveStream> {
         else {
           EasyLoading.showToast("Sorry, Network Issues! Please Connect Again.",
               toastPosition: EasyLoadingToastPosition.top,
-              duration: Duration(seconds: 5)
+              duration: const Duration(seconds: 5)
           );
           Navigator.pop(context);
         }
@@ -241,10 +243,10 @@ class _TestLiveStreamState extends State<TestLiveStream> {
     _engine.destroy();
     player.stop();
     _timer.cancel();
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('counter',0);
     super.dispose();
+    /*final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter',0);*/
+
   }
 
   @override

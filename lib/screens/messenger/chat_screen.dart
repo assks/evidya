@@ -153,6 +153,8 @@ class _Chat_ScreenState extends State<Chat_Screen> {
     replytex = '';
     timer?.cancel();
     await dbHelper.deletebadge(widget.rtmpeerid);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('action',"nochatscreen");
     clearprefnacedata();
     super.dispose();
   }
@@ -1680,7 +1682,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                             print("uplordsucess");
                             loading = false;
                             uplordstatus = 0;
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
+                            AgoraRtmMessage message = AgoraRtmMessage.fromText("video#@####@#noreplay#@####@#" + value.body.source + "#@#&" + files.name + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
                             widget.client.sendMessageToPeer(widget.rtmpeerid, message, true, false);
                             updatelocaldata(widget.rtmpeerid);
                           });
@@ -1823,7 +1825,7 @@ class _Chat_ScreenState extends State<Chat_Screen> {
                     color: Colors.red,
                     semanticLabel: "image not found")),
           )
-        : Text(replytex, style: TextStyle(fontSize: 14.0, color: Colors.black));
+        : Text(replytex, style: const TextStyle(fontSize: 14.0, color: Colors.black));
   }
 
   void fcmapicall ( String msg, String fcmtoken, image, call_id, type, profileimage,textid) {

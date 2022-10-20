@@ -32,6 +32,7 @@ class LocalNotificationService{
             channelKey: 'basic_channel',
             title: message.data['title']+"      "+_messageIncrement.toString(),
             body: message.data['body'],
+            ticker: _messageIncrement.toString(),
             wakeUpScreen: true,
             bigPicture: message.data['image'],
             notificationLayout: NotificationLayout.BigPicture

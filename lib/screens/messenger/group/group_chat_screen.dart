@@ -20,6 +20,7 @@ import 'package:evidya/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:swipe_to/swipe_to.dart';
 import 'package:video_player/video_player.dart';
@@ -125,13 +126,15 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     // TODO: implement dispose
     widget.logController.value.clear();
     replytex = '';
     timer?.cancel();
     dbHelper.deletebadge(widget.rtmpeerid);
     PreferenceConnector().setCurrentChatUserName("");
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('action',"nochatscreen");
     super.dispose();
   }
 
@@ -1676,7 +1679,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         });
   }
 
-  localdata() {
+  localdata() async{
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.Userdata)
         .then((value) => {
               if (value != null)
@@ -1699,6 +1702,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                   })
                 }
             });
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('action', widget.recentchatuserdetails.groupName);
   }
 
   Future<void> _query() async {

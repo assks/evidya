@@ -105,6 +105,17 @@ class _RecentChatState extends State<RecentChat> {
                     userlist: filterdUsers,
                   )));
           break;
+        }else{
+          Navigator.of(context)
+              .push(MaterialPageRoute(
+              builder: (context) => GroupListPage(
+                client: widget.client,
+                messagePeerId: widget.messageLog,
+                logController: widget.logController,
+                groupmessagelog: widget.groupmessageLog,
+                groupname : widget.clientpeerid
+              )))
+              .whenComplete(initState);
         }
       }
       index++;

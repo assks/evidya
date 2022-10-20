@@ -1,6 +1,7 @@
 import 'package:agora_rtm/agora_rtm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:evidya/constants/string_constant.dart';
+import 'package:evidya/model/GroupListModal.dart';
 import 'package:evidya/model/login/contactsmatch_Modal.dart';
 import 'package:evidya/model/recentchatconnectionslist_modal.dart';
 import 'package:evidya/network/repository/api_repository.dart';
@@ -26,6 +27,7 @@ class GroupListPage extends StatefulWidget {
   final Contacts userdetails;
   final Connections recentchatuserdetails;
   final GroupMessageLog groupmessagelog;
+  final String groupname;
 
   const GroupListPage(
       {this.client,
@@ -36,6 +38,7 @@ class GroupListPage extends StatefulWidget {
       this.rtmpeerid,
       this.groupmessagelog,
       this.recentchatuserdetails,
+        this.groupname,
       Key key})
       : super(key: key);
 
@@ -300,6 +303,9 @@ class _GroupListPageState extends State<GroupListPage> {
                           {
                             ApiRepository().groupList(value).then((value) {
                               if (value != null) {
+                                if (widget.groupname != null) {
+                                  navigatequery(value.body.groups);
+                                }
                                 setState(() {
                                   groupListData = value.body.groups;
                                   loader = true;
@@ -307,6 +313,7 @@ class _GroupListPageState extends State<GroupListPage> {
                                 });
                                 for (int a = 0; a < groupListData.length; a++) {
                                   setState(() {
+
                                     apiusers = groupListData;
                                     _insert(groupListData[a]);
                                   });
@@ -383,5 +390,30 @@ class _GroupListPageState extends State<GroupListPage> {
   void deletelog(groupname, log) {
     widget.groupmessagelog.removegroupLog(groupname);
 
+  }
+
+  void navigatequery(dynamic groupname) async {
+    var i=0;
+    for (var value in groupname) {
+        if (value.groupName == widget.groupname) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      GroupChatScreen(
+                        client: widget.client,
+                        rtmpeerid: groupListData[i].members[0].pid,
+                        membersList: groupListData[i].members,
+                        messagePeerId: widget.messagePeerId,
+                        logController: widget.logController,
+                        recentchatuserdetails: groupListData[i],
+                        groupmessagelog: widget.groupmessagelog,
+                        self: groupListData[i].self,
+                      )));
+          break;
+        }
+
+      i++;
+    }
   }
 }

@@ -142,7 +142,7 @@ class _TestLiveStreamState extends State<AudioCallpage> {
     await engine.joinChannel(Token, channalname, null, 0);
   }
 
-  void localData()  {
+  void localData()  async{
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.Userdata)
         .then((value) =>
     {
@@ -155,10 +155,13 @@ class _TestLiveStreamState extends State<AudioCallpage> {
         }
     });
 
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('audiocall',0);
     _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.reload();
       final int counter = prefs.getInt('audiocall');
+      print("bac:$counter");
         if (counter == 20){
           Navigator.pop(context);
         }
@@ -199,8 +202,7 @@ class _TestLiveStreamState extends State<AudioCallpage> {
     _engine.destroy();
     _timer.cancel();
     _stopWatchTimer.onExecute.add(StopWatchExecute.stop);
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('audiocall',0);
+
     await _stopWatchTimer.dispose();
     super.dispose();
   }

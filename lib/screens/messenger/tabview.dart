@@ -294,18 +294,8 @@ class _messengertabState extends State<messengertab>
             await _insertgroup(shortmessage, peerId, 'text', parts[4], parts[3],"");
           } else {
             messagelog.addLog(peerId + '#@#&' + time);
-            logController.addLog(messages +
-                '#@####@#Receive' +
-                '#@####@#text' +
-                '#@####@#' +
-                time +
-                "#@####@#" +
-                "" +
-                '#@####@#' +
-                peerId +
-                '#@####@#' +
-                "new");
-            if (message_exists) {
+            logController.addLog(messages + '#@####@#Receive' + '#@####@#text' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId + '#@####@#' + "new");
+            if (message_exists==1) {
               return;
             }
             await _insert(messages, peerId, 'text', time, parts[4]);
@@ -315,7 +305,7 @@ class _messengertabState extends State<messengertab>
       control_Log = true;
     };
 
-    _client.onConnectionStateChanged = (int state, int reason) {
+    _client.onConnectionStateChanged = (dynamic state, dynamic reason) {
       if (kDebugMode) {
         print('Connection state changed: ' +
             state.toString() +

@@ -307,9 +307,17 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         return;
       }
       else if (receivedAction.channelKey == 'basic_channel') {
-        await Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) =>
-            messengertab(rtmpeerid: receivedAction.payload['peerid'],
-                )));
+        if(receivedAction.payload['peerid']=='group') {
+          await Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) =>
+                  messengertab(rtmpeerid: receivedAction.payload['name'],
+                  )));
+        }else{
+          await Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (context) =>
+                  messengertab(rtmpeerid: receivedAction.payload['peerid'],
+                  )));
+        }
        // Navigator.pushAndRemoveUntil<dynamic>(context, MaterialPageRoute<dynamic>(builder: (BuildContext context) => messengertab(rtmpeerid: receivedAction.payload['peerid']),), (route) => false,//if you want to disable back feature set to false);
         return;
       }
@@ -477,18 +485,19 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           downlord(message);
           final prefs = await SharedPreferences.getInstance();
           final String action = prefs.getString('action');
-          if(action==message.data["senderpeerid"]) return;
+          if(action==message.data["receiverpeerid"]) return;
+          if(action==message.data["title"]) return;
           //insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
           LocalNotificationService.showNotification(message);
         }
         else
           if (type == 'call_channel') {
             Vibrate.vibrate();
-            LocalNotificationService.callkitNotification(message);
+
             final prefs = await SharedPreferences.getInstance();
             await prefs.setInt('audiocall', 0);
             await prefs.setInt('counter', 0);
-
+            LocalNotificationService.callkitNotification(message);
         }
           else
             if (type == 'cut') {
@@ -513,11 +522,12 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
           } else if (message.data['type'] == 'call_channel') {
             //Vibrate.vibrate();
            // LocalNotificationService.showCallNotification(message.data);
-            LocalNotificationService.callkitNotification(message);
+
             final prefs = await SharedPreferences.getInstance();
             final String action = prefs.getString('action');
             await prefs.setInt('audiocall', 0);
             await prefs.setInt('counter', 0);
+            LocalNotificationService.callkitNotification(message);
           //  LocalNotificationService.misscallkitNotification(message);
           } else if (message.data['type'] == 'cut') {
             await FlutterCallkitIncoming.endAllCalls();

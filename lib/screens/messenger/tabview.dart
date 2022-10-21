@@ -144,6 +144,7 @@ class _messengertabState extends State<messengertab>
   Future<void> downlordimage(
       String file, String peerid, group, groupname, textid, time) async {
     try {
+
       if (group == "group") {
         dynamic parts = file.split('#@####@#');
         var imageId = await ImageDownloader.downloadImage(parts[1]);
@@ -160,6 +161,9 @@ class _messengertabState extends State<messengertab>
         // print('size' + size.toString());
         var mimeType = await ImageDownloader.findMimeType(imageId);
         // print('mimetype' + mimeType);
+        // Obtain shared preferences.
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('groupbadge', true);
       } else {
         dynamic parts = file.split('#@####@#');
         var imageId = await ImageDownloader.downloadImage(parts[2]);
@@ -210,6 +214,9 @@ class _messengertabState extends State<messengertab>
 
       //  logController.addLog("group"+"#@####@#"+pdfurl + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + "" + "#@####@#" + time + '#@####@#' + peerid+'#@####@#'+time+'#@####@#'+groupname);
         _insertgroup("group"+"#@####@#" + filepath.toString() + "#@#&" + name+"#@####@#noreplay#@####@#", peerid, 'doc',groupname, time,"" );
+        // Obtain shared preferences.
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('groupbadge', true);
       }else{
         logController.addLog("#@####@#noreplay#@####@#" + filepath.toString() + "#@#&" + name + '#@####@#Receive' + '#@####@#doc' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerid + '#@####@#');
         _insert("" + "#@####@#noreplay#@####@#" + filepath.toString() + "#@#&" + name, peerid, 'doc', time, groupname);
@@ -221,7 +228,10 @@ class _messengertabState extends State<messengertab>
 
   void _createClient() async {
     var time;
+
     logController.clear();
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
     _client = await AgoraRtmClient.createInstance(appId);
     _client.onMessageReceived = (AgoraRtmMessage message, String peerId) async {
       RegExp fileExp = RegExp(r"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg|pdf|mp4)");
@@ -258,6 +268,7 @@ class _messengertabState extends State<messengertab>
               logController.addLog(shortmessage + "#@####@#noreplay" + '#@####@#Receive' + '#@####@#network' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + '#@####@#' + peerId+'#@####@#'+parts[3]);
               downlordimage(shortmessage, peerId, "group", parts[3], parts[5], parts[4]);
             }
+            await prefs.setBool('groupbadge', true);
           } else {
             messagelog.addLog(peerId + '#@#&' + time);
             try {
@@ -292,6 +303,7 @@ class _messengertabState extends State<messengertab>
             var shortmessage = parts[0] + '#@####@#' + parts[1] + '#@####@#' + parts[2] + '#@####@#' + time;
             logController.addLog(shortmessage + '#@####@#Receive' + '#@####@#text' + '#@####@#' + parts[5] + '#@####@#' + "" + '#@####@#' + peerId + '#@####@#' + parts[4]);
             await _insertgroup(shortmessage, peerId, 'text', parts[4], parts[3],"");
+            await prefs.setBool('groupbadge', true);
           } else {
             messagelog.addLog(peerId + '#@#&' + time);
             logController.addLog(messages + '#@####@#Receive' + '#@####@#text' + '#@####@#' + time + "#@####@#" + "" + '#@####@#' + peerId + '#@####@#' + "new");

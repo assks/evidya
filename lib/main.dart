@@ -40,10 +40,8 @@ Future<void> backgroundHandler(RemoteMessage message) async {
   if (type == 'basic_channel') {
       LocalNotificationService.showNotification(message);
       insertlocaldata(message);
-
    } else if (type == 'call_channel') {
     print('listen a background and not terminated message123 ${message.data}');
-
     LocalNotificationService.callkitNotification(message);
 
   } else if (type == 'cut') {
@@ -308,15 +306,19 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
       }
       else if (receivedAction.channelKey == 'basic_channel') {
         if(receivedAction.payload['peerid']=='group') {
-          await Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) =>
-                  messengertab(rtmpeerid: receivedAction.payload['name'],
-                  )));
+         // Future.delayed(const Duration(seconds: 1), (){
+             Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) =>
+                    messengertab(rtmpeerid: receivedAction.payload['name'],
+                    )));
+         // });
         }else{
-          await Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (context) =>
-                  messengertab(rtmpeerid: receivedAction.payload['peerid'],
-                  )));
+         // Future.delayed(const Duration(seconds: 1), (){
+             Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) =>
+                    messengertab(rtmpeerid: receivedAction.payload['peerid'],
+                    )));
+        //  });
         }
        // Navigator.pushAndRemoveUntil<dynamic>(context, MaterialPageRoute<dynamic>(builder: (BuildContext context) => messengertab(rtmpeerid: receivedAction.payload['peerid']),), (route) => false,//if you want to disable back feature set to false);
         return;
@@ -450,6 +452,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         if (message.data['type'] == 'basic_channel') {
           LocalNotificationService.showNotification(message);
           downlord(message);
+          insertlocaldata(message);
          // insert(message.data['body'],message.data['senderpeerid'], 'text',message.data['datetime'],message.data['receiverpeerid'],message.data['textid']);
 
           // PreferenceConnector.getJsonToSharedPreferenceechatscreen(StringConstant.chatscreen).then((value) => {
@@ -483,6 +486,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
         var type = message.data['type'];
         if (type == 'basic_channel') {
           downlord(message);
+          insertlocaldata(message);
           final prefs = await SharedPreferences.getInstance();
           final String action = prefs.getString('action');
           if(action==message.data["receiverpeerid"]) return;
@@ -545,7 +549,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver{
     // TODO: implement build
     return MaterialApp(
       title: 'bVidya',
-      checkerboardOffscreenLayers: true,
+     // checkerboardOffscreenLayers: true,
       theme: ThemeData(
         primaryColor: AppColors.redColor,
       ).copyWith(

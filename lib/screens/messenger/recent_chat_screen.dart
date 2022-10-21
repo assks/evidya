@@ -20,9 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-
 import 'chat_screen.dart';
-import 'dart:math' as math;
 
 class RecentChat extends StatefulWidget {
   final LogController logController;
@@ -60,6 +58,7 @@ class _RecentChatState extends State<RecentChat> {
   var _image;
   String image, token;
   var naviage = false;
+  var badgevisiabilty=false;
 
   @override
   void initState() {
@@ -73,7 +72,9 @@ class _RecentChatState extends State<RecentChat> {
   void SharedPreferencedata() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     image = prefs.getString('profileImage');
-    await PreferenceConnector.getJsonToSharedPreferencetoken(
+    badgevisiabilty=  prefs.getBool('groupbadge')==true;//? badgevisiabilty==true:badgevisiabilty==false;
+
+     PreferenceConnector.getJsonToSharedPreferencetoken(
             StringConstant.Userdata)
         .then((value) => {
               if (value != null)
@@ -85,40 +86,50 @@ class _RecentChatState extends State<RecentChat> {
                   })
                 }
             });
+
+
   }
 
   void navigatequery() async {
+    if (widget.clientpeerid == null) {
+      return;
+    }
     final _allRows = await dbHelper.getAlldata();
-    var index = 0;
-    for (var value in _allRows) {
-      if (widget.clientpeerid != null) {
-        if (value.peerId == widget.clientpeerid) {
-          Navigator.push(context,
-              MaterialPageRoute(
-                  builder: (context) => Chat_Screen(
-                    client: widget.client,
-                    rtmpeerid: widget.clientpeerid,
-                    messagePeerId: widget.messageLog,
-                    logController: widget.logController,
-                    recentchatuserdetails: filterdUsers[index],
-                    status: filterdUsers[index].status,
-                    userlist: filterdUsers,
-                  )));
-          break;
-        }else{
-          Navigator.of(context)
-              .push(MaterialPageRoute(
-              builder: (context) => GroupListPage(
+    final items = _allRows.where((element) => element.peerId == widget.clientpeerid);
+
+    if (items.isNotEmpty) {
+      final item = items.first;
+      Future.delayed(Duration.zero, () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Chat_Screen(
+              client: widget.client,
+              rtmpeerid: widget.clientpeerid,
+              messagePeerId: widget.messageLog,
+              logController: widget.logController,
+              recentchatuserdetails: item,
+              status: item.status,
+              userlist: filterdUsers,
+            ),
+          ),
+        );
+      });
+    } else {
+      Future.delayed(Duration.zero, () {
+        Navigator.of(context)
+            .push(
+          MaterialPageRoute(
+            builder: (context) => GroupListPage(
                 client: widget.client,
                 messagePeerId: widget.messageLog,
                 logController: widget.logController,
                 groupmessagelog: widget.groupmessageLog,
-                groupname : widget.clientpeerid
-              )))
-              .whenComplete(initState);
-        }
-      }
-      index++;
+                groupname: widget.clientpeerid),
+          ),
+        )
+            .whenComplete(initState);
+      });
     }
   }
 
@@ -366,7 +377,10 @@ class _RecentChatState extends State<RecentChat> {
                                   Icons.people_alt_sharp,
                                   size: 3.h,
                                   color: Colors.black,
-                                )
+                                ),
+                                 Visibility(
+                                  visible: badgevisiabilty,
+                                    child: const Text("New",style: TextStyle(color: Colors.yellow),))
                               ],
                             ),
                             onTap: () {
@@ -376,8 +390,7 @@ class _RecentChatState extends State<RecentChat> {
                                             client: widget.client,
                                             messagePeerId: widget.messageLog,
                                             logController: widget.logController,
-                                            groupmessagelog:
-                                                widget.groupmessageLog,
+                                            groupmessagelog: widget.groupmessageLog,
                                           )))
                                   .whenComplete(initState);
                             },

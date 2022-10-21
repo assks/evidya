@@ -13,6 +13,7 @@ import 'package:evidya/sharedpref/preference_connector.dart';
 import 'package:evidya/utils/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '../../../localdb/databasehelper.dart';
 import 'create_group.dart';
@@ -58,6 +59,7 @@ class _GroupListPageState extends State<GroupListPage> {
   @override
   void initState() {
     super.initState();
+    clearnewmsgbadge();
     groups();
   }
 
@@ -415,5 +417,12 @@ class _GroupListPageState extends State<GroupListPage> {
 
       i++;
     }
+  }
+
+  void clearnewmsgbadge() async {
+    // Obtain shared preferences.
+    final prefs = await SharedPreferences.getInstance();
+    // Remove data for the 'counter' key.
+     await prefs.remove('groupbadge');
   }
 }

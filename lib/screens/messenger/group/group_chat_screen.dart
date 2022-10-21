@@ -246,7 +246,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                         ),
                                                       )
                                                     : Text(
-                                                        "${widget.userdetails.name[0]}",
+                                                        widget.userdetails.name[0],
                                                         textAlign:
                                                             TextAlign.center,
                                                         style: TextStyle(

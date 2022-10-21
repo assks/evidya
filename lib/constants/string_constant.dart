@@ -25,7 +25,6 @@ class StringConstant {
   static const String callscreen = 'callscreen';
   static const String videoscreen = 'videoscreen';
 
-
   static const String First_name = 'First Name';
   static const String Last_name = 'Last Name';
   static const String date = 'Date';

@@ -302,7 +302,7 @@ class _messengertabState extends State<messengertab>
             groupmessagelog.addLog(parts[4]);
             var shortmessage = parts[0] + '#@####@#' + parts[1] + '#@####@#' + parts[2] + '#@####@#' + time;
             logController.addLog(shortmessage + '#@####@#Receive' + '#@####@#text' + '#@####@#' + parts[5] + '#@####@#' + "" + '#@####@#' + peerId + '#@####@#' + parts[4]);
-            await _insertgroup(shortmessage, peerId, 'text', parts[4], parts[3],"");
+            await _insertgroup(shortmessage, peerId, 'text', parts[4], parts[3],parts[6]);
             await prefs.setBool('groupbadge', true);
           } else {
             messagelog.addLog(peerId + '#@#&' + time);

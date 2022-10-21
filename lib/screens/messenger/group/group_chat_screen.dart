@@ -1319,43 +1319,13 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
     imageapi(pickedFile, "", "image");
     if (replytex != "") {
-      var file = "group" "#@####@#" +
-          pickedFile.path +
-          '#@####@#' +
-          replytex +
-          "#@####@#replay#@####@#" +
-          'send' +
-          '#@####@#image' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
+      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#replay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path,
-          'image', 'send');
+      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path, 'image', 'send');
     } else {
-      var file = "group" "#@####@#" +
-          pickedFile.path +
-          '#@####@#' +
-          replytex +
-          "#@####@#noreplay#@####@#" +
-          'send' +
-          '#@####@#image' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
+      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#noreplay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
       widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path,
-          'image', 'send');
+      _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path, 'image', 'send');
     }
   }
 
@@ -1528,7 +1498,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         .then((value) => {
               if (value != null)
                 {
-
                   ApiRepository().uplordchatimage(value, image).then((value) {
                     if (mounted) {
                       if (value != null) {
@@ -1543,7 +1512,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                               print(row);
                             }
                           }
-                          fcmapicall(joiner, widget.recentchatuserdetails.groupAdmin, value.body.source, '', 'basic_channel',textid,"");
                           AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#$textid");
                           for (int i = 0; i < widget.membersList.length; i++) {
                             widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);

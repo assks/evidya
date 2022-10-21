@@ -78,7 +78,7 @@ dependencies:
   flutter_callkit_incoming: ^1.0.2+2
   callkeep:
   file_picker:
-  pdf_viewer_plugin:
+  pdf_viewer_plugin: 1.1.1
   google_sign_in:
   firebase_core:
   firebase_auth:

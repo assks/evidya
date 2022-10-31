@@ -1,5 +1,5 @@
 import 'package:evidya/constants/page_route_constants.dart';
-import 'package:evidya/model/home.dart';
+// import 'package:evidya/model/home.dart';
 import 'package:evidya/screens/bottom_navigation/bottom_navigaction_bar.dart';
 import 'package:evidya/screens/createmeet/schudle_meet_screen.dart';
 import 'package:evidya/screens/login/forget_password.dart';
@@ -12,7 +12,7 @@ import 'package:evidya/screens/splash/splash_screen.dart';
 import 'package:evidya/screens/welcome_screen/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../screens/livestreaming/broadcast/audiocallpage.dart';
+// import '../screens/livestreaming/broadcast/audiocallpage.dart';
 
 class ScreenRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -28,13 +28,13 @@ class ScreenRouter {
       case PageRouteConstants.policy_screen:
         return MaterialPageRoute(builder: (_) => Policy());
       case PageRouteConstants.registration_screen:
-         return MaterialPageRoute(builder: (_) => RegistrationScreen());
+        return MaterialPageRoute(builder: (_) => RegistrationScreen());
       case PageRouteConstants.forget_password:
         return MaterialPageRoute(builder: (_) => ForgetPassword());
       case PageRouteConstants.bottom_navigaction:
         return MaterialPageRoute(builder: (_) => BottomNavbar(index: 2));
-       case PageRouteConstants.audiocallscreen:
-         return MaterialPageRoute(builder: (_) => AudioCallpage());
+      // case PageRouteConstants.audiocallscreen:
+      //   return MaterialPageRoute(builder: (_) => AudioCallpage());
       case PageRouteConstants.schudle_meet_screen:
         return MaterialPageRoute(builder: (_) => Schudle_Meet_Screen());
 

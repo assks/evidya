@@ -1,14 +1,14 @@
 import 'package:evidya/utils/helper.dart';
-import 'package:flutter/cupertino.dart';
+// import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
-import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
-import 'package:flutter/services.dart';
+import 'package:agora_rtc_engine/rtc_local_view.dart' as rtc_local_view;
+import 'package:agora_rtc_engine/rtc_remote_view.dart' as rtc_remote_view;
+// import 'package:flutter/services.dart';
 import 'package:pip_view/pip_view.dart';
 import 'package:wakelock/wakelock.dart';
 
-import 'liveclass.dart';
+// import 'liveclass.dart';
 
 class BroadcastPage extends StatefulWidget {
   final String channelName;
@@ -53,16 +53,16 @@ class _BroadcastPageState extends State<BroadcastPage> {
   @override
   void initState() {
     super.initState();
-     rotate =widget.rotate;
+    rotate = widget.rotate;
     initialize();
-
   }
 
   Future<void> initialize() async {
     //print('Client Role: ${widget.isBroadcaster}');
     if (appId.isEmpty) {
       setState(() {
-        _infoStrings.add('APP_ID missing, please provide your APP_ID in settings.dart',
+        _infoStrings.add(
+          'APP_ID missing, please provide your APP_ID in settings.dart',
         );
         _infoStrings.add('Agora Engine is not starting');
       });
@@ -70,7 +70,8 @@ class _BroadcastPageState extends State<BroadcastPage> {
     }
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
-    await _engine.joinChannel(widget.token, widget.channelName, null, int.parse(widget.userName));
+    await _engine.joinChannel(
+        widget.token, widget.channelName, null, int.parse(widget.userName));
   }
 
   Future<void> _initAgoraRtcEngine() async {
@@ -138,31 +139,31 @@ class _BroadcastPageState extends State<BroadcastPage> {
                     color: muted ? Colors.white : Colors.blueAccent,
                     size: 20.0,
                   ),
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   elevation: 2.0,
                   fillColor: muted ? Colors.blueAccent : Colors.white,
                   padding: const EdgeInsets.all(12.0),
                 ),
                 RawMaterialButton(
                   onPressed: () => _onCallEnd(context),
-                  child: Icon(
+                  child: const Icon(
                     Icons.call_end,
                     color: Colors.white,
                     size: 35.0,
                   ),
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   elevation: 2.0,
                   fillColor: Colors.redAccent,
                   padding: const EdgeInsets.all(15.0),
                 ),
                 RawMaterialButton(
                   onPressed: _onSwitchCamera,
-                  child: Icon(
+                  child: const Icon(
                     Icons.switch_camera,
                     color: Colors.blueAccent,
                     size: 20.0,
                   ),
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   elevation: 2.0,
                   fillColor: Colors.white,
                   padding: const EdgeInsets.all(12.0),
@@ -170,12 +171,12 @@ class _BroadcastPageState extends State<BroadcastPage> {
                 RawMaterialButton(
                   onPressed: () => _onCallEnd(context),
                   // onPressed: _goToChatPage,
-                  child: Icon(
+                  child: const Icon(
                     Icons.call_end,
                     color: Colors.redAccent,
                     size: 20.0,
                   ),
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   elevation: 2.0,
                   fillColor: Colors.white,
                   padding: const EdgeInsets.all(12.0),
@@ -183,9 +184,10 @@ class _BroadcastPageState extends State<BroadcastPage> {
               ],
             ),
           )
-        : Row(
-            children: [
-              /* Container(
+        : const SizedBox();
+    // Row(
+    //     children: [
+    /* Container(
                 alignment: Alignment.bottomCenter,
                 padding: EdgeInsets.only(bottom: 48),
                 child: RawMaterialButton(
@@ -204,8 +206,8 @@ class _BroadcastPageState extends State<BroadcastPage> {
                   padding: const EdgeInsets.all(12.0),
                 ),
               ),*/
-            ],
-          );
+    //   ],
+    // );
   }
 
   @override
@@ -217,22 +219,24 @@ class _BroadcastPageState extends State<BroadcastPage> {
         body: Center(
           child: Stack(
             children: <Widget>[
-            rotate == true ? _viewRows() :  RotatedBox(quarterTurns: 1, child: _viewRows()),
+              rotate == true
+                  ? _viewRows()
+                  : RotatedBox(quarterTurns: 1, child: _viewRows()),
               _toolbar(),
               Container(
-                alignment: Alignment.bottomRight,
-              child:  IconButton(
-                  icon: Icon(
-                    Icons.fullscreen_exit,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    // Navigator.pop(context);
-                    setState(() {
-                      rotate = (rotate == true) ? false : true;
-                    });
-                    })),
-                ],
+                  alignment: Alignment.bottomRight,
+                  child: IconButton(
+                      icon: const Icon(
+                        Icons.fullscreen_exit,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        // Navigator.pop(context);
+                        setState(() {
+                          rotate = (rotate == true) ? false : true;
+                        });
+                      })),
+            ],
           ),
         ),
       );
@@ -243,9 +247,11 @@ class _BroadcastPageState extends State<BroadcastPage> {
   List<Widget> _getRenderViews() {
     final List<StatefulWidget> list = [];
     if (widget.isBroadcaster) {
-      list.add(RtcLocalView.SurfaceView());
+      list.add( rtc_local_view.SurfaceView());
     }
-    _users.forEach((int uid) => list.add(RtcRemoteView.SurfaceView(uid: uid)));
+    for (var uid in _users) {
+      list.add(rtc_remote_view.SurfaceView(uid: uid));
+    }
     return list;
   }
 
@@ -268,9 +274,9 @@ class _BroadcastPageState extends State<BroadcastPage> {
     switch (views.length) {
       case 1:
         return Container(
-              child: Column(
+            child: Column(
           children: <Widget>[_videoView(views[0])],
-            ));
+        ));
       case 2:
         return Container(
           child: Column(
@@ -315,8 +321,8 @@ class _BroadcastPageState extends State<BroadcastPage> {
     _engine.switchCamera();
   }
 
-  Widget back() {
-    // ModalRoute.of(context).settings.name;
-    Navigator.of(context).pop();
-  }
+  // Widget back() {
+  //   // ModalRoute.of(context).settings.name;
+  //   Navigator.of(context).pop();
+  // }
 }

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:evidya/constants/color_constant.dart';
 import 'package:evidya/constants/string_constant.dart';
+import 'package:evidya/model/chat_model.dart';
 import 'package:evidya/network/repository/api_repository.dart';
 import 'package:evidya/notificationservice/LocalNotificationService.dart';
 import 'package:evidya/sharedpref/preference_connector.dart';
@@ -23,7 +24,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:swipe_to/swipe_to.dart';
-import 'package:video_player/video_player.dart';
+// import 'package:video_player/video_player.dart';
 import '../../../model/GroupListModal.dart';
 import '../fullscreenimage.dart';
 import '../msgvideoplayer.dart';
@@ -35,7 +36,7 @@ class GroupChatScreen extends StatefulWidget {
   final AgoraRtmChannel channel;
   final String rtmpeerid;
   final List<Members> membersList;
-  final LogController logController;
+  final GroupLongController logController;
   final MessageLog messagePeerId;
   final Contacts userdetails;
   final Groups recentchatuserdetails;
@@ -64,35 +65,36 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     with WidgetsBindingObserver {
   final _peerMessage = TextEditingController();
   final ScrollController _controller = ScrollController();
-  VideoPlayerController _videoPlayerController;
+  // VideoPlayerController _videoPlayerController;
   var onlinestatus = "offline";
   String replytex = "", username;
   List groupMembers = [];
-  File _video;
+  // File _video;
   bool replyvisibility = false;
   final dbHelper = DatabaseHelper.instance;
   MessageLog messagelog = MessageLog();
   final picker = ImagePicker();
   RegExp fileExp = RegExp(r"([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)");
-  dynamic afile = false;
+  bool afile = false;
   Timer timer;
   var Logindata, userpeerid;
   dynamic profileJson;
   String recieptPerson;
   String message = "";
+  String replyPath = '';
   int length = 0;
 
   @override
   void initState() {
-    _isUserOnline();
-    Timer.periodic(const Duration(seconds: 10), (timer) {
-      _isUserOnline();
-    });
+    // _isUserOnline();
+    // Timer.periodic(const Duration(seconds: 10), (timer) {
+    //   _isUserOnline();
+    // });
     queryRowCount();
     localdata();
     super.initState();
     recieptPerson = widget.recentchatuserdetails.groupName;
-    _query();
+    // _query();
   }
 
   void _delete(msgid, index) async {
@@ -103,38 +105,76 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   void queryRowCount() async {
-    await PreferenceConnector.getJsonToSharedPreferenceertmuserpeerid(StringConstant.rtmuserpeerid)
-        .then((value) => {
-              if (value != null)
-                {
-                  userpeerid = value
-                }
-            });
-    final allRows = await dbHelper.groupqueryRowCount(widget.rtmpeerid.toString(), userpeerid.toString(), widget.recentchatuserdetails.groupName);
-    print('query all rows:$allRows');
-    allRows.forEach((row) => {
-          if (row != null)
-            {
-              widget.logController.addLog(row["message"] + row["diraction"] + "#@####@#" + row['type1'] + "#@####@#" + row["timestamp"] + "#@####@#" + row["id"].toString() + "#@####@#" + row["to1"] + "#@####@#" + row["groupname"]),
-              setState(() {
-                _controller.animateTo(_controller.position.maxScrollExtent,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeOut);
-              }),
-            }
+    final value =
+        await PreferenceConnector.getJsonToSharedPreferenceertmuserpeerid(
+            StringConstant.rtmuserpeerid);
+    if (value == null) {
+      return;
+    }
+    userpeerid = value;
+    final allRows = await dbHelper.groupqueryRowCount(
+        widget.rtmpeerid.toString(),
+        userpeerid.toString(),
+        widget.recentchatuserdetails.groupName);
+    for (var row in allRows) {
+      if (row != null) {
+        ChatModel model = ChatModel(
+            id: row['id'] == null ? '' : row['id'].toString(),
+            message: row['message'],
+            from: row['from_id'],
+            to: row['to_id'],
+            group: row['groupname'],
+            // deliveryStatus: row['deliveryStatus'],
+            diraction: row['diraction'],
+            reply: row['reply'],
+            replyText: row['reply_text'],
+            textId: row['textid'],
+            timestamp: row['timestamp'],
+            url: row['url'] ?? '',
+            type: row['type']);
+        widget.logController.addLog(model);
+        setState(() {
+          _controller.animateTo(_controller.position.maxScrollExtent,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOut);
         });
+      }
+    }
+    // print('query all rows:$allRows');
+//     allRows.forEach((row) => {
+//           if (row != null)
+//             {
+// // ChatModel model = ChatMode();
+//               widget.logController.addGroupLog(row["message"] +
+//                   row["diraction"] +
+//                   "#@####@#" +
+//                   row['type1'] +
+//                   "#@####@#" +
+//                   row["timestamp"] +
+//                   "#@####@#" +
+//                   row["id"].toString() +
+//                   "#@####@#" +
+//                   row["to1"] +
+//                   "#@####@#" +
+//                   row["groupname"]),
+//               setState(() {
+//                 _controller.animateTo(_controller.position.maxScrollExtent,
+//                     duration: const Duration(milliseconds: 300),
+//                     curve: Curves.easeOut);
+//               }),
+//             }
+//         });
   }
 
   @override
   void dispose() async {
-    // TODO: implement dispose
     widget.logController.value.clear();
     replytex = '';
     timer?.cancel();
     dbHelper.deletebadge(widget.rtmpeerid);
     PreferenceConnector().setCurrentChatUserName("");
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('action',"nochatscreen");
+    await prefs.setString('action', "nochatscreen");
     super.dispose();
   }
 
@@ -142,7 +182,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   void deactivate() {
     widget.groupmessagelog
         .removegroupLog(widget.recentchatuserdetails.groupName);
-    // TODO: implement deactivate
     super.deactivate();
   }
 
@@ -212,46 +251,53 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             backgroundColor:
                                                 AppColors.appNewDarkThemeColor,
                                             child: Center(
-                                                child: widget.recentchatuserdetails.image != null
-                                                    ? CachedNetworkImage(
-                                                        imageUrl: StringConstant
-                                                                .IMAGE_URL +
-                                                            widget
-                                                                .recentchatuserdetails
-                                                                .image,
-                                                        imageBuilder: (context,
-                                                                imageProvider) =>
-                                                            Container(
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            image: DecorationImage(
-                                                                image:
-                                                                    imageProvider,
-                                                                fit: BoxFit
-                                                                    .cover /*,
+                                                child:
+                                                    widget.recentchatuserdetails
+                                                                .image !=
+                                                            null
+                                                        ? CachedNetworkImage(
+                                                            imageUrl: StringConstant
+                                                                    .IMAGE_URL +
+                                                                widget
+                                                                    .recentchatuserdetails
+                                                                    .image,
+                                                            imageBuilder: (context,
+                                                                    imageProvider) =>
+                                                                Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                image: DecorationImage(
+                                                                    image:
+                                                                        imageProvider,
+                                                                    fit: BoxFit
+                                                                        .cover /*,
                                                           colorFilter: const ColorFilter.mode(Colors.red, BlendMode.colorBurn)*/
-                                                                ),
-                                                          ),
-                                                        ),
-                                                        height: 30.h,
-                                                        width: 40.w,
-                                                        placeholder: (context,
-                                                                url) =>
-                                                            const CircularProgressIndicator(),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            const Icon(
-                                                          Icons.error,
-                                                          size: 50,
-                                                        ),
-                                                      )
-                                                    : Text(
-                                                        widget.userdetails.name[0],
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 15.sp))),
+                                                                    ),
+                                                              ),
+                                                            ),
+                                                            height: 30.h,
+                                                            width: 40.w,
+                                                            placeholder: (context,
+                                                                    url) =>
+                                                                const CircularProgressIndicator(),
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    const Icon(
+                                                              Icons.error,
+                                                              size: 50,
+                                                            ),
+                                                          )
+                                                        : Text(
+                                                            widget.userdetails
+                                                                .name[0],
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize:
+                                                                    15.sp))),
                                           ),
                                         ),
                                       ),
@@ -352,205 +398,587 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                 shrinkWrap: true,
                                 // ignore: missing_return
                                 itemBuilder: (context, i) {
-                                  dynamic parts = log[i].split('#@####@#');
-                                  if (parts[0] == 'group') {
-                                    print("pars$parts");
-                                    if (parts[9] == widget.recentchatuserdetails.groupName) {
-                                      if (parts.length > 0) {
-                                        if (parts[4].trim() != null && parts[5] != 'image') {
-                                          return SwipeTo(
-                                              child: Container(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 0.0,
-                                                          left: 0.0,
-                                                          top: 0,
-                                                          bottom: 0),
-                                                  alignment: (parts[4] != 'send'
-                                                      ? Alignment.topLeft
-                                                      : Alignment.topRight),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        parts[4] != 'send'
-                                                            ? MainAxisAlignment
-                                                                .start
-                                                            : MainAxisAlignment
-                                                                .end,
-                                                    children: [
-                                                      if (parts[4] == 'Receive')
-                                                        usershort(parts[8]),
-                                                      const SizedBox(width: 10),
-                                                      Container(
-                                                        constraints:
-                                                            BoxConstraints(
-                                                                minWidth: 30.w,
-                                                                maxWidth: 60.w),
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(0),
-                                                        decoration: parts[4] !=
-                                                                'send'
-                                                            ? const BoxDecoration(
-                                                                color: Colors
-                                                                    .black12,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                                  //topLeft: Radius.circular(10),
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                  bottomLeft: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                  bottomRight: Radius
-                                                                      .circular(
-                                                                          10),
-                                                                ))
-                                                            : const BoxDecoration(
-                                                                gradient: LinearGradient(
-                                                                  begin: Alignment.topCenter,
-                                                                  end: Alignment.bottomCenter,
-                                                                  colors: [Color(0xFF901133),Color(0xFF5c0e35)],
-                                                                ),
-                                                                borderRadius: BorderRadius.only(
-                                                                  topLeft: Radius.circular(10),
-                                                                  bottomLeft: Radius.circular(10),
-                                                                  bottomRight: Radius.circular(10),
-                                                                ),
+                                  // dynamic parts = log[i].split('#@####@#');
+                                  ChatModel model = log[i];
+                                  if (model.group.isNotEmpty) {
+                                    // print("pars$parts");
+                                    if (model.group ==
+                                        widget
+                                            .recentchatuserdetails.groupName) {
+                                      // if (parts.length > 0)
+                                      // {
+                                      if (model.type != null &&
+                                          model.type != 'image') {
+                                        return SwipeTo(
+                                            child: Container(
+                                                padding: const EdgeInsets.only(
+                                                    right: 0.0,
+                                                    left: 0.0,
+                                                    top: 0,
+                                                    bottom: 0),
+                                                alignment:
+                                                    (model.diraction != 'send'
+                                                        ? Alignment.topLeft
+                                                        : Alignment.topRight),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment: model
+                                                              .diraction !=
+                                                          'send'
+                                                      ? MainAxisAlignment.start
+                                                      : MainAxisAlignment.end,
+                                                  children: [
+                                                    if (model.diraction ==
+                                                        'Receive')
+                                                      usershort(model.from),
+                                                    const SizedBox(width: 10),
+                                                    Container(
+                                                      constraints:
+                                                          BoxConstraints(
+                                                              minWidth: 30.w,
+                                                              maxWidth: 60.w),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              0),
+                                                      decoration: model
+                                                                  .diraction !=
+                                                              'send'
+                                                          ? const BoxDecoration(
+                                                              color: Colors
+                                                                  .black12,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                                //topLeft: Radius.circular(10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            10),
+                                                              ))
+                                                          : const BoxDecoration(
+                                                              gradient:
+                                                                  LinearGradient(
+                                                                begin: Alignment
+                                                                    .topCenter,
+                                                                end: Alignment
+                                                                    .bottomCenter,
+                                                                colors: [
+                                                                  Color(
+                                                                      0xFF901133),
+                                                                  Color(
+                                                                      0xFF5c0e35)
+                                                                ],
                                                               ),
-                                                        child: GestureDetector(
-                                                          onLongPressUp: () {
-                                                            _askFavColor(parts[6], parts[1], i);
-                                                          },
-                                                          onTap: (){
-                                                            if (parts[5] == "doc") {
-                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Pdfviewer(pdfpath: parts[1])),);
-                                                            } else if (parts[5] == "video") {
-                                                              Navigator.of(context).push(
-                                                                MaterialPageRoute(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                bottomRight:
+                                                                    Radius
+                                                                        .circular(
+                                                                            10),
+                                                              ),
+                                                            ),
+                                                      child: GestureDetector(
+                                                        onLongPressUp: () {
+                                                          _askFavColor(model.id,
+                                                              model.message, i);
+                                                        },
+                                                        onTap: () {
+                                                          if (model.type ==
+                                                              "doc") {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                              MaterialPageRoute(
                                                                   builder: (context) =>
-                                                                      Msgvideoplayer(
-                                                                          videourl:
-                                                                          parts[1]),
-                                                                ),
-                                                              );
-                                                            } else if (parts[5] == "image") {
-                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[2]),),);
-                                                            }else if (parts[5] == "network"){
-                                                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image:parts[1]),),);
-                                                            }
-                                                          },
-                                                          child: Padding(padding: const EdgeInsets.all(5.0),
-                                                              child: parts[5] == "text" || parts[5] == "doc" || parts[5] == "video"
-                                                                  ? Stack(
-                                                                      children: [
-                                                                        Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: <Widget>[
-                                                                            Row(
-                                                                                children:[
-                                                                                  if(parts[5]=="doc"||parts[5]=="video")
-                                                                                  typeicons(parts[5]),
-                                                                                  if (parts[4] == "Receive")
-                                                                                    sendername(parts[8], parts[4]),parts[3] == 'replay'
-                                                                                      ? Container(
+                                                                      Pdfviewer(
+                                                                          pdfpath:
+                                                                              model.url)),
+                                                            );
+                                                          } else if (model
+                                                                  .type ==
+                                                              "video") {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    Msgvideoplayer(
+                                                                        videourl:
+                                                                            model.url),
+                                                              ),
+                                                            );
+                                                          } else if (model
+                                                                  .type ==
+                                                              "image") {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    FullScreenImage(
+                                                                        image: model
+                                                                            .url),
+                                                              ),
+                                                            );
+                                                          } else if (model
+                                                                  .type ==
+                                                              "network") {
+                                                            Navigator.of(
+                                                                    context)
+                                                                .push(
+                                                              MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    FullScreenImage(
+                                                                        image: model
+                                                                            .url),
+                                                              ),
+                                                            );
+                                                          }
+                                                        },
+                                                        child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(5.0),
+                                                            child: model
+                                                                            .type ==
+                                                                        "text" ||
+                                                                    model.type ==
+                                                                        "doc" ||
+                                                                    model.type ==
+                                                                        "video"
+                                                                ? Stack(
+                                                                    children: [
+                                                                      Column(
+                                                                        crossAxisAlignment:
+                                                                            CrossAxisAlignment.start,
+                                                                        children: <
+                                                                            Widget>[
+                                                                          if (model.diraction ==
+                                                                              "Receive")
+                                                                            sendername(model.from),
+                                                                          Row(children: [
+                                                                            if (model.type == "doc" ||
+                                                                                model.type == "video")
+                                                                              typeicons(model.type),
+                                                                            model.reply == 'reply'
+                                                                                ? Container(
                                                                                     margin: const EdgeInsets.only(left: 8.0, right: 8.0, top: 8.0),
                                                                                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8.0)),
                                                                                     child: IntrinsicHeight(
                                                                                         child: Container(
-                                                                                          decoration: BoxDecoration(
-                                                                                            color: const Color(0xFFf8ece8),
-                                                                                            borderRadius: BorderRadius.circular(8.0),
+                                                                                      constraints: BoxConstraints(minWidth: 10.w, maxWidth: 40.w),
+                                                                                      decoration: BoxDecoration(
+                                                                                        color: const Color(0xFFf8ece8),
+                                                                                        borderRadius: BorderRadius.circular(8.0),
+                                                                                      ),
+                                                                                      child: Row(
+                                                                                        mainAxisSize: MainAxisSize.min,
+                                                                                        children: [
+                                                                                          Container(
+                                                                                            decoration: BoxDecoration(
+                                                                                              color: model.diraction != 'send' ? const Color(0xFF800000) : Colors.white,
+                                                                                              borderRadius: const BorderRadius.only(
+                                                                                                bottomLeft: Radius.circular(30.0),
+                                                                                                topLeft: Radius.circular(30.0),
+                                                                                              ),
+                                                                                            ),
+                                                                                            width: 5.0,
                                                                                           ),
-                                                                                          child: Row(
-                                                                                            children: [
-                                                                                              Container(
-                                                                                                decoration: BoxDecoration(
-                                                                                                  color: parts[4] != 'send' ? const Color(0xFF800000) : Colors.white,
-                                                                                                  borderRadius: const BorderRadius.only(
-                                                                                                    bottomLeft: Radius.circular(30.0),
-                                                                                                    topLeft: Radius.circular(30.0),
+                                                                                          const SizedBox(
+                                                                                            height: 5,
+                                                                                          ),
+                                                                                          Expanded(
+                                                                                            child: Container(
+                                                                                                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                                                                                decoration: const BoxDecoration(
+                                                                                                  color: Color(0xFFf8ece8),
+                                                                                                  borderRadius: BorderRadius.only(
+                                                                                                    bottomRight: Radius.circular(30.0),
+                                                                                                    topRight: Radius.circular(30.0),
                                                                                                   ),
                                                                                                 ),
-                                                                                                width: 5.0,
-                                                                                              ),
-                                                                                              const SizedBox(
-                                                                                                height: 5,
-                                                                                              ),
-                                                                                              Expanded(
-                                                                                                child: Container(
-                                                                                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                                                                                                    decoration: const BoxDecoration(
-                                                                                                      color: Color(0xFFf8ece8),
-                                                                                                      borderRadius: BorderRadius.only(
-                                                                                                        bottomRight: Radius.circular(30.0),
-                                                                                                        topRight: Radius.circular(30.0),
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    child: Column(
-                                                                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                                      children: [
-                                                                                                        parts[4] != 'send'
-                                                                                                            ? const Text(
-                                                                                                          "You",
-                                                                                                          style: TextStyle(
-                                                                                                            fontSize: 14.0,
-                                                                                                            fontWeight: FontWeight.w600,
-                                                                                                            color: Colors.black,
+                                                                                                child: Column(
+                                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                  children: [
+                                                                                                    model.diraction != 'send'
+                                                                                                        ? const Text(
+                                                                                                            "You",
+                                                                                                            style: TextStyle(
+                                                                                                              fontSize: 14.0,
+                                                                                                              fontWeight: FontWeight.w600,
+                                                                                                              color: Colors.black,
+                                                                                                            ),
+                                                                                                          )
+                                                                                                        : const Text(
+                                                                                                            "reply",
+                                                                                                            style: TextStyle(
+                                                                                                              fontSize: 14.0,
+                                                                                                              fontWeight: FontWeight.w600,
+                                                                                                              color: Colors.black,
+                                                                                                            ),
                                                                                                           ),
-                                                                                                        )
-                                                                                                            : const Text(
-                                                                                                          "replay",
+                                                                                                    Row(
+                                                                                                      children: [
+                                                                                                        const Icon(
+                                                                                                          Icons.description_outlined,
+                                                                                                          color: Colors.yellow,
+                                                                                                        ),
+                                                                                                        Text(
+                                                                                                          // 'unknown part',
+                                                                                                          model.replyText,
+                                                                                                          // parts[2] != "" ? parts[2] : parts[1],
                                                                                                           style: TextStyle(
                                                                                                             fontSize: 14.0,
-                                                                                                            fontWeight: FontWeight.w600,
-                                                                                                            color: Colors.black,
+                                                                                                            color: AppColors.cardContainerColor,
                                                                                                           ),
                                                                                                         ),
-                                                                                                        Row(
-                                                                                                          children: [
-                                                                                                            const Icon(Icons.description_outlined,color: Colors.yellow,),
-                                                                                                            Text(parts[2] != "" ? parts[2] : parts[1],
-                                                                                                              style: TextStyle(
-                                                                                                                fontSize: 14.0,
-                                                                                                                color: AppColors.cardContainerColor,
-                                                                                                              ),
-                                                                                                            ),
-                                                                                                          ],
-                                                                                                        )
                                                                                                       ],
-                                                                                                    )),
-                                                                                              ),
-                                                                                            ],
+                                                                                                    )
+                                                                                                  ],
+                                                                                                )),
                                                                                           ),
-                                                                                        )),
+                                                                                        ],
+                                                                                      ),
+                                                                                    )),
                                                                                   )
-                                                                                      : Container(),
-                                                                                ]
+                                                                                : Container(),
+                                                                          ]),
+                                                                          Padding(
+                                                                            padding: const EdgeInsets.only(
+                                                                                left: 8.0,
+                                                                                right: 8.0,
+                                                                                top: 5.0,
+                                                                                bottom: 5),
+                                                                            child:
+                                                                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                                                                              Expanded(
+                                                                                child: model.reply == "noreplay"
+                                                                                    ? textwidget(model.message, model.type, model.diraction)
+                                                                                    : model.reply != ""
+                                                                                        ? textwidget(model.message, model.type, model.diraction)
+                                                                                        : textwidget(model.message, model.type, model.diraction),
+                                                                              ),
+                                                                            ]),
+                                                                          )
+                                                                        ],
+                                                                      ),
+                                                                      Positioned(
+                                                                        bottom:
+                                                                            -3,
+                                                                        right:
+                                                                            1,
+                                                                        child:
+                                                                            Align(
+                                                                          alignment:
+                                                                              Alignment.bottomRight,
+                                                                          child:
+                                                                              Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.end,
+                                                                            crossAxisAlignment:
+                                                                                CrossAxisAlignment.end,
+                                                                            children: [
+                                                                              Text(
+                                                                                DateFormat('hh:mm a').format(DateTime.parse(model.timestamp)),
+                                                                                style: TextStyle(color: model.diraction != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                                textAlign: TextAlign.end,
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: 1.w,
+                                                                              ),
+                                                                              //  parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                : Column(
+                                                                    children: [
+                                                                      if (model
+                                                                              .type ==
+                                                                          "image")
+                                                                        Image.file(
+                                                                            File(model
+                                                                                .url),
+                                                                            fit:
+                                                                                BoxFit.cover,
+                                                                            errorBuilder: (context, url, error) => const Icon(
+                                                                                  Icons.error,
+                                                                                  size: 70,
+                                                                                  color: Colors.red,
+                                                                                  semanticLabel: "image not found",
+                                                                                ))
+                                                                      else if (model
+                                                                              .type ==
+                                                                          "network")
+                                                                        CachedNetworkImage(
+                                                                          imageUrl:
+                                                                              model.url,
+                                                                          fit: BoxFit
+                                                                              .cover,
+                                                                          /*height: 40.h,
+                                                                        width: 60.w,*/
+                                                                          placeholder: (context, url) =>
+                                                                              LinearProgressIndicator(
+                                                                            minHeight:
+                                                                                20.sp,
+                                                                          ),
+                                                                          errorWidget: (context, url, error) =>
+                                                                              const Icon(
+                                                                            Icons.error,
+                                                                            size:
+                                                                                50,
+                                                                          ),
+                                                                        ),
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.end,
+                                                                          children: [
+                                                                            Text(
+                                                                              DateFormat('hh:mm a').format(DateTime.parse(model.timestamp)),
+                                                                              style: TextStyle(color: model.diraction != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                              textAlign: TextAlign.right,
                                                                             ),
-
-
-
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 8.0, right: 8.0, top: 5.0, bottom: 5),
-                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                                                                                Expanded(
-                                                                                  child: parts[2] == "noreplay" ? textwidget(parts[1], parts[5], parts[4],parts): parts[2] != ""  ? textwidget(parts[2], parts[5], parts[4],parts) : textwidget(parts[1], parts[5], parts[4],parts),
-                                                                                ),
-                                                                              ]),
+                                                                            SizedBox(
+                                                                              width: 1.w,
+                                                                            ),
+                                                                            // parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
+                                                                          ]),
+                                                                    ],
+                                                                  )),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    if (model.diraction ==
+                                                        'send')
+                                                      CircleAvatar(
+                                                        backgroundColor:
+                                                            Color(0xFF901133),
+                                                        child: Text(
+                                                            "${Logindata.name[0]}",
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white)),
+                                                      ),
+                                                  ],
+                                                )),
+                                            onLeftSwipe: () {
+                                              // print(
+                                              //     'Callback from Swipe To Right' +
+                                              //         parts[4] +
+                                              //         parts[1]);
+                                              setState(() {
+                                                replyvisibility = true;
+                                                replytex = model.message;
+                                                if (model.url?.isNotEmpty ==
+                                                    true) {
+                                                  replyPath = model.url;
+                                                  afile = fileExp
+                                                      .hasMatch(model.url);
+                                                  print(afile);
+                                                }
+                                              });
+                                            });
+                                      } else {
+                                        return Container(
+                                          padding: const EdgeInsets.only(
+                                              right: 0.0,
+                                              left: 0.0,
+                                              top: 2,
+                                              bottom: 2),
+                                          alignment: (model.diraction != 'send'
+                                              ? Alignment.topLeft
+                                              : Alignment.topRight),
+                                          child: GestureDetector(
+                                            onLongPressUp: () {
+                                              _askFavColor(
+                                                  model.id, model.message, i);
+                                            },
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          FullScreenImage(
+                                                              image:
+                                                                  model.url)));
+                                            },
+                                            child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(5.0),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment: model
+                                                              .diraction !=
+                                                          'send'
+                                                      ? MainAxisAlignment.start
+                                                      : MainAxisAlignment.end,
+                                                  children: [
+                                                    if (model.diraction ==
+                                                        'Receive')
+                                                      usershort(model.from),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    Expanded(
+                                                        child:
+                                                            model.type == "text"
+                                                                ? Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: <
+                                                                        Widget>[
+                                                                      model.reply ==
+                                                                              'reply'
+                                                                          ? Container(
+                                                                              decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
+                                                                              child: Column(
+                                                                                children: [
+                                                                                  IntrinsicHeight(
+                                                                                    child: Row(
+                                                                                      children: [
+                                                                                        Container(
+                                                                                          decoration: const BoxDecoration(
+                                                                                            color: Colors.red,
+                                                                                            borderRadius: BorderRadius.only(
+                                                                                              bottomLeft: Radius.circular(30.0),
+                                                                                              topLeft: Radius.circular(30.0),
+                                                                                            ),
+                                                                                          ),
+                                                                                          width: 5.0,
+                                                                                        ),
+                                                                                        Expanded(
+                                                                                          child: Padding(
+                                                                                            padding: const EdgeInsets.all(7.0),
+                                                                                            child: Container(
+                                                                                              decoration: BoxDecoration(
+                                                                                                // color: Colors.grey,
+                                                                                                borderRadius: BorderRadius.circular(8.0),
+                                                                                              ),
+                                                                                              child: Column(
+                                                                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                                                                children: [
+                                                                                                  const Text(
+                                                                                                    "Reply",
+                                                                                                    style: TextStyle(
+                                                                                                      fontSize: 18.0,
+                                                                                                      color: Colors.red,
+                                                                                                    ),
+                                                                                                  ),
+                                                                                                  Text(
+                                                                                                    'replayed message' + replytex,
+                                                                                                    style: const TextStyle(
+                                                                                                      fontSize: 14.0,
+                                                                                                      color: Colors.black,
+                                                                                                    ),
+                                                                                                  )
+                                                                                                ],
+                                                                                              ),
+                                                                                            ),
+                                                                                          ),
+                                                                                        )
+                                                                                      ],
+                                                                                    ),
+                                                                                  ),
+                                                                                ],
+                                                                              ),
                                                                             )
+                                                                          : Container(),
+                                                                      Text(
+                                                                        model
+                                                                            .message
+                                                                            .trim(),
+                                                                        style: TextStyle(
+                                                                            color: model.diraction != 'send'
+                                                                                ? Colors.black
+                                                                                : Colors.white,
+                                                                            fontSize: 16),
+                                                                        textAlign:
+                                                                            TextAlign.left,
+                                                                      )
+                                                                    ],
+                                                                  )
+                                                                : Container(
+                                                                    constraints: BoxConstraints(
+                                                                        minWidth: 30
+                                                                            .w,
+                                                                        maxWidth:
+                                                                            60.w),
+                                                                    alignment: (model.diraction !=
+                                                                            'send'
+                                                                        ? Alignment
+                                                                            .topLeft
+                                                                        : Alignment
+                                                                            .topRight),
+                                                                    child:
+                                                                        Column(
+                                                                      children: [
+                                                                        // Icon(Icons.error,color:Colors.yellow,size:10.sp,),
+                                                                        if (model.diraction ==
+                                                                            "Receive")
+                                                                          sendername(
+                                                                              model.from),
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            model.type == "image"
+                                                                                ? ClipRRect(
+                                                                                    borderRadius: const BorderRadius.only(
+                                                                                      topLeft: Radius.circular(10),
+                                                                                      //topRight: Radius.circular(10),
+                                                                                      bottomLeft: Radius.circular(10),
+                                                                                      bottomRight: Radius.circular(10),
+                                                                                    ),
+                                                                                    child: Image.file(File(model.url),
+                                                                                        height: 40.h,
+                                                                                        width: 60.w,
+                                                                                        fit: BoxFit.fill,
+                                                                                        errorBuilder: (context, url, error) => const Icon(
+                                                                                              Icons.error,
+                                                                                              size: 70,
+                                                                                              color: Colors.red,
+                                                                                              semanticLabel: "image not found",
+                                                                                            )),
+                                                                                  )
+                                                                                : CachedNetworkImage(
+                                                                                    imageUrl: model.url,
+                                                                                    fit: BoxFit.cover,
+                                                                                    placeholder: (context, url) => LinearProgressIndicator(
+                                                                                      minHeight: 20.sp,
+                                                                                    ),
+                                                                                    errorWidget: (context, url, error) => const Icon(
+                                                                                      Icons.error,
+                                                                                      size: 50,
+                                                                                    ),
+                                                                                  ),
                                                                           ],
                                                                         ),
-                                                                        Positioned(
-                                                                          bottom:
-                                                                              -3,
-                                                                          right:
-                                                                              1,
+                                                                        SizedBox(
+                                                                          width:
+                                                                              60.w,
                                                                           child:
                                                                               Align(
                                                                             alignment:
@@ -561,298 +989,42 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                               crossAxisAlignment: CrossAxisAlignment.end,
                                                                               children: [
                                                                                 Text(
-                                                                                  DateFormat('hh:mm a').format(DateTime.parse(parts[6]=="noreplay"?parts[3]:parts[6].trim())),
-                                                                                  style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
+                                                                                  DateFormat('hh:mm a').format(DateTime.parse(model.timestamp)),
+                                                                                  style: TextStyle(color: model.diraction != 'send' ? Colors.black : Colors.white, fontSize: 10),
                                                                                   textAlign: TextAlign.end,
                                                                                 ),
-                                                                                SizedBox(
-                                                                                  width: 1.w,
-                                                                                ),
-                                                                                //  parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
+                                                                                SizedBox(width: 1.w),
                                                                               ],
                                                                             ),
                                                                           ),
-                                                                        )
+                                                                        ),
                                                                       ],
-                                                                    )
-                                                                  : Column(
-                                                                      children: [
-                                                                        if (parts[5] ==
-                                                                            "image")
-                                                                          Image.file(
-                                                                              File(parts[1]),
-                                                                              fit: BoxFit.cover,
-                                                                              errorBuilder: (context, url, error) => const Icon(
-                                                                                    Icons.error,
-                                                                                    size: 70,
-                                                                                    color: Colors.red,
-                                                                                    semanticLabel: "image not found",
-                                                                                  ))
-                                                                        else if (parts[5] == "network")
-                                                                          CachedNetworkImage(
-                                                                            imageUrl:
-                                                                                parts[1],
-                                                                            fit:
-                                                                                BoxFit.cover,
-                                                                            /*height: 40.h,
-                                                                        width: 60.w,*/
-                                                                            placeholder: (context, url) =>
-                                                                                LinearProgressIndicator(
-                                                                              minHeight: 20.sp,
-                                                                            ),
-                                                                            errorWidget: (context, url, error) =>
-                                                                                const Icon(
-                                                                              Icons.error,
-                                                                              size: 50,
-                                                                            ),
-                                                                          ),
-                                                                        const SizedBox(
-                                                                            height:
-                                                                                10),
-                                                                        Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.end,
-                                                                            children: [
-                                                                              Text(
-                                                                                DateFormat('hh:mm a').format(DateTime.parse(parts[6]=="text"?parts[3]:parts[6].trim())),
-                                                                                style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10),
-                                                                                textAlign: TextAlign.right,
-                                                                              ),
-                                                                              SizedBox(
-                                                                                width: 1.w,
-                                                                              ),
-                                                                              // parts[4] != 'send' ? Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : AppColors.redDarkColor, size: 15,) : Icon(Icons.done_all_outlined, color: onlinestatus == 'online' ? Colors.blue : Colors.white, size: 15,),
-                                                                            ]),
-                                                                      ],
-                                                                    )),
-                                                        ),
+                                                                    ),
+                                                                  )),
+                                                    const SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    if (model.diraction ==
+                                                        'send')
+                                                      CircleAvatar(
+                                                        backgroundColor:
+                                                            const Color(
+                                                                0xFF901133),
+                                                        child: Text(
+                                                            "${Logindata.name[0]}",
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white)),
                                                       ),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      if (parts[4] == 'send')
-                                                        CircleAvatar(
-                                                          backgroundColor:
-                                                              Color(0xFF901133),
-                                                          child: Text(
-                                                              "${Logindata.name[0]}",
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white)),
-                                                        ),
-                                                    ],
-                                                  )),
-                                              onLeftSwipe: () {
-                                                print(
-                                                    'Callback from Swipe To Right' +
-                                                        parts[4] +
-                                                        parts[1]);
-                                                setState(() {
-                                                  replyvisibility = true;
-                                                  replytex = parts[1];
-                                                  afile = fileExp.hasMatch(replytex);
-                                                  print(afile);
-                                                });
-                                              });
-                                        } else {
-                                          return Container(
-                                            padding: const EdgeInsets.only(
-                                                right: 0.0,
-                                                left: 0.0,
-                                                top: 2,
-                                                bottom: 2),
-                                            alignment: (parts[4] != 'send'
-                                                ? Alignment.topLeft
-                                                : Alignment.topRight),
-                                            child: GestureDetector(
-                                              onLongPressUp: () {
-                                                _askFavColor(parts[6], parts[1], i);
-                                              },
-                                              onTap: (){
-                                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => FullScreenImage(image: parts[1])));
-                                              },
-                                              child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(5.0),
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        parts[4] != 'send'
-                                                            ? MainAxisAlignment
-                                                                .start
-                                                            : MainAxisAlignment
-                                                                .end,
-                                                    children: [
-                                                      if (parts[4] == 'Receive')
-                                                        usershort(parts[8]),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      Expanded(
-                                                          child:
-                                                              parts[4] == "text"
-                                                                  ? Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: <
-                                                                          Widget>[
-                                                                        parts[1] ==
-                                                                                'replay'
-                                                                            ? Container(
-                                                                                decoration: BoxDecoration(color: Colors.grey, borderRadius: BorderRadius.circular(8.0)),
-                                                                                child: Column(
-                                                                                  children: [
-                                                                                    IntrinsicHeight(
-                                                                                      child: Row(
-                                                                                        children: [
-                                                                                          Container(
-                                                                                            decoration: const BoxDecoration(
-                                                                                              color: Colors.red,
-                                                                                              borderRadius: BorderRadius.only(
-                                                                                                bottomLeft: Radius.circular(30.0),
-                                                                                                topLeft: Radius.circular(30.0),
-                                                                                              ),
-                                                                                            ),
-                                                                                            width: 5.0,
-                                                                                          ),
-                                                                                          Expanded(
-                                                                                            child: Padding(
-                                                                                              padding: const EdgeInsets.all(7.0),
-                                                                                              child: Container(
-                                                                                                decoration: BoxDecoration(
-                                                                                                  // color: Colors.grey,
-                                                                                                  borderRadius: BorderRadius.circular(8.0),
-                                                                                                ),
-                                                                                                child: Column(
-                                                                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                                                                  children: [
-                                                                                                    const Text(
-                                                                                                      "Reply",
-                                                                                                      style: TextStyle(
-                                                                                                        fontSize: 18.0,
-                                                                                                        color: Colors.red,
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    Text(
-                                                                                                      'replayed message' + replytex,
-                                                                                                      style: const TextStyle(
-                                                                                                        fontSize: 14.0,
-                                                                                                        color: Colors.black,
-                                                                                                      ),
-                                                                                                    )
-                                                                                                  ],
-                                                                                                ),
-                                                                                              ),
-                                                                                            ),
-                                                                                          )
-                                                                                        ],
-                                                                                      ),
-                                                                                    ),
-                                                                                  ],
-                                                                                ),
-                                                                              )
-                                                                            : Container(),
-                                                                        Text(
-                                                                          parts[1]
-                                                                              .trim(),
-                                                                          style: TextStyle(
-                                                                              color: parts[4] != 'send' ? Colors.black : Colors.white,
-                                                                              fontSize: 16),
-                                                                          textAlign:
-                                                                              TextAlign.left,
-                                                                        )
-                                                                      ],
-                                                                    )
-                                                                  : Container(
-                                                                      constraints: BoxConstraints(
-                                                                          minWidth: 30
-                                                                              .w,
-                                                                          maxWidth:
-                                                                              60.w),
-                                                                      alignment: (parts[4] !=
-                                                                              'send'
-                                                                          ? Alignment
-                                                                              .topLeft
-                                                                          : Alignment
-                                                                              .topRight),
-                                                                      child:
-                                                                          Column(
-                                                                        children: [
-                                                                         // Icon(Icons.error,color:Colors.yellow,size:10.sp,),
-                                                                          if (parts[4] == "Receive")
-                                                                            sendername(parts[8], parts[4]),
-                                                                          Column(
-                                                                            crossAxisAlignment:
-                                                                                CrossAxisAlignment.start,
-                                                                            children: [
-                                                                              parts[5] == "image"
-                                                                                  ? ClipRRect(
-                                                                                      borderRadius: const BorderRadius.only(
-                                                                                        topLeft: Radius.circular(10),
-                                                                                        //topRight: Radius.circular(10),
-                                                                                        bottomLeft: Radius.circular(10),
-                                                                                        bottomRight: Radius.circular(10),
-                                                                                      ),
-                                                                                      child: Image.file(File(parts[1]),
-                                                                                          height: 40.h,
-                                                                                          width: 60.w,
-                                                                                          fit: BoxFit.fill,
-                                                                                          errorBuilder: (context, url, error) => const Icon(
-                                                                                                Icons.error,
-                                                                                                size: 70,
-                                                                                                color: Colors.red,
-                                                                                                semanticLabel: "image not found",
-                                                                                              )),
-                                                                                    )
-                                                                                  : CachedNetworkImage(
-                                                                                      imageUrl: parts[1],
-                                                                                      fit: BoxFit.cover,
-                                                                                      placeholder: (context, url) => LinearProgressIndicator(
-                                                                                        minHeight: 20.sp,
-                                                                                      ),
-                                                                                      errorWidget: (context, url, error) => const Icon(
-                                                                                        Icons.error,
-                                                                                        size: 50,
-                                                                                      ),
-                                                                                    ),
-                                                                            ],
-                                                                          ),
-                                                                          SizedBox(
-                                                                            width: 60.w,
-                                                                            child: Align(
-                                                                              alignment: Alignment.bottomRight,
-                                                                              child: Row(
-                                                                                mainAxisAlignment: MainAxisAlignment.end,
-                                                                                crossAxisAlignment: CrossAxisAlignment.end,
-                                                                                children: [
-                                                                                  Text(DateFormat('hh:mm a').format(DateTime.parse(parts[6].trim())), style: TextStyle(color: parts[4] != 'send' ? Colors.black : Colors.white, fontSize: 10), textAlign: TextAlign.end,),
-                                                                                  SizedBox(width: 1.w),
-                                                                                ],
-                                                                              ),
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    )),
-                                                      const SizedBox(
-                                                        width: 10,
-                                                      ),
-                                                      if (parts[4] == 'send')
-                                                        CircleAvatar(
-                                                          backgroundColor: const Color(0xFF901133),
-                                                          child: Text("${Logindata.name[0]}", style: const TextStyle(color: Colors.white)),
-                                                        ),
-                                                    ],
-                                                  )),
-                                            ),
-                                          );
-                                        }
-                                      } else {
-                                        return null;
+                                                  ],
+                                                )),
+                                          ),
+                                        );
                                       }
+                                      // } else {
+                                      //   return null;
+                                      // }
                                     } else {
                                       return null;
                                     }
@@ -917,7 +1089,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                   Visibility(
                                     visible: replyvisibility,
                                     child: Container(
-                                      margin: EdgeInsets.only(
+                                      margin: const EdgeInsets.only(
                                           left: 8.0, right: 8.0, top: 8.0),
                                       decoration: BoxDecoration(
                                         color: ColorConstant.replaybluegray,
@@ -992,7 +1164,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                                                         "";
                                                                   });
                                                                 },
-                                                                icon: Icon(
+                                                                icon:
+                                                                    const Icon(
                                                                   Icons.close,
                                                                   size: 20,
                                                                 ),
@@ -1047,7 +1220,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                 ],
                               ),
                             )),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             message == ""
@@ -1066,7 +1239,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             //    getImage(ImageSource.gallery);
                                             print('mic button pressed');
                                           },
-                                          child: Icon(
+                                          child: const Icon(
                                             Icons.attachment,
                                             color: Colors.white,
                                           ),
@@ -1076,14 +1249,14 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                             print('add button pressed');
                                             getImage(ImageSource.camera);
                                           },
-                                          child: Icon(Icons.photo_camera,
+                                          child: const Icon(Icons.photo_camera,
                                               color: Colors.white),
                                         ),
                                       ],
                                     ),
                                   )
                                 : Container(),
-                            SizedBox(
+                            const SizedBox(
                               width: 5,
                             ),
                             message != ""
@@ -1093,7 +1266,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                       backgroundColor: Colors.white,
                                       radius: 22,
                                       child: IconButton(
-                                          icon: Icon(
+                                          icon: const Icon(
                                             Icons.send,
                                             color: Color(0xFF5c0e35),
                                             size: 25,
@@ -1103,12 +1276,11 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                               message = "";
                                             });
                                             if (_peerMessage.text
-                                                    .trim()
-                                                    .length ==
-                                                0) {
-                                              //EasyLoading.showToast('Kya yrr kuch toh likho');
-                                            } else {
+                                                .trim()
+                                                .isNotEmpty) {
                                               _sendPeerMessage();
+                                            } else {
+                                              //EasyLoading.showToast('Kya yrr kuch toh likho');
                                             }
                                           }),
                                     ),
@@ -1150,7 +1322,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                         onPressed: () {
                           Navigator.pop(context);
                         },
-                        icon: Icon(Icons.cancel))
+                        icon: const Icon(Icons.cancel))
                   ],
                 ),
                 Padding(
@@ -1168,7 +1340,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                   backgroundColor:
                                       AppColors.appNewDarkThemeColor,
                                   child: IconButton(
-                                    icon: Icon(
+                                    icon: const Icon(
                                       Icons.camera_alt,
                                       color: Colors.white,
                                     ),
@@ -1317,175 +1489,120 @@ class _GroupChatScreenState extends State<GroupChatScreen>
 
   Future<void> getImage(ImageSource source) async {
     final pickedFile = await picker.pickImage(source: source, imageQuality: 50);
-    imageapi(pickedFile, "", "image");
-    if (replytex != "") {
-      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#replay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#replay#@####@#" + pickedFile.path, 'image', 'send');
-    } else {
-      var file = "group" "#@####@#" + pickedFile.path + '#@####@#' + replytex + "#@####@#noreplay#@####@#" + 'send' + '#@####@#image' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
-      _insertgroup(replytex + "#@####@#noreplay#@####@#" + pickedFile.path, 'image', 'send');
-    }
+    final textid = DateTime.now().millisecondsSinceEpoch.toString();
+
+    ChatModel model = ChatModel(
+        // deliveryStatus: 'new',
+        diraction: 'send',
+        from: userpeerid,
+        textId: textid,
+        group: widget.recentchatuserdetails.groupName,
+        message: pickedFile.name,
+        url: pickedFile.path,
+        // message: pickedFile.path + "#@#&" + pickedFile.name,
+        reply: replytex.isNotEmpty ? 'reply' : 'noreplay',
+        timestamp: DateTime.now().toString(),
+        to: '',
+        type: 'image');
+
+    imageapi(pickedFile, model);
   }
 
   _pickVideo() async {
-    FilePickerResult result = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['mp4']);
+    FilePickerResult result = await FilePicker.platform
+        .pickFiles(type: FileType.custom, allowedExtensions: ['mp4']);
     PlatformFile files = result.files.first;
     final file = XFile(files.path);
-    videoAPI(file, files);
-    if (replytex != "") {
-      var file = "group" "#@####@#" + files.path + "#@#&" + files.name + '#@####@#' + replytex + "#@####@#replay#@####@#" + 'send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;widget.logController.addLog(file);
-    } else {
-      var file = "group" "#@####@#" + files.path + "#@#&" + files.name + '#@####@#' + replytex + "#@####@#noreplay#@####@#" + 'send' + '#@####@#video' + "#@####@#" + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.rtmpeerid + "#@####@#" + widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
-    }
+    final textid = DateTime.now().millisecondsSinceEpoch.toString();
+
+    ChatModel model = ChatModel(
+        // deliveryStatus: 'new',
+        diraction: 'send',
+        from: userpeerid,
+        textId: textid,
+        group: widget.recentchatuserdetails.groupName,
+        message: files.name,
+        url: file.path,
+        reply: replytex.isNotEmpty ? 'reply' : 'noreplay',
+        timestamp: DateTime.now().toString(),
+        to: '',
+        type: 'video');
+
+    videoAPI(file, model);
   }
 
   void _sendPeerMessage() async {
     if (widget.rtmpeerid.isEmpty) {
-      // widget.logController.addLog('Please input peer user id to send message.');
+      // widget.logController.addGroupLog('Please input peer user id to send message.');
       return;
     }
     if (_peerMessage.text.isEmpty) {
-      //  widget.logController.addLog('Please input text to send.');
+      //  widget.logController.addGroupLog('Please input text to send.');
       return;
     }
     var textid = DateTime.now().millisecondsSinceEpoch.toString();
-    for (var row in widget.recentchatuserdetails.members) {
-      {
-        if (userpeerid != row.pid) {
-          fcmapicall(_peerMessage.text, row.fcmToken, '', "group" , 'basic_channel',textid,widget.rtmpeerid.toString(),);
-        }
-        print(row);
-      }
-    }
+
     try {
-      if (replytex != "") {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
-        for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(
-              widget.membersList[i].pid, message, true, false);
+      ChatModel model = ChatModel(
+          replyText: replytex,
+          // deliveryStatus: 'new',
+          diraction: 'send',
+          from: userpeerid,
+          textId: textid,
+          group: widget.recentchatuserdetails.groupName,
+          message: _peerMessage.text,
+          reply: replytex.isNotEmpty ? 'reply' : 'noreplay',
+          timestamp: DateTime.now().toString(),
+          url: '',
+          to: '',
+          type: 'text');
+
+      AgoraRtmMessage message =
+          AgoraRtmMessage.fromText(jsonEncode(model.toJson()));
+
+      for (var row in widget.membersList) {
+        if (userpeerid != row.pid) {
+          await widget.client.sendMessageToPeer(row.pid, message, true, false);
+          fcmapicall(
+              model, row.fcmToken, '', "group", 'basic_channel', textid, row.pid
+              // widget.rtmpeerid.toString(),
+              );
         }
-        _insertgroup(replytex + "#@####@#replay#@####@#" + _peerMessage.text, "text", 'send');
-        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
-        replytex = "";
-        _peerMessage.clear();
-      } else {
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
-        for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
-        }
-        _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
-        widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + '#@####@#noreplay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + '#@####@#' + "123456" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
-        _peerMessage.clear();
       }
+      final id = await _insertgroup(model);
+      model.id = id.toString();
+      widget.logController.addLog(model);
+      replytex = "";
+      _peerMessage.clear();
       setState(() {
-        _controller.animateTo(_controller.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
+        _controller.animateTo(_controller.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
         _peerMessage.clear();
         replyvisibility = false;
       });
     } catch (errorCode) {
-      if (replytex != "") {
-        widget.logController.addLog('group' + "#@####@#" + _peerMessage.text + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#replay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
-        _peerMessage.clear();
-        setState(() {
-          replyvisibility = false;
-          replytex = "";
-        });
-        _insertgroup(replytex + "#@####@#replay#@####@#" + _peerMessage.text, "text", 'send');
-        for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer( widget.membersList[i].pid, message, true, false);
-        }
-        setState(() {
-          replyvisibility = false;
-          replytex = "";
-        });
-        _peerMessage.clear();
-      } else {
-        widget.logController.addLog('group' "#@####@#" + _peerMessage.text + '#@####@#' + replytex + '#@####@#replay#@####@#' + 'send' + '#@####@#text' + '#@####@#' + DateTime.now().toString() + "#@####@#" + "" + "#@####@#" + widget.membersList[0].pid + "#@####@#" + widget.recentchatuserdetails.groupName);
-        _insertgroup(replytex + "#@####@#noreplay#@####@#" + _peerMessage.text, "text", 'send');
-        AgoraRtmMessage message = AgoraRtmMessage.fromText("group" + "#@####@#" + _peerMessage.text + "#@####@#" + replytex + "#@####@#noreplay#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#"+textid);
-        replytex = "";
-        _peerMessage.clear();
-        for (int i = 0; i < widget.membersList.length; i++) {
-          await widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
-        }
-        print('catch else-before');
-        // }
-        replytex = "";
-        _peerMessage.clear();
-        print('catch else-after');
-        Helper.showMessage('catch_else');
-      }
-      setState(() {
-        _controller.animateTo(_controller.position.maxScrollExtent, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-        _peerMessage.clear();
-        replytex = "";
-        replyvisibility = false;
-      });
+      print('error $errorCode');
     }
   }
 
-  _insertgroup(String _peerMessage, String type, diraction) async {
-    dynamic parts = _peerMessage.split('#@####@#');
-    // row to insert
+  Future<int> _insertgroup(ChatModel model) async {
     Map<String, dynamic> row = {
       DatabaseHelper.Id: null,
-      DatabaseHelper.message: "group#@####@#" + parts[2] + "#@####@##@####@#" + parts[1] + "#@####@#",
+      DatabaseHelper.message: model.message,
+      DatabaseHelper.url: model.url ?? '',
       DatabaseHelper.timestamp: DateTime.now().toString(),
-      DatabaseHelper.diraction: diraction,
-      DatabaseHelper.reply: replytex,
-      DatabaseHelper.type: type,
-      DatabaseHelper.from: widget.rtmpeerid.toString(),
-      DatabaseHelper.to: userpeerid.toString(),
-      DatabaseHelper.groupname: widget.recentchatuserdetails.groupName.toString(),
-      DatabaseHelper.textId:DateTime.now().millisecondsSinceEpoch.toString()
+      DatabaseHelper.diraction: 'send',
+      DatabaseHelper.replyText: model.replyText,
+      DatabaseHelper.reply: model.reply,
+      DatabaseHelper.type: model.type,
+      DatabaseHelper.from: widget.rtmpeerid,
+      DatabaseHelper.to: '',
+      DatabaseHelper.groupname: model.group,
+      DatabaseHelper.textId: model.textId
     };
     final id = await dbHelper.groupinsert(row);
-    print('inserted row id: $id');
+    print('inserted group row id: $id');
     return id;
-  }
-
-  void firebaseNotification() {
-    FirebaseMessaging.onMessage.listen(
-      (message) {
-        print("$userpeerid");
-        print('listen a forground message ${message.data}');
-        var type = message.data['type'];
-        if (type == 'basic_channel') {
-          if (widget.recentchatuserdetails.groupName != message.data['title']) {
-            LocalNotificationService.showNotification(message.data);
-          }
-        } else if (type == 'call_channel') {
-          LocalNotificationService.showCallNotification(message.data);
-        }
-      },
-    );
-  }
-
-  void _isUserOnline() async {
-    PreferenceConnector().setCurrentChatUserName(
-      widget.recentchatuserdetails.groupName,
-    );
-    if (widget.rtmpeerid.isEmpty) {
-      print('Please input peer user id to query.');
-      return;
-    }
-    try {
-      Map<dynamic, dynamic> result =
-          await widget.client.queryPeersOnlineStatus([widget.rtmpeerid]);
-      print('Query result: ' + result.toString() + widget.rtmpeerid);
-      var clientstatus = result.values.toString();
-      if (clientstatus == '(true)') {
-        setState(() {
-          onlinestatus = "Online";
-        });
-      }
-    } catch (errorCode) {
-      print('Query error: ' + errorCode.toString());
-    }
   }
 
   void updatelocaldata(user) async {
@@ -1493,29 +1610,64 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     print('query all rows:');
   }
 
-  void imageapi(XFile image, name, joiner) {
+  void imageapi(XFile image, ChatModel model) {
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.loginData)
         .then((value) => {
               if (value != null)
                 {
-                  ApiRepository().uplordchatimage(value, image).then((value) {
+                  ApiRepository()
+                      .uplordchatimage(value, image)
+                      .then((value) async {
                     if (mounted) {
                       if (value != null) {
                         if (value.status == "successfull") {
-                          var textid = DateTime.now().millisecondsSinceEpoch.toString();
-                          for (var row
-                              in widget.recentchatuserdetails.members) {
-                            {
-                              if (userpeerid != row.pid) {
-                                fcmapicall(joiner, row.fcmToken, value.body.source, "group", 'basic_channel',textid,"");
-                              }
-                              print(row);
+                          model.message = image.name;
+                          model.url = value.body.source;
+                          AgoraRtmMessage message = AgoraRtmMessage.fromText(
+                              jsonEncode(model.toJson()));
+                          for (var row in widget.membersList) {
+                            if (userpeerid != row.pid) {
+                              widget.client.sendMessageToPeer(
+                                  row.pid, message, true, false);
+                              fcmapicall(
+                                  model,
+                                  row.fcmToken,
+                                  value.body.source,
+                                  "group",
+                                  'basic_channel',
+                                  model.textId,
+                                  row.pid);
                             }
                           }
-                          AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#$textid");
-                          for (int i = 0; i < widget.membersList.length; i++) {
-                            widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
-                          }
+                          // for (int i = 0; i < widget.membersList.length; i++) {
+                          //   widget.client.sendMessageToPeer(
+                          //       widget.membersList[i].pid,
+                          //       message,
+                          //       true,
+                          //       false);
+                          // }
+
+                          model.url = image.path;
+                          final id = await _insertgroup(model);
+                          model.id = id.toString();
+                          widget.logController.addLog(model);
+
+                          // for (var row
+                          //     in widget.recentchatuserdetails.members) {
+                          //   {
+                          //     if (userpeerid != row.pid) {
+                          //       fcmapicall(
+                          //           model,
+                          //           row.fcmToken,
+                          //           value.body.source,
+                          //           "group",
+                          //           'basic_channel',
+                          //           model.textId,
+                          //           "");
+                          //     }
+                          //     print(row);
+                          //   }
+                          // }
                         } else {
                           Helper.showMessage("Unable to send ");
                         }
@@ -1526,34 +1678,79 @@ class _GroupChatScreenState extends State<GroupChatScreen>
             });
   }
 
-  void videoAPI(final video, files) {
+  void videoAPI(final XFile video, ChatModel model) {
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.loginData)
         .then((value) => {
               if (value != null)
                 {
-                  ApiRepository().uplordchatimage(value, video).then((value) {
+                  ApiRepository()
+                      .uplordchatimage(value, video)
+                      .then((value) async {
                     if (mounted) {
                       if (value != null) {
-                        var textid = DateTime.now().millisecondsSinceEpoch.toString();
+                        // var textid =
+                        //     DateTime.now().millisecondsSinceEpoch.toString();
                         if (value.status == "successfull") {
-                          if (onlinestatus == 'offline') {
-                            fcmapicall(files.name, widget.recentchatuserdetails.groupAdmin, value.body.source, "", 'basic_channel',textid,widget.rtmpeerid.toString(),);
-                          }
-                          for (var row in widget.recentchatuserdetails.members) {
-                            {
-                              if (userpeerid != row.pid) {
-                                fcmapicall(files.name, row.fcmToken, value.body.source, '', 'basic_channel',textid,widget.rtmpeerid.toString(),);
-                              }
+                          // if (onlinestatus == 'offline') {
+                          //   fcmapicall(
+                          //     files.name,
+                          //     widget.recentchatuserdetails.groupAdmin,
+                          //     value.body.source,
+                          //     "",
+                          //     'basic_channel',
+                          //     model.textId,
+                          //     widget.rtmpeerid.toString(),
+                          //   );
+                          // }
+                          model.message = video.name;
+                          model.url = value.body.source;
+                          AgoraRtmMessage message = AgoraRtmMessage.fromText(
+                              jsonEncode(model.toJson()));
+
+                          for (var row
+                              in widget.recentchatuserdetails.members) {
+                            if (userpeerid != row.pid) {
+                              widget.client.sendMessageToPeer(
+                                  row.pid, message, true, false);
+                              fcmapicall(
+                                model,
+                                row.fcmToken,
+                                value.body.source,
+                                '',
+                                'basic_channel',
+                                model.textId,
+                                row.pid,
+                              );
                               print(row);
                             }
                           }
+
+                          model.url = video.path;
+                          final id = await _insertgroup(model);
+                          model.id = id.toString();
+                          widget.logController.addLog(model);
+
                           setState(() {
-                            AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#" + value.body.source + "#@####@#" + replytex + "#@####@#" + widget.recentchatuserdetails.groupName + "#@####@#" + DateTime.now().toString()+"#@####@#$textid");
-                           // AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#"+ value.body.source+ "#@####@#"+ DateTime.now().toString());
-                            for (int i = 0; i < widget.membersList.length; i++) {
-                              widget.client.sendMessageToPeer(widget.membersList[i].pid, message, true, false);
-                            }
-                            _insertgroup(replytex + "#@####@#noreplay#@####@#" + files.path + "#@#&" + files.name, 'video', 'send');
+                            // AgoraRtmMessage message = AgoraRtmMessage.fromText(
+                            //     "group#@####@#" +
+                            //         value.body.source +
+                            //         "#@####@#" +
+                            //         replytex +
+                            //         "#@####@#" +
+                            //         widget.recentchatuserdetails.groupName +
+                            //         "#@####@#" +
+                            //         DateTime.now().toString() +
+                            //         "#@####@#$textid");
+                            // AgoraRtmMessage message = AgoraRtmMessage.fromText("group#@####@#"+ value.body.source+ "#@####@#"+ DateTime.now().toString());
+
+                            // _insertgroup(
+                            //     replytex +
+                            //         "#@####@#noreplay#@####@#" +
+                            //         files.path +
+                            //         "#@#&" +
+                            //         files.name,
+                            //     'video',
+                            //     'send');
                           });
                         } else {
                           Helper.showMessage("Unable to send ");
@@ -1613,22 +1810,24 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         ? SizedBox(
             height: 20.h,
             width: double.infinity,
-            child: Image.file(File(replytex),
+            child: Image.file(File(replyPath),
                 errorBuilder: (context, url, error) => const Icon(Icons.error,
                     size: 70,
                     color: Colors.red,
                     semanticLabel: "image not found")),
           )
-        : Text(replytex, style: TextStyle(fontSize: 14.0, color: Colors.black));
+        : Text(replytex,
+            style: const TextStyle(fontSize: 14.0, color: Colors.black));
   }
 
-  void fcmapicall(String msg, String fcmtoken, image, call_id, type,textid,senderpeerid) {
+  void fcmapicall(ChatModel model, String fcmtoken, image, call_id, type,
+      textid, senderpeerid) {
     Helper.checkConnectivity().then((value) => {
           if (value)
             {
               ApiRepository()
-                  .fcmnotifiction(
-                      msg,
+                  .fcmnotifictionChat(
+                      model,
                       widget.recentchatuserdetails.groupName,
                       fcmtoken,
                       image,
@@ -1647,7 +1846,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         });
   }
 
-  localdata() async{
+  localdata() async {
     PreferenceConnector.getJsonToSharedPreferencetoken(StringConstant.Userdata)
         .then((value) => {
               if (value != null)
@@ -1674,17 +1873,17 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     await prefs.setString('action', widget.recentchatuserdetails.groupName);
   }
 
-  Future<void> _query() async {
-    final allRows = await dbHelper.AllRows();
-    print('query all rows:$allRows');
-    for (var row in allRows) {
-      {
-        if (row != null) {
-          // logController.addLog(row["calleeName"] + "#@####@#" + row["calltype"] + "#@####@#" + row["Calldrm"] +"#@####@#" + row["timestamp"] );}}
-        }
-      }
-    }
-  }
+  // Future<void> _query() async {
+  //   final allRows = await dbHelper.AllRows();
+  //   print('query all rows:$allRows');
+  //   for (var row in allRows) {
+  //     {
+  //       if (row != null) {
+  //         // logController.addGroupLog(row["calleeName"] + "#@####@#" + row["calltype"] + "#@####@#" + row["Calldrm"] +"#@####@#" + row["timestamp"] );}}
+  //       }
+  //     }
+  //   }
+  // }
 
   void _scrollDown(log) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1710,12 +1909,13 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         ));
   }
 
-  sendername(id, type) {
+  sendername(id) {
     var name = "";
     for (var row in widget.recentchatuserdetails.members) {
       {
         if (id == row.pid) {
           name = row.name;
+          break;
         }
       }
     }
@@ -1730,90 +1930,112 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     );
     PlatformFile files = result.files.first;
     final file = XFile('${files.path}');
-    imageapi(file, files.name, "pdf");
-    if (replytex != "") {
-      var file = "group" "#@####@#" + files.path + "#@#&" + files.name +
-          '#@####@#' +
-          replytex +
-          "#@####@#replay#@####@#" +
-          'send' +
-          '#@####@#doc' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
-      widget.logController.addLog(file);
-      _insertgroup(
-        replytex + "#@####@#replay#@####@#" + files.path + "#@#&" + files.name,
-        'doc',
-        'send',
-      );
-    } else {
-      var file = "group" "#@####@#" +
-          files.path +
-          "#@#&" +
-          files.name +
-          '#@####@#' +
-          replytex +
-          "#@####@#noreplay#@####@#" +
-          'send' +
-          '#@####@#doc' +
-          "#@####@#" +
-          DateTime.now().toString() +
-          "#@####@#" +
-          "" +
-          "#@####@#" +
-          widget.rtmpeerid +
-          "#@####@#" +
-          widget.recentchatuserdetails.groupName;
+    final textid = DateTime.now().millisecondsSinceEpoch.toString();
 
-      widget.logController.addLog(file);
-      _insertgroup(
-        replytex +
-            "#@####@#noreplay#@####@#" +
-            files.path +
-            "#@#&" +
-            files.name,
-        'doc',
-        'send',
-      );
-    }
+    ChatModel model = ChatModel(
+        // deliveryStatus: 'new',
+        diraction: 'send',
+        from: userpeerid,
+        textId: textid,
+        group: widget.recentchatuserdetails.groupName,
+        message: files.name,
+        url: files.path,
+        reply: replytex.isNotEmpty ? 'reply' : 'noreplay',
+        timestamp: DateTime.now().toString(),
+        to: '',
+        type: 'doc');
+    imageapi(file, model);
+    // if (replytex != "") {
+    //   var file = "group" "#@####@#" +
+    //       files.path +
+    //       "#@#&" +
+    //       files.name +
+    //       '#@####@#' +
+    //       replytex +
+    //       "#@####@#replay#@####@#" +
+    //       'send' +
+    //       '#@####@#doc' +
+    //       "#@####@#" +
+    //       DateTime.now().toString() +
+    //       "#@####@#" +
+    //       "" +
+    //       "#@####@#" +
+    //       widget.rtmpeerid +
+    //       "#@####@#" +
+    //       widget.recentchatuserdetails.groupName;
+    //   widget.logController.addGroupLog(file);
+    //   _insertgroup(
+    //     replytex + "#@####@#replay#@####@#" + files.path + "#@#&" + files.name,
+    //     'doc',
+    //     'send',
+    //   );
+    // } else {
+    //   var file = "group" "#@####@#" +
+    //       files.path +
+    //       "#@#&" +
+    //       files.name +
+    //       '#@####@#' +
+    //       replytex +
+    //       "#@####@#noreplay#@####@#" +
+    //       'send' +
+    //       '#@####@#doc' +
+    //       "#@####@#" +
+    //       DateTime.now().toString() +
+    //       "#@####@#" +
+    //       "" +
+    //       "#@####@#" +
+    //       widget.rtmpeerid +
+    //       "#@####@#" +
+    //       widget.recentchatuserdetails.groupName;
+
+    //   widget.logController.addGroupLog(file);
+    //   _insertgroup(
+    //     replytex +
+    //         "#@####@#noreplay#@####@#" +
+    //         files.path +
+    //         "#@#&" +
+    //         files.name,
+    //     'doc',
+    //     'send',
+    //   );
+    // }
     updatelocaldata(widget.rtmpeerid);
   }
 
-  textwidget(textname, type, sendtype,parts) {
+  textwidget(String textname, String type, String direction) {
     var texts = textname;
     if (type == "doc" || type == "video") {
-
-        dynamic text = textname.split('#@#&');
-        if(text.length==1){
-          dynamic text = textname.split('/');
-          texts= text[text.length-1];
-        }else {
-          texts = text[1];
-        }
-
+      dynamic text = textname.split('#@#&');
+      if (text.length == 1) {
+        dynamic text = textname.split('/');
+        texts = text[text.length - 1];
+      } else {
+        texts = text[1];
+      }
     }
 
     return Text(
       texts.trim(),
-      style: TextStyle(color:sendtype!='send'?Colors.black:Colors.white,fontSize: 16),
+      style: TextStyle(
+          color: direction != 'send' ? Colors.black : Colors.white,
+          fontSize: 16),
       textAlign: TextAlign.left,
     );
   }
 
   typeicons(texttype) {
-    if(texttype=="doc") {
+    if (texttype == "doc") {
       return Icon(
-        Icons.description_outlined, color: Colors.yellow, size: 15.sp,);
-  }else if(texttype =="video"){
+        Icons.description_outlined,
+        color: Colors.yellow,
+        size: 15.sp,
+      );
+    } else if (texttype == "video") {
       return Icon(
-      Icons.play_arrow, color: Colors.yellow, size: 15.sp,);
+        Icons.play_arrow,
+        color: Colors.yellow,
+        size: 15.sp,
+      );
     }
-
   }
 }

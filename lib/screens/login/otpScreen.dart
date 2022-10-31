@@ -33,16 +33,13 @@ import 'auth.dart';
 import 'otpScreen.dart';
 
 class OtpScreen extends StatefulWidget {
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
-
 }
 
 class _LoginScreenState extends State<OtpScreen> {
-
-  final _mobileController =  TextEditingController();
-  final _otpController =  TextEditingController();
+  final _mobileController = TextEditingController();
+  final _otpController = TextEditingController();
   final loginUserDetails = LoginUserDetails();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final progressKey = GlobalKey();
@@ -57,21 +54,13 @@ class _LoginScreenState extends State<OtpScreen> {
     onChangeRawSecond: (value) => print('onChangeRawSecond $value'),
     onChangeRawMinute: (value) => print('onChangeRawMinute $value'),
   );
-  bool _obsure_resend_otp=false;
-
-
-
+  bool _obsure_resend_otp = false;
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     return Container(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
+        height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("assets/images/background.png"),
@@ -82,145 +71,151 @@ class _LoginScreenState extends State<OtpScreen> {
             // resizeToAvoidBottomInset: false,
             body: SingleChildScrollView(
                 child: Center(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 10.h,
-                        ),
-                        Text(
-                          "Login With OTP",
-                          style: TextStyle(
-                              fontSize: 23.sp, fontWeight: FontWeight.bold),
-                        ),
-
-                        SizedBox(
-                          height: 10.h,
-                        ),
-                        Form(
-                            key: _formKey,
-                            child: Padding(
-                                padding: const EdgeInsets.all(30),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Text(
+                      "Login With OTP",
+                      style: TextStyle(
+                          fontSize: 23.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Form(
+                        key: _formKey,
+                        child: Padding(
+                            padding: const EdgeInsets.all(30),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Column(
                                     children: <Widget>[
                                       Column(
-                                        children: <Widget>[
-                                          Column(
-                                            children: [
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.white,
-                                                    borderRadius:
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
                                                     BorderRadius.circular(5),
-                                                    border: Border.all(
-                                                        width: 1,
-                                                        color: Colors.grey)),
-                                                child: TextFormField(
-                                                  controller: _mobileController,
-                                                  keyboardType: TextInputType.number,
-                                                  onChanged: (content) {
-                                                    if(content.length>=10){
-                                                      _stopWatchTimer.rawTime.listen((value) =>
-                                                          print('rawTime $value ${StopWatchTimer.getDisplayTime(value)}'));
-                                                      SendOTP();
-                                                      _obsure_resend_otp=true;
-                                                    }
-                                                  },
-                                                  decoration: InputDecoration(
-                                                    filled: true,
-                                                    focusColor: Colors.white.withOpacity(0.5),
-                                                    hintText: "Enter your Phone.No",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.grey.shade700,
-                                                        fontSize: 15),
-                                                    border: InputBorder.none,
-                                                    focusedBorder: InputBorder.none,
-                                                    enabledBorder: InputBorder.none,
-                                                    errorBorder: InputBorder.none,
-                                                    disabledBorder: InputBorder.none,
-                                                  ),
-                                                  validator: (value) {
-                                                    if (value.isEmpty ||value.length==10)
-                                                       {
-                                                      return 'Enter your 10 digit Phone.No!';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
+                                                border: Border.all(
+                                                    width: 1,
+                                                    color: Colors.grey)),
+                                            child: TextFormField(
+                                              controller: _mobileController,
+                                              keyboardType:
+                                                  TextInputType.number,
+                                              onChanged: (content) {
+                                                if (content.length >= 10) {
+                                                  _stopWatchTimer.rawTime
+                                                      .listen((value) => print(
+                                                          'rawTime $value ${StopWatchTimer.getDisplayTime(value)}'));
+                                                  SendOTP();
+                                                  _obsure_resend_otp = true;
+                                                }
+                                              },
+                                              decoration: InputDecoration(
+                                                filled: true,
+                                                focusColor: Colors.white
+                                                    .withOpacity(0.5),
+                                                hintText: "Enter your Phone.No",
+                                                hintStyle: TextStyle(
+                                                    color: Colors.grey.shade700,
+                                                    fontSize: 15),
+                                                border: InputBorder.none,
+                                                focusedBorder: InputBorder.none,
+                                                enabledBorder: InputBorder.none,
+                                                errorBorder: InputBorder.none,
+                                                disabledBorder:
+                                                    InputBorder.none,
                                               ),
-                                              Visibility(
-                                                  visible: _obsure_resend_otp,
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                                    children: [
-                                                      // Text(displayTime),
-                                                      GestureDetector(
-                                                        onTap: (){
-                                                          SendOTP();
-                                                        },
-                                                        child: const Text("Resend OTP",style: TextStyle(color: Colors.red,fontSize: 14)),
-                                                      ),
-                                                    ],
-                                                  )
-                                              )
-                                            ],
+                                              validator: (value) {
+                                                if (value.isEmpty ||
+                                                    value.length == 10) {
+                                                  return 'Enter your 10 digit Phone.No!';
+                                                }
+                                                return null;
+                                              },
+                                            ),
                                           ),
-                                          // _email(size),
-                                          SizedBox(height: 5.h),
-                                              Container(
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  border: Border.all(width: 1, color: Colors.grey),
-                                                  borderRadius: BorderRadius.circular(5),
-                                                ),
-                                                child: TextFormField(
-                                                  controller: _otpController,
-                                                  keyboardType: TextInputType.number,
-                                                  //obscureText: !_obscureText,
-                                                  decoration: InputDecoration(
-                                                    filled: true,
-                                                    focusColor: Colors.white.withOpacity(0.5),
-                                                    hintText: "Enter your OTP",
-                                                    hintStyle: TextStyle(
-                                                        color: Colors.grey.shade700,
-                                                        fontSize: 15),
-                                                    border: InputBorder.none,
-                                                    focusedBorder: InputBorder.none,
-                                                    enabledBorder: InputBorder.none,
-                                                    errorBorder: InputBorder.none,
-                                                    disabledBorder: InputBorder
-                                                        .none,
-
+                                          Visibility(
+                                              visible: _obsure_resend_otp,
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.end,
+                                                children: [
+                                                  // Text(displayTime),
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      SendOTP();
+                                                    },
+                                                    child: const Text(
+                                                        "Resend OTP",
+                                                        style: TextStyle(
+                                                            color: Colors.red,
+                                                            fontSize: 14)),
                                                   ),
-                                                  validator: (value) {
-                                                    if (value.isEmpty) {
-                                                      return 'Enter a OTP!';
-                                                    } else if (value.length == 6) {
-                                                      return 'OTP must be at least 6 characters.';
-                                                    }
-                                                    return null;
-                                                  },
-                                                ),
-                                              ),
-
-
-                                          SizedBox(height: 8.h),
-                                          _submitButton(size),
-
+                                                ],
+                                              ))
                                         ],
                                       ),
-                                      SizedBox(height: 22.h),
-                                      _dontHaveAccount(),
-                                      //SizedBox(height: 20),
-                                      //_buildBody()
-                                    ])))
-                      ]),
-                ))));
+                                      // _email(size),
+                                      SizedBox(height: 5.h),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              width: 1, color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: TextFormField(
+                                          controller: _otpController,
+                                          keyboardType: TextInputType.number,
+                                          //obscureText: !_obscureText,
+                                          decoration: InputDecoration(
+                                            filled: true,
+                                            focusColor:
+                                                Colors.white.withOpacity(0.5),
+                                            hintText: "Enter your OTP",
+                                            hintStyle: TextStyle(
+                                                color: Colors.grey.shade700,
+                                                fontSize: 15),
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                          ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return 'Enter a OTP!';
+                                            } else if (value.length == 6) {
+                                              return 'OTP must be at least 6 characters.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+
+                                      SizedBox(height: 8.h),
+                                      _submitButton(size),
+                                    ],
+                                  ),
+                                  SizedBox(height: 22.h),
+                                  _dontHaveAccount(),
+                                  //SizedBox(height: 20),
+                                  //_buildBody()
+                                ])))
+                  ]),
+            ))));
   }
 
   _onEmailChanged() {
@@ -233,41 +228,38 @@ class _LoginScreenState extends State<OtpScreen> {
 
   void SendOTP() {
     FocusScope.of(context).requestFocus(FocusNode());
-    Helper.checkConnectivity().then((value) =>
-    {
-      if (value)
-        {
-        EasyLoading.show(),
-          ApiRepository().loginOtp( _mobileController.text).then((value) {
-            if (value != null) {
-              if (value.status == "successfull") {
-                EasyLoading.showToast(value.message,toastPosition: EasyLoadingToastPosition.bottom,duration: const Duration(milliseconds: 10000));
-              }
-              else {
-                EasyLoading.dismiss();
-                EasyLoading.showToast("${value.message}",toastPosition: EasyLoadingToastPosition.bottom,duration: const Duration(milliseconds: 500));
-                //showInSnackBar(value.message);
-              }
-            } else {
-              EasyLoading.dismiss();
-              EasyLoading.showToast("Something went wrong! ",toastPosition: EasyLoadingToastPosition.bottom);
-              //showInSnackBar(value.message);
+    Helper.checkConnectivity().then((value) => {
+          if (value)
+            {
+              EasyLoading.show(),
+              ApiRepository().loginOtp(_mobileController.text).then((value) {
+                if (value != null) {
+                  if (value.status == "successfull") {
+                    EasyLoading.showToast(value.message,
+                        toastPosition: EasyLoadingToastPosition.bottom,
+                        duration: const Duration(milliseconds: 10000));
+                  } else {
+                    EasyLoading.dismiss();
+                    EasyLoading.showToast("${value.message}",
+                        toastPosition: EasyLoadingToastPosition.bottom,
+                        duration: const Duration(milliseconds: 500));
+                    //showInSnackBar(value.message);
+                  }
+                } else {
+                  EasyLoading.dismiss();
+                  EasyLoading.showToast("Something went wrong! ",
+                      toastPosition: EasyLoadingToastPosition.bottom);
+                  //showInSnackBar(value.message);
+                }
+              })
             }
-          }
-          )
-        }
-      else
-        {
-          EasyLoading.dismiss(),
-          Helper.showNoConnectivityDialog(context)
-        }
-    }
-
-    );
+          else
+            {EasyLoading.dismiss(), Helper.showNoConnectivityDialog(context)}
+        });
   }
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(value),
       backgroundColor: Colors.pink,
     ));
@@ -280,8 +272,8 @@ class _LoginScreenState extends State<OtpScreen> {
         buttonName: "Login",
         onPressed: () {
           //if (_formKey.currentState.validate()) {
-            EasyLoading.show();
-            getDeviceTokenToSendNotification();
+          EasyLoading.show();
+          getDeviceTokenToSendNotification();
           //}
         });
   }
@@ -291,7 +283,8 @@ class _LoginScreenState extends State<OtpScreen> {
     final token = await _fcm.getToken();
     deviceTokenToSendPushNotification = token.toString();
     print("Token Value $deviceTokenToSendPushNotification");
-    PreferenceConnector.setJsonToSharedPreferenceefcmtoken(StringConstant.fcmtoken,deviceTokenToSendPushNotification);
+    PreferenceConnector.setJsonToSharedPreferenceefcmtoken(
+        StringConstant.fcmtoken, deviceTokenToSendPushNotification);
     _loginUser();
   }
 
@@ -313,55 +306,62 @@ class _LoginScreenState extends State<OtpScreen> {
     super.initState();
   }
 
-
   void onLocaleChange(Locale locale) async {
     setState(() {
       AppTranslations.load(locale);
     });
   }
 
-
-
   void _loginUser() {
     FocusScope.of(context).requestFocus(FocusNode());
-    Helper.checkConnectivity().then((value) =>
-    {
-      if (value)
-        {
-          ApiRepository().otpLogin(_mobileController.text, _otpController.text, deviceTokenToSendPushNotification).then((value) async {
-            EasyLoading.dismiss();
-            print("logindata123 " + value.body.toString());
-            if (value != null) {
-              if (value.status == "successfull") {
-                var loginData = value.body;
-                String Data = jsonEncode(value.body);
-                PreferenceConnector().setRole(loginData.role);
-                PreferenceConnector().setProfileData(loginData.name, loginData.email);
-                PreferenceConnector().setProfileImage(loginData.image);
-                PreferenceConnector.setJsonToSharedPreference(StringConstant.loginData, loginData.authToken);
+    Helper.checkConnectivity().then((value) => {
+          if (value)
+            {
+              ApiRepository()
+                  .otpLogin(_mobileController.text, _otpController.text,
+                      deviceTokenToSendPushNotification)
+                  .then((value) async {
+                EasyLoading.dismiss();
+                print("logindata123 " + value.body.toString());
+                if (value != null) {
+                  if (value.status == "successfull") {
+                    var loginData = value.body;
+                    String Data = jsonEncode(value.body);
+                    PreferenceConnector().setRole(loginData.role);
+                    PreferenceConnector()
+                        .setProfileData(loginData.name, loginData.email);
+                    PreferenceConnector().setProfileImage(loginData.image);
+                    PreferenceConnector.setJsonToSharedPreference(
+                        StringConstant.loginData, loginData.authToken);
 
-                PreferenceConnector.setJsonToSharedPreferencename(StringConstant.Username, loginData.name);
-                PreferenceConnector.setJsonToSharedPreferenceemail(StringConstant.email, loginData.email);
-                PreferenceConnector.setJsonToSharedPreferencephone(StringConstant.phoneno, loginData.phone);
-                PreferenceConnector.setJsonToSharedPreferencetoken(StringConstant.Userdata, Data);
-                PreferenceConnector().setLoginData(true);
-                Navigator.pushAndRemoveUntil(context,
-                    MaterialPageRoute( builder: (context) => BottomNavbar(index: 2)),
+                    PreferenceConnector.setJsonToSharedPreferencename(
+                        StringConstant.Username, loginData.name);
+                    PreferenceConnector.setJsonToSharedPreferenceemail(
+                        StringConstant.email, loginData.email);
+                    PreferenceConnector.setJsonToSharedPreferencephone(
+                        StringConstant.phoneno, loginData.phone);
+                    PreferenceConnector.setJsonToSharedPreferencetoken(
+                        StringConstant.Userdata, Data);
+                    PreferenceConnector().setLoginData(true);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BottomNavbar(index: 2)),
                         (Route<dynamic> route) => false);
-              } else {
-                EasyLoading.showToast(value.message,
-                    toastPosition: EasyLoadingToastPosition.bottom);
-                //showInSnackBar(value.message);
-              }
-            } else {
-              showInSnackBar(
-                  AppTranslations.of(context).text("Something went wrong"));
+                  } else {
+                    EasyLoading.showToast(value.message,
+                        toastPosition: EasyLoadingToastPosition.bottom);
+                    //showInSnackBar(value.message);
+                  }
+                } else {
+                  showInSnackBar(
+                      AppTranslations.of(context).text("Something went wrong"));
+                }
+              })
             }
-          })
-        }
-      else
-        {EasyLoading.dismiss(), Helper.showNoConnectivityDialog(context)}
-    });
+          else
+            {EasyLoading.dismiss(), Helper.showNoConnectivityDialog(context)}
+        });
   }
 
   Widget _dontHaveAccount() {
@@ -380,25 +380,25 @@ class _LoginScreenState extends State<OtpScreen> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Don't have an account?",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        )),
-                    Text("Create",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.redColor,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ])),
+                Text("Don't have an account?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    )),
+                Text("Create",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.redColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ])),
         ));
   }
-
 }
+
 class LoginUserDetails {
   String userEmail;
   String password;

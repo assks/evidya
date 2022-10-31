@@ -1,4 +1,3 @@
-
 import 'package:evidya/resources/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_rtm/agora_rtm.dart';
@@ -45,8 +44,8 @@ class _ChatScreenState extends State<LiveChatScreen> {
   void _createClient() async {
     _client = await AgoraRtmClient.createInstance(widget.appid);
     _client.onMessageReceived = (AgoraRtmMessage message, String peerId) {
-      logController
-          .addLog("Private Message from " + peerId + ": " + message.text);
+      // logController
+      //     .addLog("Private Message from " + peerId + ": " + message.text);
       _scrollDown();
     };
     _client.onConnectionStateChanged = (int state, int reason) {
@@ -65,7 +64,7 @@ class _ChatScreenState extends State<LiveChatScreen> {
   void _login(BuildContext context) async {
     try {
       await _client.login(widget.rtmToken, widget.rtmUser /*token,_userId*/);
-     // logController.addLog('Login success: ' + widget.rtmUser);
+      // logController.addLog('Login success: ' + widget.rtmUser);
       _joinChannel(context);
     } catch (errorCode) {
       print('Login error: ' + errorCode.toString());
@@ -162,7 +161,6 @@ class _ChatScreenState extends State<LiveChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       body: Container(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -173,16 +171,17 @@ class _ChatScreenState extends State<LiveChatScreen> {
                   builder: (context, log, widget) {
                     return Expanded(
                         child: ListView.separated(
-                          separatorBuilder: (_, __)=>SizedBox(height: 5,),
+                      separatorBuilder: (_, __) => SizedBox(
+                        height: 5,
+                      ),
                       controller: _controller,
-                          reverse: false,
+                      reverse: false,
                       itemBuilder: (context, i) {
                         return Container(
                           padding: const EdgeInsets.all(5.0),
                           decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            borderRadius: BorderRadius.circular(10)
-                          ),
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(10)),
                           child: Text(log[i],
                               style: const TextStyle(
                                   height: 1.5,
@@ -201,13 +200,14 @@ class _ChatScreenState extends State<LiveChatScreen> {
                 child: TextFormField(
                   controller: _channelMessage,
                   keyboardType: TextInputType.text,
-                  style:  TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12),
                   decoration: InputDecoration(
-                    contentPadding: EdgeInsets.only(left: 20,top: 15),
+                    contentPadding: EdgeInsets.only(left: 20, top: 15),
                     filled: true,
                     focusColor: Colors.white.withOpacity(0.5),
                     hintText: "Enter a message",
-                    hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+                    hintStyle:
+                        TextStyle(color: Colors.grey.shade700, fontSize: 12),
                     border: InputBorder.none,
                     focusedBorder: InputBorder.none,
                     enabledBorder: InputBorder.none,
@@ -292,7 +292,8 @@ class _ChatScreenState extends State<LiveChatScreen> {
       await _channel
           .sendMessage(AgoraRtmMessage.fromText(_channelMessage.text));
       logController.addLog("you: " + _channelMessage.text);
-      _controller.animateTo(0.0, duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      _controller.animateTo(0.0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
       _channelMessage.clear();
     } catch (errorCode) {
       logController

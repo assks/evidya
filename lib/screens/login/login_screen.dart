@@ -29,15 +29,11 @@ import 'auth.dart';
 import 'otpScreen.dart';
 
 class LoginScreen extends StatefulWidget {
-
   @override
   _LoginScreenState createState() => _LoginScreenState();
-
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
-
   static final List<String> languagesList = application.supportedLanguages;
   static final List<String> languageCodesList =
       application.supportedLanguagesCodes;
@@ -64,17 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery
-        .of(context)
-        .size;
+    final size = MediaQuery.of(context).size;
     return Container(
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
+        height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("assets/images/background.png"),
@@ -85,148 +75,142 @@ class _LoginScreenState extends State<LoginScreen> {
             // resizeToAvoidBottomInset: false,
             body: SingleChildScrollView(
                 child: Center(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: 10.h,
-                        ),
-                        Text(
-                          "Hello again!",
-                          style: TextStyle(
-                              fontSize: 23.sp, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(
-                          height: 1.h,
-                        ),
-                        Text(
-                          "Let's continue with \n our learning journey.",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              fontSize: 13.sp, fontWeight: FontWeight.w600),
-                        ),
-                        SizedBox(
-                          height: 4.h,
-                        ),
-                        Form(
-                            key: _formKey,
-                            child: Padding(
-                                padding: const EdgeInsets.all(30),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment
-                                        .center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 10.h,
+                    ),
+                    Text(
+                      "Hello again!",
+                      style: TextStyle(
+                          fontSize: 23.sp, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    Text(
+                      "Let's continue with \n our learning journey.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 13.sp, fontWeight: FontWeight.w600),
+                    ),
+                    SizedBox(
+                      height: 4.h,
+                    ),
+                    Form(
+                        key: _formKey,
+                        child: Padding(
+                            padding: const EdgeInsets.all(30),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Column(
                                     children: <Widget>[
-                                      Column(
-                                        children: <Widget>[
-                                          Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                borderRadius:
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
                                                 BorderRadius.circular(5),
-                                                border: Border.all(
-                                                    width: 1,
-                                                    color: Colors.grey)),
-                                            child: TextFormField(
-                                              controller: _emailController,
-                                              decoration: InputDecoration(
-                                                filled: true,
-                                                focusColor:
+                                            border: Border.all(
+                                                width: 1, color: Colors.grey)),
+                                        child: TextFormField(
+                                          controller: _emailController,
+                                          decoration: InputDecoration(
+                                            filled: true,
+                                            focusColor:
                                                 Colors.white.withOpacity(0.5),
-                                                hintText:
+                                            hintText:
                                                 "Enter your registered email",
-                                                hintStyle: TextStyle(
-                                                    color: Colors.grey.shade700,
-                                                    fontSize: 15),
-                                                border: InputBorder.none,
-                                                focusedBorder: InputBorder.none,
-                                                enabledBorder: InputBorder.none,
-                                                errorBorder: InputBorder.none,
-                                                disabledBorder: InputBorder
-                                                    .none,
-                                              ),
-                                              validator: (value) {
-                                                if (value.isEmpty ||
-                                                    !RegExp(
-                                                        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                                        .hasMatch(value)) {
-                                                  return 'Enter your registered email!';
-                                                }
-                                                return null;
-                                              },
-                                            ),
+                                            hintStyle: TextStyle(
+                                                color: Colors.grey.shade700,
+                                                fontSize: 15),
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
                                           ),
-                                          // _email(size),
-                                          SizedBox(height: 3.h),
-                                          Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              border: Border.all(
-                                                  width: 1, color: Colors.grey),
-                                              borderRadius:
-                                              BorderRadius.circular(5),
-                                            ),
-                                            child: TextFormField(
-                                              controller: _passwordController,
-                                              keyboardType:
-                                              TextInputType.visiblePassword,
-                                              obscureText: !_obscureText,
-                                              decoration: InputDecoration(
-                                                filled: true,
-                                                focusColor:
-                                                Colors.white.withOpacity(0.5),
-                                                hintText: "Enter your password",
-                                                hintStyle: TextStyle(
-                                                    color: Colors.grey.shade700,
-                                                    fontSize: 15),
-                                                border: InputBorder.none,
-                                                focusedBorder: InputBorder.none,
-                                                enabledBorder: InputBorder.none,
-                                                errorBorder: InputBorder.none,
-                                                disabledBorder: InputBorder
-                                                    .none,
-                                                suffixIcon: IconButton(
-                                                  icon: Icon(
-                                                    _obscureText
-                                                        ? Icons.visibility
-                                                        : Icons.visibility_off,
-                                                    size: 20,
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(() {
-                                                      _obscureText =
-                                                      !_obscureText;
-                                                    });
-                                                  },
-                                                ),
-                                              ),
-                                              validator: (value) {
-                                                if (value.isEmpty) {
-                                                  return 'Enter a valid password!';
-                                                } else if (value.length < 8) {
-                                                  return 'password must be at least 8 characters.';
-                                                }
-                                                return null;
-                                              },
-                                            ),
-                                          ),
-                                          _forgetPassword(size),
-                                          SizedBox(height: 2.h),
-                                          _submitButton(size),
-                                          SizedBox(height: 1.h),
-                                          _horizontalline(size),
-                                          SizedBox(height: 1.h),
-                                          _loginwithotpButton(size),
-                                        ],
+                                          validator: (value) {
+                                            if (value.isEmpty ||
+                                                !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                    .hasMatch(value)) {
+                                              return 'Enter your registered email!';
+                                            }
+                                            return null;
+                                          },
+                                        ),
                                       ),
-                                      SizedBox(height: 14.h),
-                                      _dontHaveAccount(),
-                                      //SizedBox(height: 20),
-                                      //_buildBody()
-                                    ])))
-                      ]),
-                ))));
+                                      // _email(size),
+                                      SizedBox(height: 3.h),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              width: 1, color: Colors.grey),
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                        ),
+                                        child: TextFormField(
+                                          controller: _passwordController,
+                                          keyboardType:
+                                              TextInputType.visiblePassword,
+                                          obscureText: !_obscureText,
+                                          decoration: InputDecoration(
+                                            filled: true,
+                                            focusColor:
+                                                Colors.white.withOpacity(0.5),
+                                            hintText: "Enter your password",
+                                            hintStyle: TextStyle(
+                                                color: Colors.grey.shade700,
+                                                fontSize: 15),
+                                            border: InputBorder.none,
+                                            focusedBorder: InputBorder.none,
+                                            enabledBorder: InputBorder.none,
+                                            errorBorder: InputBorder.none,
+                                            disabledBorder: InputBorder.none,
+                                            suffixIcon: IconButton(
+                                              icon: Icon(
+                                                _obscureText
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
+                                                size: 20,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _obscureText = !_obscureText;
+                                                });
+                                              },
+                                            ),
+                                          ),
+                                          validator: (value) {
+                                            if (value.isEmpty) {
+                                              return 'Enter a valid password!';
+                                            } else if (value.length < 8) {
+                                              return 'password must be at least 8 characters.';
+                                            }
+                                            return null;
+                                          },
+                                        ),
+                                      ),
+                                      _forgetPassword(size),
+                                      SizedBox(height: 2.h),
+                                      _submitButton(size),
+                                      SizedBox(height: 1.h),
+                                      _horizontalline(size),
+                                      SizedBox(height: 1.h),
+                                      _loginwithotpButton(size),
+                                    ],
+                                  ),
+                                  SizedBox(height: 14.h),
+                                  _dontHaveAccount(),
+                                  //SizedBox(height: 20),
+                                  //_buildBody()
+                                ])))
+                  ]),
+            ))));
   }
 
   _onEmailChanged() {
@@ -238,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(value),
       backgroundColor: Colors.pink,
     ));
@@ -251,13 +235,10 @@ class _LoginScreenState extends State<LoginScreen> {
         buttonName: "Login With OTP",
         onPressed: () {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    OtpScreen()));
-
+              context, MaterialPageRoute(builder: (context) => OtpScreen()));
         });
   }
+
   Widget _submitButton(Size size) {
     return GradiantButton(
         buttonName: "Login ",
@@ -274,7 +255,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final token = await _fcm.getToken();
     deviceTokenToSendPushNotification = token.toString();
     print("Token Value $deviceTokenToSendPushNotification");
-    PreferenceConnector.setJsonToSharedPreferenceefcmtoken(StringConstant.fcmtoken,deviceTokenToSendPushNotification);
+    PreferenceConnector.setJsonToSharedPreferenceefcmtoken(
+        StringConstant.fcmtoken, deviceTokenToSendPushNotification);
     _loginUser();
   }
 
@@ -295,7 +277,6 @@ class _LoginScreenState extends State<LoginScreen> {
     onLocaleChange(Locale(languagesMap["malay"]));
     super.initState();
   }
-
 
   void onLocaleChange(Locale locale) async {
     setState(() {
@@ -318,8 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
               )),
         ),
       ),
-      onTap: () =>
-      {
+      onTap: () => {
         Navigator.of(context)
             .push(MaterialPageRoute(builder: (context) => ForgetPassword()))
       },
@@ -337,55 +317,57 @@ class _LoginScreenState extends State<LoginScreen> {
       deviceType = 2;
     }
 
-    Helper.checkConnectivity().then((value) =>
-    {
-      if (value)
-        {
-          ApiRepository()
-              .userLogin(_emailController.text, _passwordController.text,
-              deviceTokenToSendPushNotification)
-              .then((value) async {
-            EasyLoading.dismiss();
-            print("logindata123 " + value.body.toString());
-            if (value != null) {
-              if (value.status == "successfull") {
-                var loginData = value.body;
-                String Data = jsonEncode(value.body);
-                print("Dtaayayayaayaya $Data");
-                print("DataRole ${loginData.role}");
-                PreferenceConnector().setRole(loginData.role);
-                PreferenceConnector().setProfileData(loginData.name, loginData.email);
-                PreferenceConnector().setProfileImage(loginData.image);
-                PreferenceConnector.setJsonToSharedPreference(
-                    StringConstant.loginData, loginData.authToken);
-                print(
-                    "Token ${loginData.authToken} UserId ${loginData.id} ");
-                PreferenceConnector.setJsonToSharedPreferencename(
-                    StringConstant.Username, loginData.name);
-                PreferenceConnector.setJsonToSharedPreferenceemail(
-                    StringConstant.email, loginData.email);
-                PreferenceConnector.setJsonToSharedPreferencephone(
-                    StringConstant.phoneno, loginData.phone);
-                PreferenceConnector.setJsonToSharedPreferencetoken(
-                    StringConstant.Userdata, Data);
-                PreferenceConnector().setLoginData(true);
-                Navigator.pushAndRemoveUntil(context,
-                    MaterialPageRoute( builder: (context) => BottomNavbar(index: 2)),
+    Helper.checkConnectivity().then((value) => {
+          if (value)
+            {
+              ApiRepository()
+                  .userLogin(_emailController.text, _passwordController.text,
+                      deviceTokenToSendPushNotification)
+                  .then((value) async {
+                EasyLoading.dismiss();
+                print("logindata123 " + value.body.toString());
+                if (value != null) {
+                  if (value.status == "successfull") {
+                    var loginData = value.body;
+                    String Data = jsonEncode(value.body);
+                    print("Dtaayayayaayaya $Data");
+                    print("DataRole ${loginData.role}");
+                    PreferenceConnector().setRole(loginData.role);
+                    PreferenceConnector()
+                        .setProfileData(loginData.name, loginData.email);
+                    PreferenceConnector().setProfileImage(loginData.image);
+                    PreferenceConnector.setJsonToSharedPreference(
+                        StringConstant.loginData, loginData.authToken);
+                    print(
+                        "Token ${loginData.authToken} UserId ${loginData.id} ");
+                    PreferenceConnector.setJsonToSharedPreferencename(
+                        StringConstant.Username, loginData.name);
+                    PreferenceConnector.setJsonToSharedPreferenceemail(
+                        StringConstant.email, loginData.email);
+                    PreferenceConnector.setJsonToSharedPreferencephone(
+                        StringConstant.phoneno, loginData.phone);
+                    PreferenceConnector.setJsonToSharedPreferencetoken(
+                        StringConstant.Userdata, Data);
+                    PreferenceConnector().setLoginData(true);
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BottomNavbar(index: 2)),
                         (Route<dynamic> route) => false);
-              } else {
-                EasyLoading.showToast(value.message,
-                    toastPosition: EasyLoadingToastPosition.bottom);
-                //showInSnackBar(value.message);
-              }
-            } else {
-              showInSnackBar(
-                  AppTranslations.of(context).text("Something went wrong"));
+                  } else {
+                    EasyLoading.showToast(value.message,
+                        toastPosition: EasyLoadingToastPosition.bottom);
+                    //showInSnackBar(value.message);
+                  }
+                } else {
+                  showInSnackBar(
+                      AppTranslations.of(context).text("Something went wrong"));
+                }
+              })
             }
-          })
-        }
-      else
-        {EasyLoading.dismiss(), Helper.showNoConnectivityDialog(context)}
-    });
+          else
+            {EasyLoading.dismiss(), Helper.showNoConnectivityDialog(context)}
+        });
   }
 
   Widget _dontHaveAccount() {
@@ -404,21 +386,21 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Don't have an account?",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        )),
-                    Text("Create",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.redColor,
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ])),
+                Text("Don't have an account?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    )),
+                Text("Create",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: AppColors.redColor,
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ])),
         ));
   }
 
@@ -430,27 +412,27 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(20), color: Colors.black),
           child: Center(
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Container(
-                    height: 30.0,
-                    width: 30.0,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/icons/google.png'),
-                          fit: BoxFit.cover),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  Text(
-                    'Sign in with Google',
-                    style: TextStyle(
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                ],
-              ))),
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Container(
+                height: 30.0,
+                width: 30.0,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage('assets/icons/google.png'),
+                      fit: BoxFit.cover),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Text(
+                'Sign in with Google',
+                style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
+              ),
+            ],
+          ))),
       onTap: () async {
         //_onPressedLogInButton();
         // _onPressedExpressLogInButton(context);
@@ -461,13 +443,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 return HomeScreen();
               },
             ),
-          )*/;
+          )*/
+          ;
         });
       },
     );
   }
-
-
 
 /*  Future<String> _onPressedLogInButton() async {
     final result = await FacebookAuth.instance.login();
@@ -479,30 +460,23 @@ class _LoginScreenState extends State<LoginScreen> {
     }*/
 
   _horizontalline(Size size) {
- return   Row(
-        children: const <Widget>[
-          Expanded(
-              child: Divider(
-                color: Colors.yellow,
-                thickness: 2,
-              )
-          ),
-
-          Padding(
-            padding: EdgeInsets.only(left: 8.0,right: 8.0),
-            child: Text("OR"),
-          ),
-
-          Expanded(
-              child: Divider(
-                color: Colors.yellow,
-                thickness: 2,
-              )
-          ),
-        ]
-    );
+    return Row(children: const <Widget>[
+      Expanded(
+          child: Divider(
+        color: Colors.yellow,
+        thickness: 2,
+      )),
+      Padding(
+        padding: EdgeInsets.only(left: 8.0, right: 8.0),
+        child: Text("OR"),
+      ),
+      Expanded(
+          child: Divider(
+        color: Colors.yellow,
+        thickness: 2,
+      )),
+    ]);
   }
-
 }
 
 class LoginUserDetails {

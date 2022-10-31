@@ -19,11 +19,10 @@ import '../../../localdb/databasehelper.dart';
 import 'create_group.dart';
 
 class GroupListPage extends StatefulWidget {
-
   final AgoraRtmClient client;
   final AgoraRtmChannel channel;
   final String rtmpeerid;
-  final LogController logController;
+  final GroupLongController logController;
   final MessageLog messagePeerId;
   final Contacts userdetails;
   final Connections recentchatuserdetails;
@@ -39,7 +38,7 @@ class GroupListPage extends StatefulWidget {
       this.rtmpeerid,
       this.groupmessagelog,
       this.recentchatuserdetails,
-        this.groupname,
+      this.groupname,
       Key key})
       : super(key: key);
 
@@ -79,13 +78,14 @@ class _GroupListPageState extends State<GroupListPage> {
             backgroundColor: AppColors.appNewDarkThemeColor,
             centerTitle: true,
             leading: IconButton(
-              icon:  Icon(
+              icon: Icon(
                 Icons.keyboard_backspace,
                 color: Colors.white,
                 size: 3.h,
               ),
               onPressed: () {
-                Navigator.pushAndRemoveUntil(context,
+                Navigator.pushAndRemoveUntil(
+                    context,
                     MaterialPageRoute(
                         builder: (context) => const BottomNavbar(index: 2)),
                     (Route<dynamic> route) => false);
@@ -101,7 +101,7 @@ class _GroupListPageState extends State<GroupListPage> {
                         MaterialPageRoute(
                             builder: (context) => const CreateGroup()));
                   },
-                  icon:  Icon(
+                  icon: Icon(
                     Icons.add,
                     size: 3.h,
                   ))
@@ -144,53 +144,56 @@ class _GroupListPageState extends State<GroupListPage> {
                     ),
                   )
                 : groupListData.length == 0
-                 ? Center(
-                    child: Text(
-                     "No Recent Group List!",
-                     style: TextStyle(
-                      color: Colors.grey,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.sp),
-          ),
-        )
-                 :ValueListenableBuilder(
-                    valueListenable: widget.groupmessagelog,
-                    builder: (context, log, wdgt) {
-                      return ListView.separated(
-                          itemBuilder: (BuildContext context, int i) {
-                            print(StringConstant.BASE_URL +
-                                groupListData[i].image);
-                              return InkWell(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(10),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Stack(
-                                          children: [
-                                            ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              child: CircleAvatar(
-                                                radius: 3.2.h,
-                                                backgroundColor: AppColors
-                                                    .appNewDarkThemeColor,
-                                                child: Center(
-                                                    child: groupListData[i]
-                                                                .image !=
-                                                            null
-                                                        ? CachedNetworkImage(
-                                                            imageUrl: StringConstant
-                                                                    .IMAGE_URL +
-                                                                groupListData[i]
-                                                                    .image,
-                                                            imageBuilder: (context,
-                                                                    imageProvider) =>
-                                                                Container(
-                                                              decoration:
-                                                                  BoxDecoration(
-                                                                image: DecorationImage(
+                    ? Center(
+                        child: Text(
+                          "No Recent Group List!",
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.sp),
+                        ),
+                      )
+                    : ValueListenableBuilder(
+                        valueListenable: widget.groupmessagelog,
+                        builder: (context, log, wdgt) {
+                          return ListView.separated(
+                              itemBuilder: (BuildContext context, int i) {
+                                print(StringConstant.BASE_URL +
+                                    groupListData[i].image);
+                                return InkWell(
+                                    child: Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Stack(
+                                            children: [
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                child: CircleAvatar(
+                                                  radius: 3.2.h,
+                                                  backgroundColor: AppColors
+                                                      .appNewDarkThemeColor,
+                                                  child: Center(
+                                                      child: groupListData[i]
+                                                                  .image !=
+                                                              null
+                                                          ? CachedNetworkImage(
+                                                              imageUrl: StringConstant
+                                                                      .IMAGE_URL +
+                                                                  groupListData[
+                                                                          i]
+                                                                      .image,
+                                                              imageBuilder:
+                                                                  (context,
+                                                                          imageProvider) =>
+                                                                      Container(
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  image:
+                                                                      DecorationImage(
                                                                     image:
                                                                         imageProvider,
                                                                     fit: BoxFit
@@ -200,91 +203,103 @@ class _GroupListPageState extends State<GroupListPage> {
                                                                         Colors
                                                                             .red,
                                                                         BlendMode
-                                                                            .colorBurn)*/),
+                                                                            .colorBurn)*/
+                                                                  ),
+                                                                ),
                                                               ),
-                                                            ),
-                                                            height: 30.h,
-                                                            width: 40.w,
-                                                            placeholder: (context,
-                                                                    url) =>
-                                                                const CircularProgressIndicator(),
-                                                            errorWidget:
-                                                                (context, url,
-                                                                        error) =>
-                                                                    const Icon(
-                                                              Icons.error,
-                                                              size: 50,
-                                                            ),
-                                                          )
-                                                        : Text(
-                                                            "${groupListData[i].groupName[0]}",
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontSize:
-                                                                    2.5.h))),
+                                                              height: 30.h,
+                                                              width: 40.w,
+                                                              placeholder: (context,
+                                                                      url) =>
+                                                                  const CircularProgressIndicator(),
+                                                              errorWidget: (context,
+                                                                      url,
+                                                                      error) =>
+                                                                  const Icon(
+                                                                Icons.error,
+                                                                size: 50,
+                                                              ),
+                                                            )
+                                                          : Text(
+                                                              "${groupListData[i].groupName[0]}",
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize:
+                                                                      2.5.h))),
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                            child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              groupListData[i].groupName,
-                                              style: TextStyle(
-                                                  fontSize: 2.1.h,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                            Text(
-                                              "${groupListData[i].description}",
-                                              maxLines: 2,
-                                              style: TextStyle(
-                                                color: Colors.grey,
-                                                overflow: TextOverflow.ellipsis,
-                                                fontSize: 2.0.h,
+                                            ],
+                                          ),
+                                          const SizedBox(width: 15),
+                                          Expanded(
+                                              child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                groupListData[i].groupName,
+                                                style: TextStyle(
+                                                    fontSize: 2.1.h,
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
-                                            ),
-                                          ],
-                                        )),
-                                        badge(log, groupListData[i].groupName)
-                                      ],
+                                              Text(
+                                                "${groupListData[i].description}",
+                                                maxLines: 2,
+                                                style: TextStyle(
+                                                  color: Colors.grey,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  fontSize: 2.0.h,
+                                                ),
+                                              ),
+                                            ],
+                                          )),
+                                          badge(log, groupListData[i].groupName)
+                                        ],
+                                      ),
                                     ),
+                                    onTap: () async {
+                                      deletelog(
+                                          groupListData[i].groupName, log);
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  GroupChatScreen(
+                                                    client: widget.client,
+                                                    rtmpeerid: groupListData[i]
+                                                        .members[0]
+                                                        .pid,
+                                                    membersList:
+                                                        groupListData[i]
+                                                            .members,
+                                                    messagePeerId:
+                                                        widget.messagePeerId,
+                                                    logController:
+                                                        widget.logController,
+                                                    recentchatuserdetails:
+                                                        groupListData[i],
+                                                    groupmessagelog:
+                                                        widget.groupmessagelog,
+                                                    self: groupListData[i].self,
+                                                  )));
+                                    });
+                              },
+                              separatorBuilder: (_, __) => const Divider(
+                                    indent: 10,
+                                    endIndent: 10,
+                                    height: 1,
+                                    thickness: 1,
+                                    color: Colors.grey,
                                   ),
-                                  onTap: () async {
-                                    deletelog(groupListData[i].groupName, log);
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                GroupChatScreen(
-                                                  client: widget.client,
-                                                  rtmpeerid: groupListData[i].members[0].pid,
-                                                  membersList: groupListData[i].members,
-                                                  messagePeerId: widget.messagePeerId,
-                                                  logController: widget.logController,
-                                                  recentchatuserdetails: groupListData[i],
-                                                  groupmessagelog: widget.groupmessagelog,
-                                                  self: groupListData[i].self,
-
-                                                )));
-                                  });
-                          },
-                          separatorBuilder: (_, __) => const Divider(
-                                indent: 10,
-                                endIndent: 10,
-                                height: 1,
-                                thickness: 1,
-                                color: Colors.grey,
-                              ),
-                          itemCount: groupListData.length);
-                    }),
+                              itemCount: groupListData.length);
+                        }),
 
             ///sd
           ),
@@ -315,8 +330,7 @@ class _GroupListPageState extends State<GroupListPage> {
                                 });
                                 for (int a = 0; a < groupListData.length; a++) {
                                   setState(() {
-
-                                    apiusers = groupListData;
+                                    // apiusers = groupListData;
                                     _insert(groupListData[a]);
                                   });
                                 }
@@ -391,29 +405,27 @@ class _GroupListPageState extends State<GroupListPage> {
 
   void deletelog(groupname, log) {
     widget.groupmessagelog.removegroupLog(groupname);
-
   }
 
   void navigatequery(dynamic groupname) async {
-    var i=0;
+    var i = 0;
     for (var value in groupname) {
-        if (value.groupName == widget.groupname) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      GroupChatScreen(
-                        client: widget.client,
-                        rtmpeerid: groupListData[i].members[0].pid,
-                        membersList: groupListData[i].members,
-                        messagePeerId: widget.messagePeerId,
-                        logController: widget.logController,
-                        recentchatuserdetails: groupListData[i],
-                        groupmessagelog: widget.groupmessagelog,
-                        self: groupListData[i].self,
-                      )));
-          break;
-        }
+      if (value.groupName == widget.groupname) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => GroupChatScreen(
+                      client: widget.client,
+                      rtmpeerid: groupListData[i].members[0].pid,
+                      membersList: groupListData[i].members,
+                      messagePeerId: widget.messagePeerId,
+                      logController: widget.logController,
+                      recentchatuserdetails: groupListData[i],
+                      groupmessagelog: widget.groupmessagelog,
+                      self: groupListData[i].self,
+                    )));
+        break;
+      }
 
       i++;
     }
@@ -423,6 +435,6 @@ class _GroupListPageState extends State<GroupListPage> {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();
     // Remove data for the 'counter' key.
-     await prefs.remove('groupbadge');
+    await prefs.remove('groupbadge');
   }
 }

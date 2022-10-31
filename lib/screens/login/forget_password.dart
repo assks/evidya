@@ -1,4 +1,3 @@
-
 import 'package:evidya/constants/color_constant.dart';
 import 'package:evidya/constants/font_constants.dart';
 import 'package:evidya/constants/page_route_constants.dart';
@@ -37,102 +36,100 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Container(
-      height: size.height,
+        height: size.height,
         decoration: const BoxDecoration(
-        image: DecorationImage(
-        image: AssetImage("assets/images/background.png"),
-            fit: BoxFit.fill
-    ),),
-    child:
-      Scaffold(
-       backgroundColor: Colors.transparent,
-        key: _scaffoldKey,
-
-        body: SingleChildScrollView(
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-               Padding(
-                 padding: EdgeInsets.only(top: 40,left: 20),
-                 child:  Align(
-                   alignment: Alignment.centerLeft,
-                   child: IconButton(
-                     icon: Icon(
-                       Icons.keyboard_backspace,
-                       color: Colors.black,
-                     ),
-                     onPressed: () =>
-                         Navigator.of(context).pop(),
-                   ),
-                 )
-               ),
-                Padding(
-                  padding:
-                  const EdgeInsets.only(left: 10, bottom: 30, right: 20),
-                  child: HeadingAppBar(
-                    title: StringConstant.forgetPassword,
-                    sizes: 20,
-                    padding_top: 5,
-                    description:
-                    "Enter the email associated with your account and we'll send  an email with instructions to reset your password.",
-                    description_size: 13,
-                  ),
-                ),
-                Center(
-                    child: Padding(
-                        padding: EdgeInsets.all(30),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                child: Column(
-                                  children: <Widget>[
-                                    SizedBox(
-                                        height:
-                                        30),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(width: 1,color: Colors.black)
-                                      ),
-                                      child: TextFormField(
-                                        controller: _emailController,
-                                        decoration: InputDecoration(
-                                          filled: true,
-                                          focusColor: Colors.white.withOpacity(0.5),
-                                          hintText: "Email",
-                                          suffixIcon: Icon(Icons.mail),
-                                          hintStyle: TextStyle(color: Colors.grey.shade700, fontSize: 15),
-                                          border: InputBorder.none,
-                                          focusedBorder: InputBorder.none,
-                                          enabledBorder: InputBorder.none,
-                                          errorBorder: InputBorder.none,
-                                          disabledBorder: InputBorder.none,
+          image: DecorationImage(
+              image: AssetImage("assets/images/background.png"),
+              fit: BoxFit.fill),
+        ),
+        child: Scaffold(
+            backgroundColor: Colors.transparent,
+            key: _scaffoldKey,
+            body: SingleChildScrollView(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(top: 40, left: 20),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.keyboard_backspace,
+                              color: Colors.black,
+                            ),
+                            onPressed: () => Navigator.of(context).pop(),
+                          ),
+                        )),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 10, bottom: 30, right: 20),
+                      child: HeadingAppBar(
+                        title: StringConstant.forgetPassword,
+                        sizes: 20,
+                        padding_top: 5,
+                        description:
+                            "Enter the email associated with your account and we'll send  an email with instructions to reset your password.",
+                        description_size: 13,
+                      ),
+                    ),
+                    Center(
+                        child: Padding(
+                            padding: EdgeInsets.all(30),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    child: Column(
+                                      children: <Widget>[
+                                        SizedBox(height: 30),
+                                        Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              border: Border.all(
+                                                  width: 1,
+                                                  color: Colors.black)),
+                                          child: TextFormField(
+                                            controller: _emailController,
+                                            decoration: InputDecoration(
+                                              filled: true,
+                                              focusColor:
+                                                  Colors.white.withOpacity(0.5),
+                                              hintText: "Email",
+                                              suffixIcon: Icon(Icons.mail),
+                                              hintStyle: TextStyle(
+                                                  color: Colors.grey.shade700,
+                                                  fontSize: 15),
+                                              border: InputBorder.none,
+                                              focusedBorder: InputBorder.none,
+                                              enabledBorder: InputBorder.none,
+                                              errorBorder: InputBorder.none,
+                                              disabledBorder: InputBorder.none,
+                                            ),
+                                            validator: (value) {
+                                              if (value.isEmpty ||
+                                                  !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                                      .hasMatch(value)) {
+                                                return 'Enter a valid email!';
+                                              }
+                                              return null;
+                                            },
+                                          ),
                                         ),
-                                        validator: (value) {
-                                          if (value.isEmpty ||
-                                              !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                                  .hasMatch(value)) {
-                                            return 'Enter a valid email!';
-                                          }
-                                          return null;
-                                        },
-                                      ),
+                                        SizedBox(
+                                            height:
+                                                getProportionateScreenHeight(
+                                                    30)),
+                                        _submitButton(size)
+                                      ],
                                     ),
-                                    SizedBox(
-                                        height:
-                                        getProportionateScreenHeight(30)),
-                                    _submitButton(size)
-                                  ],
-                                ),
-                              ),
-                            ])))
-              ]),
-        )
-      )
-    );
+                                  ),
+                                ])))
+                  ]),
+            )));
   }
 
   _onEmailChanged() {
@@ -165,7 +162,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
   }
 
   void showInSnackBar(String value) {
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(value),
       backgroundColor: Colors.pink,
     ));
@@ -204,12 +201,12 @@ class _ForgetPasswordState extends State<ForgetPassword> {
     Helper.checkConnectivity().then((value) => {
           if (value)
             {
-              ApiRepository().forgetPasswordApiCall(_emailController.text)
+              ApiRepository()
+                  .forgetPasswordApiCall(_emailController.text)
                   .then((value) {
-                  EasyLoading.dismiss();
+                EasyLoading.dismiss();
                 if (value != null) {
                   if (value.status == "successfull") {
-
                     //Helper.showMessage("Successfully sent . Please check your registered mail id. ");
                     showDialog(
                         context: context,
@@ -217,46 +214,61 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                           return Dialog(
                             backgroundColor: Colors.transparent,
                             child: new Container(
-                              padding: EdgeInsets.symmetric(horizontal: 25,vertical: 20),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 25, vertical: 20),
                               width: 300.0,
                               height: 350.0,
                               decoration: new BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 color: Colors.transparent,
-                                borderRadius: new BorderRadius.all(new Radius.circular(10.0)),
+                                borderRadius: new BorderRadius.all(
+                                    new Radius.circular(10.0)),
                                 image: DecorationImage(
                                     fit: BoxFit.fill,
-                                    image: AssetImage("assets/images/whitebackground.png")
-                                ),
+                                    image: AssetImage(
+                                        "assets/images/whitebackground.png")),
                               ),
                               child: new Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  Image.asset("assets/images/Smile.png",height: 10.h,),
-                                  SizedBox(height: 15,),
-                                  Text("Congratulations!",style: TextStyle(
-                                      fontSize: 17.sp,
-                                      color: Color(0xFF1da1f2),
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: .5
-                                  ),),
-                                  SizedBox(height: 5,),
-                                  Text("Your Password change request has been submitted successfully.\n Please check your email.",style: TextStyle(
-                                      fontSize: 10.sp,
-                                      letterSpacing: .5
+                                  Image.asset(
+                                    "assets/images/Smile.png",
+                                    height: 10.h,
                                   ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                  Text(
+                                    "Congratulations!",
+                                    style: TextStyle(
+                                        fontSize: 17.sp,
+                                        color: Color(0xFF1da1f2),
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: .5),
+                                  ),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
+                                  Text(
+                                    "Your Password change request has been submitted successfully.\n Please check your email.",
+                                    style: TextStyle(
+                                        fontSize: 10.sp, letterSpacing: .5),
                                     textAlign: TextAlign.center,
                                   ),
-                                  SizedBox(height: 15,),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
                                   GestureDetector(
-                                      onTap: (){
+                                      onTap: () {
                                         //isShow = false;
                                         Navigator.pushAndRemoveUntil(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (BuildContext context) => LoginScreen(),
-                                          ), (route) => false,
+                                            builder: (BuildContext context) =>
+                                                LoginScreen(),
+                                          ),
+                                          (route) => false,
                                         );
                                       },
                                       child: Center(
@@ -273,29 +285,30 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                                                 Color(0xFF520e35),
                                               ],
                                             ),
-                                            borderRadius: BorderRadius.circular(30),
+                                            borderRadius:
+                                                BorderRadius.circular(30),
                                           ),
-                                          child:  Center(
+                                          child: Center(
                                             child: Padding(
-                                              padding: EdgeInsets.only(top: 10, bottom: 10),
+                                              padding: EdgeInsets.only(
+                                                  top: 10, bottom: 10),
                                               child: Text(
                                                 "Tap to login",
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 10.sp,
                                                     fontWeight: FontWeight.w500,
-                                                    letterSpacing: .5
-                                                ),
+                                                    letterSpacing: .5),
                                               ),
                                             ),
                                           ),
-                                        ),)),
+                                        ),
+                                      )),
                                 ],
                               ),
                             ),
                           );
                         });
-
                   } else {
                     showInSnackBar(value.message.toString());
                   }

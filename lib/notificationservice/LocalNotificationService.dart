@@ -1,113 +1,173 @@
-
 import 'dart:async';
 import 'package:awesome_notifications/android_foreground_service.dart';
-import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:firebase_messaging_platform_interface/src/remote_message.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_callkit_incoming/flutter_callkit_incoming.dart';
 
 import '../constants/string_constant.dart';
+import '../model/chat_model.dart';
 
-class LocalNotificationService{
-///  after this create a method initialize to initialize  localnotification
+class LocalNotificationService {
+  ///  after this create a method initialize to initialize  localnotification
 
-  static void initialize() {
+  static void initialize() {}
+
+  /// after initialize we create channel in createanddisplaynotification method
+
+  static int messageIncrement = 0;
+
+  static final Map<int, int> _messagePool = {};
+  static void clearPool(int id) async {
+    if (_messagePool.containsKey(id)) {
+      _messagePool.remove(id);
+      await AwesomeNotifications().cancel(id);
+    }
   }
 
- /// after initialize we create channel in createanddisplaynotification method
+  static Future<void> showNotificationModel(
+      ChatModel model, RemoteMessage message) async {
+    messageIncrement++;
+    final id = model.from.hashCode;
 
-  static int _messageIncrement = 0;
-  static Future<void> showNotification(dynamic message) async {
-
-    dynamic name = message.data['body'].split('#@####@#');
-   // print(name[1]);
-    _messageIncrement++;
-    if(message.data['image']!="") {
+    if (_messagePool.containsKey(id)) {
+      _messagePool.update(id, (value) {
+        return value + 1;
+        // return "${model.message} \\n $value";
+      });
+    } else {
+      _messagePool.putIfAbsent(id, () => 1);
+    }
+    final counter = _messagePool[id] ?? 0;
+    String newMessage = model.message + (counter > 0 ? counter.toString() : '');
+    // print('newMessage#$newMessage');
+    if (model.type == 'image') {
       AwesomeNotifications().createNotification(
         content: NotificationContent(
-            id: int.parse(message.from.substring(message.from.length - 3)),
+            id: id,
             channelKey: 'basic_channel',
-            title: message.data['title']+"      "+_messageIncrement.toString(),
-            body:  message.data['body'],
+            title: message.data['title'],
+            // body: "image" /*?? message.data['body']*/,
+            body: newMessage,
             wakeUpScreen: true,
             fullScreenIntent: false,
             bigPicture: message.data['image'],
             notificationLayout: NotificationLayout.BigPicture,
             payload: {
-            'peerid': message.data['call_id'],
-            }
-        ),
+              'peerid': message.data['call_id'],
+              'from': model.from,
+            }),
       );
-    }else{
+    } else {
       AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: int.parse(message.from.substring(message.from.length - 3)),
-          channelKey: 'basic_channel',
-          title: message.data['title']+"      "+_messageIncrement.toString(),
-          body: name.length <= 1? name[0]:name[2] /*?? message.data['body']*/,
-            fullScreenIntent: false,
-          wakeUpScreen: true,
-          payload: {
+          content: NotificationContent(
+              id: id,
+              channelKey: 'basic_channel',
+              title: message.data['title'],
+              body: newMessage,
+              category: NotificationCategory.Message,
+              groupKey: model.from,
+              fullScreenIntent: false,
+              wakeUpScreen: true,
+              payload: {
             'peerid': message.data['call_id'],
-            'name': message.data['title']
-          }
-        )
-      );
+            'name': message.data['title'],
+            'from': model.from
+          }));
     }
-
   }
+
+  // static Future<void> showNotification(dynamic message) async {
+  //   dynamic name = message.data['body'].split('#@####@#');
+  //   //print("showNotification :" + name);
+  //   _messageIncrement++;
+  //   if (message.data['image'] != "") {
+  //     AwesomeNotifications().createNotification(
+  //       content: NotificationContent(
+  //           id: int.parse(message.from.substring(message.from.length - 3)),
+  //           channelKey: 'basic_channel',
+  //           title:
+  //               message.data['title'] + "      " + _messageIncrement.toString(),
+  //           // body: "image" /*?? message.data['body']*/,
+  //           body: message.data['body'],
+  //           wakeUpScreen: true,
+  //           fullScreenIntent: false,
+  //           bigPicture: message.data['image'],
+  //           notificationLayout: NotificationLayout.BigPicture,
+  //           payload: {
+  //             'peerid': message.data['call_id'],
+  //           }),
+  //     );
+  //   } else {
+  //     AwesomeNotifications().createNotification(
+  //         content: NotificationContent(
+  //             id: int.parse(message.from.substring(message.from.length - 3)),
+  //             channelKey: 'basic_channel',
+  //             title: message.data['title'] +
+  //                 "      " +
+  //                 _messageIncrement.toString(),
+  //             // body: name[2] /*?? message.data['body']*/,
+  //             body: name.length <= 1 ? name[0] : name[2],
+  //             fullScreenIntent: false,
+  //             wakeUpScreen: true,
+  //             payload: {
+  //           'peerid': message.data['call_id'],
+  //           'name': message.data['title']
+  //         }));
+  //   }
+  // }
+
   static Future<void> showCallNotification(dynamic message) async {
     String platformVersion = 'Android-31';
     AndroidForegroundService.startForeground(
         content: NotificationContent(
             id: 1,
             channelKey: 'call_channel',
-            title: message['body'] =='video'? 'bVidya Video Call': 'bVidya Audio Call',
+            title: message['body'] == 'video'
+                ? 'bVidya Video Call'
+                : 'bVidya Audio Call',
             body: message['title'],
             largeIcon: 'asset://assets/images/teacher.PNG',
             wakeUpScreen: true,
             fullScreenIntent: true,
             autoDismissible: false,
-            backgroundColor: (platformVersion == 'Android-31') ? Color(0x00796a) : Colors.white,
+            backgroundColor: (platformVersion == 'Android-31')
+                ? Color(0x00796a)
+                : Colors.white,
             payload: {
               'username': message['title'],
               'callid': message['call_id'],
-              'calltype':message['body'],
-              'fcmtoken':message['fcm_token']
-            }
-        ),
+              'calltype': message['body'],
+              'fcmtoken': message['fcm_token']
+            }),
         actionButtons: [
           NotificationActionButton(
               key: 'ACCEPT',
               label: 'Accept Call',
               color: Colors.green,
-              autoDismissible: true
-          ),
+              autoDismissible: true),
           NotificationActionButton(
-              key: 'REJECT',
-              label: 'Reject',
+            key: 'REJECT',
+            label: 'Reject',
             color: Colors.red,
-             // isDangerousOption: true,
-              autoDismissible: true,
-           // buttonType: ActionButtonType.DisabledAction,
+            // isDangerousOption: true,
+            autoDismissible: true,
+            // buttonType: ActionButtonType.DisabledAction,
           ),
-        ]
-    );
+        ]);
     Timer.periodic(const Duration(seconds: 60), (timer) {
       AndroidForegroundService.stopForeground();
-
     });
-   // AndroidForegroundService.stopForeground();
+    // AndroidForegroundService.stopForeground();
   }
-
-
 
   static void callkitNotification(RemoteMessage message) async {
     var params = <String, dynamic>{
       'id': message.data['call_id'],
       'nameCaller': message.data['title'],
       'appName': 'Bvidya',
-      'avatar': StringConstant.IMAGE_URL+message.data['userprofile'],
+      'avatar': StringConstant.IMAGE_URL + message.data['userprofile'],
       'handle': message.data['body'],
       'type': 0,
       'textAccept': 'Accept',
@@ -115,7 +175,12 @@ class LocalNotificationService{
       'textMissedCall': 'Missed call',
       'textCallback': 'Call back',
       'duration': 30000,
-      'extra': <String, dynamic>{'username': message.data['title'], 'callid': message.data['call_id'], 'calltype':message.data['body'], 'fcmtoken':message.data['fcm_token']},
+      'extra': <String, dynamic>{
+        'username': message.data['title'],
+        'callid': message.data['call_id'],
+        'calltype': message.data['body'],
+        'fcmtoken': message.data['fcm_token']
+      },
       'headers': <String, dynamic>{'apiKey': 'Abc@123!', 'platform': 'flutter'},
       'android': <String, dynamic>{
         'isCustomNotification': true,
@@ -147,7 +212,7 @@ class LocalNotificationService{
     await FlutterCallkitIncoming.showCallkitIncoming(params);
   }
 
-  static void misscallkitNotification(RemoteMessage message) async{
+  static void misscallkitNotification(RemoteMessage message) async {
     var misscall = <String, dynamic>{
       'id': message.data['call_id'],
       'nameCaller': message.data['title'],
@@ -159,5 +224,4 @@ class LocalNotificationService{
     };
     await FlutterCallkitIncoming.showMissCallNotification(misscall);
   }
-
-  }
+}

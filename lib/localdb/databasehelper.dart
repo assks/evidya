@@ -5,8 +5,6 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-
-
 class DatabaseHelper {
   static const _databaseName = "chat.db";
   static const _databaseVersion = 1;
@@ -16,20 +14,24 @@ class DatabaseHelper {
   static const recentgrouplist = 'recentgrouplist';
   static const calllist = 'calllist';
   static const deliveryStatus = 'deliveryStatus';
-  static const textId ='textid';
+  static const textId = 'textid';
   static const Id = 'id';
   static const message = 'message';
   static const reply = 'reply';
   static const timestamp = 'timestamp';
   static const diraction = 'diraction';
-  static const from = 'from1';
-  static const to = 'to1';
-  static const type = 'type1';
+  static const replyText = 'reply_text';
+  static const url = 'url';
+  static const from = 'from_id';
+  static const to = 'to_id';
+  static const type = 'type';
+  static const deleted = 'deleted';
   static const badge = 'badge';
   static const profile_image = 'profile_image';
   static const email = 'email';
   static const phone = 'phone';
   static const groupname = 'groupname';
+
   ///CallList
   static const calleeName = 'calleeName';
   static const Calldrm = 'Calldrm';
@@ -73,28 +75,34 @@ class DatabaseHelper {
           CREATE TABLE $table (
             $Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             $message TEXT NOT NULL,
+            $url TEXT,
             $timestamp INTEGER NOT NULL,
             $diraction TEXT NOT NULL,
             $from TEXT NOT NULL,
             $to TEXT NOT NULL,
             $reply TEXT NOT NULL,
+            $replyText TEXT NOT NULL,
             $type TEXT NOT NULL,
             $deliveryStatus TEXT NOT NULL,
-            $textId TEXT NOT NULL
+            $textId TEXT NOT NULL,
+            $deleted INTEGER DEFAULT 0
           );
           ''');
     await db.execute('''
           CREATE TABLE $grouptable (
             $Id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
             $message TEXT NOT NULL,
+            $url TEXT,
             $timestamp INTEGER NOT NULL,
             $diraction TEXT NOT NULL,
             $from TEXT NOT NULL,
             $to TEXT NOT NULL,
             $reply TEXT NOT NULL,
+            $replyText TEXT NOT NULL,
             $type TEXT NOT NULL,
-             $textId TEXT NOT NULL,
-            $groupname TEXT NOT NULL
+            $textId TEXT NOT NULL,
+            $groupname TEXT NOT NULL,
+            $deleted INTEGER DEFAULT 0
           );
           ''');
     await db.execute('''
@@ -141,12 +149,21 @@ class DatabaseHelper {
 
   Future<int> insert(Map<String, dynamic> row) async {
     Database db = await instance.database;
+    // dynamic alreadyExist = await is_message_exists(row[textId]);
+    // if (alreadyExist == 1) {
+    //   print('already exists!! skipping insert');
+    //   return -1;
+    // }
     return await db.insert(table, row);
   }
 
-
   Future<int> groupinsert(Map<String, dynamic> row) async {
     Database db = await instance.database;
+    // dynamic alreadyExist = await isTextIdPresentInGroup(row[textId]);
+    // if (alreadyExist == 1) {
+    //   print('already exists!! skipping insert');
+    //   return -1;
+    // }
     return await db.insert(grouptable, row);
   }
 
@@ -156,83 +173,135 @@ class DatabaseHelper {
   }
 
   Future<int> recentchatlist(row) async {
-
     Database db = await instance.database;
     return await db.insert(recentlist, row);
   }
 
   Future<int> getcount(userpeerid) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS peer_id FROM $recentlist WHERE $peerid = $userpeerid"));
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS peer_id FROM $recentlist WHERE $peerid = $userpeerid"));
     return count;
   }
 
-  Future<int> updatedfcm(userpeerid,fcmtoken,) async {
+  Future<int> updatedfcm(
+    userpeerid,
+    fcmtoken,
+  ) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $status = '$fcmtoken' AND $peerid = $userpeerid" ));
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $status = '$fcmtoken' AND $peerid = $userpeerid"));
     return count;
   }
-  Future<int> updatedstatus(userpeerid,status,) async {
+
+  Future<int> updatedstatus(
+    userpeerid,
+    status,
+  ) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $blockstatus = '$status' AND $peerid = $userpeerid" ));
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $blockstatus = '$status' AND $peerid = $userpeerid"));
     return count;
   }
+
   Future<int> is_message_exists(textid) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) FROM $table WHERE $textId = '$textid'" ));
+    int count = Sqflite.firstIntValue(await dbclient
+        .rawQuery("SELECT COUNT(*) FROM $table WHERE $textId = '$textid'"));
     return count;
   }
-  Future<int> updated_transit_allowed(userpeerid,transit,) async {
+
+  Future<int> getExistId(textid) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $transitallowed = '$transit' AND $peerid = $userpeerid" ));
+    int id = Sqflite.firstIntValue(await dbclient
+        .rawQuery("SELECT id FROM $table WHERE $textId = '$textid'"));
+    return id;
+  }
+
+  Future<int> getGroupExistId(textid) async {
+    var dbclient = await instance.database;
+    int id = Sqflite.firstIntValue(await dbclient
+        .rawQuery("SELECT id FROM $grouptable WHERE $textId = '$textid'"));
+    return id;
+  }
+
+  Future<int> isTextIdPresentInGroup(textid) async {
+    var dbclient = await instance.database;
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) FROM $grouptable WHERE $textId = '$textid'"));
     return count;
   }
 
-  Future<void> updatedeliverystatus(msg,id,status,) async {
+  Future<int> updated_transit_allowed(
+    userpeerid,
+    transit,
+  ) async {
+    var dbclient = await instance.database;
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $transitallowed = '$transit' AND $peerid = $userpeerid"));
+    return count;
+  }
+
+  Future<void> updatedeliverystatus(
+    // msg,
+    id,
+    status,
+  ) async {
     final db = await instance.database;
-    dynamic res=await db.rawQuery("UPDATE $table SET $deliveryStatus = '$status' WHERE id = $id ");
+    dynamic res = await db.rawQuery(
+        "UPDATE $table SET $deliveryStatus = '$status' WHERE id = $id ");
     print(res);
-      }
-
-  Future<int> updatefcm(userpeerid,userfcmtoken) async {
-    final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
-  }
-  Future<int> updatestatus(userpeerid,status) async {
-    final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET   $blockstatus = "$status"   WHERE peerid = $userpeerid');
-  }
-  Future<int> update_transit_allowed(userpeerid,transit_allowed) async {
-    final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET   $transitallowed = "$transit_allowed"   WHERE peerid = $userpeerid');
   }
 
-  Future<int> updatechattable(userpeerid,userfcmtoken) async {
+  Future<int> updatefcm(userpeerid, userfcmtoken) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
   }
 
-  Future<int> update(pid ,datetime) async {
+  Future<int> updatestatus(userpeerid, status) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+1 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET   $blockstatus = "$status"   WHERE peerid = $userpeerid');
   }
 
-  Future<int> sendUpdate(pid ,datetime) async {
+  Future<int> update_transit_allowed(userpeerid, transit_allowed) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+0 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET   $transitallowed = "$transit_allowed"   WHERE peerid = $userpeerid');
+  }
+
+  Future<int> updatechattable(userpeerid, userfcmtoken) async {
+    final db = await instance.database;
+    await db.rawQuery(
+        'UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
+  }
+
+  Future<int> update(pid, datetime) async {
+    final db = await instance.database;
+    await db.rawQuery(
+        'UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+1 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
+  }
+
+  Future<int> sendUpdate(pid, datetime) async {
+    final db = await instance.database;
+    await db.rawQuery(
+        'UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+0 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
   }
 
   Future<int> deletebadge(pid) async {
     final db = await instance.database;
-    final res = await db.rawQuery("UPDATE $recentlist  SET  $badge='0' WHERE peerid = $pid");
+    final res = await db
+        .rawQuery("UPDATE $recentlist  SET  $badge='0' WHERE peerid = $pid");
   }
 
   /// recent group list
   Future<List<Groups>> getAllgroupdata() async {
     final db = await instance.database;
-    List<Map> list= await db.rawQuery("SELECT * FROM $recentgrouplist ORDER BY timestamp DESC");
+    List<Map> list = await db
+        .rawQuery("SELECT * FROM $recentgrouplist ORDER BY timestamp DESC");
     List<Groups> users = [];
-    for(int i=0; i < list.length; i++) {
+    for (int i = 0; i < list.length; i++) {
       //users.add(Groups(id: list[i]['userid'], badge: list[i]["badge"], peerId:list[i]["peerid"], groupName:list[i]["NAME"],groupAdmin:list[i]["STATUS"],timeStamp:list[i]["timestamp"]));
     }
     print(users.toString());
@@ -240,49 +309,55 @@ class DatabaseHelper {
   }
 
   Future<int> recentchatgrouplist(row) async {
-
     Database db = await instance.database;
     return await db.insert(recentlist, row);
   }
 
   Future<int> getgroupcount(userpeerid) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS peer_id FROM $recentlist WHERE $peerid = $userpeerid"));
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS peer_id FROM $recentlist WHERE $peerid = $userpeerid"));
     return count;
   }
 
-
-  Future<int> updatedgroupfcm(userpeerid,fcmtoken,) async {
+  Future<int> updatedgroupfcm(
+    userpeerid,
+    fcmtoken,
+  ) async {
     var dbclient = await instance.database;
-    int count = Sqflite.firstIntValue(await dbclient.rawQuery("SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $status = '$fcmtoken' AND $peerid = $userpeerid" ));
+    int count = Sqflite.firstIntValue(await dbclient.rawQuery(
+        "SELECT COUNT(*) AS fcm_token FROM $recentlist WHERE $status = '$fcmtoken' AND $peerid = $userpeerid"));
     return count;
   }
 
-  Future<int> updategroupfcm(userpeerid,userfcmtoken) async {
+  Future<int> updategroupfcm(userpeerid, userfcmtoken) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET   $status = "$userfcmtoken"   WHERE peerid = $userpeerid');
   }
 
-  Future<int> updaterecentgroup(pid ,datetime) async {
+  Future<int> updaterecentgroup(pid, datetime) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+1 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+1 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
   }
 
-  Future<int> sendUpdategrouplist(pid ,datetime) async {
+  Future<int> sendUpdategrouplist(pid, datetime) async {
     final db = await instance.database;
-    await db.rawQuery('UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+0 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
+    await db.rawQuery(
+        'UPDATE $recentlist  SET  $badge= CAST(CAST($badge AS int)+0 AS varchar), $timestamp = "$datetime"   WHERE peerid = $pid');
   }
 
   Future<int> deletegroupbadge(pid) async {
     final db = await instance.database;
-    final res = await db.rawQuery("UPDATE $recentlist  SET  $badge='0' WHERE peerid = $pid");
+    final res = await db
+        .rawQuery("UPDATE $recentlist  SET  $badge='0' WHERE peerid = $pid");
   }
 
   Future<int> deleteAllEmployees() async {
     final db = await database;
     await db.execute("DROP TABLE IF EXISTS recentlist");
     //final res = await db.rawQuery('TRUNCATE TABLE recentlist');
-
   }
 
   // All of the rows are returned as a list of maps, where each map is
@@ -291,21 +366,35 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.query(table);
   }
+
   Future<List<Map<String, dynamic>>> AllRows() async {
     Database db = await instance.database;
     return await db.rawQuery("SELECT * FROM $calllist ORDER BY timestamp DESC");
   }
+
   Future<List<Map<String, dynamic>>> Alldata() async {
     Database db = await instance.database;
-    return await db.rawQuery("SELECT * FROM $grouptable ORDER BY timestamp DESC");
+    return await db
+        .rawQuery("SELECT * FROM $grouptable ORDER BY timestamp DESC");
   }
 
   Future<List<Connections>> getAlldata() async {
     final db = await instance.database;
-    List<Map> list= await db.rawQuery("SELECT * FROM $recentlist ORDER BY timestamp DESC");
+    List<Map> list =
+        await db.rawQuery("SELECT * FROM $recentlist ORDER BY timestamp DESC");
     List<Connections> users = [];
-    for(int i=0; i < list.length; i++) {
-      users.add(Connections(id: list[i]['userid'], badge: list[i]["badge"], peerId:list[i]["peerid"], name:list[i]["NAME"],fcm_token:list[i]["STATUS"],timeStamp:list[i]["timestamp"],email:list[i]["email"],phone:list[i]["phone"],profile_image:list[i]["profile_image"],status:list[i]["BLOCKSTATUS"]));
+    for (int i = 0; i < list.length; i++) {
+      users.add(Connections(
+          id: list[i]['userid'],
+          badge: list[i]["badge"],
+          peerId: list[i]["peerid"],
+          name: list[i]["NAME"],
+          fcm_token: list[i]["STATUS"],
+          timeStamp: list[i]["timestamp"],
+          email: list[i]["email"],
+          phone: list[i]["phone"],
+          profile_image: list[i]["profile_image"],
+          status: list[i]["BLOCKSTATUS"]));
     }
     print(users.toString());
     return users;
@@ -316,14 +405,18 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> queryRowCount(
       String peerid, String userpeerid) async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $table WHERE ($to = $peerid AND $from = $userpeerid) OR ($to = $userpeerid AND $from = $peerid)');
+    return await db.rawQuery(
+        'SELECT * FROM $table WHERE ($to = $peerid AND $from = $userpeerid) OR ($to = $userpeerid AND $from = $peerid) AND $deleted = 0');
   }
 
-  Future<List<Map<String, dynamic>>> groupqueryRowCount(String peerid, String userpeerid,groupnam) async {
+  Future<List<Map<String, dynamic>>> groupqueryRowCount(
+      String peerid, String userpeerid, groupnam) async {
     Database db = await instance.database;
-    return await db.rawQuery('SELECT * FROM $grouptable WHERE $groupname = "$groupnam"');
+    return await db.rawQuery(
+        'SELECT * FROM $grouptable WHERE $groupname = "$groupnam" AND $deleted = 0');
   }
 
+//TODO manage delete later
   Future<int> delete(int id) async {
     Database db = await instance.database;
     return await db.delete(table, where: '$Id = ?', whereArgs: [id]);
@@ -333,13 +426,20 @@ class DatabaseHelper {
     Database db = await instance.database;
     return await db.delete(table, where: '$Id = ?', whereArgs: [msgid]);
   }
-  Future<List<Map<String, dynamic>>> clearchat(String peerid, String userpeerid) async {
+
+  Future<List<Map<String, dynamic>>> clearchat(
+      String peerid, String userpeerid) async {
     Database db = await instance.database;
-    return await db.rawQuery('DELETE FROM $table WHERE ($to = $peerid AND $from = $userpeerid) OR ($to = $userpeerid AND $from = $peerid)');
+    return await db.rawQuery(
+        'DELETE FROM $table WHERE ($to = $peerid AND $from = $userpeerid) OR ($to = $userpeerid AND $from = $peerid)');
   }
-  Future<List<Map<String, dynamic>>> cleargroupchat(String selectedgroupname,) async {
+
+  Future<List<Map<String, dynamic>>> cleargroupchat(
+    String selectedgroupname,
+  ) async {
     Database db = await instance.database;
-    return await db.rawQuery('DELETE FROM $grouptable WHERE ($groupname = "$selectedgroupname")');
+    return await db.rawQuery(
+        'DELETE FROM $grouptable WHERE ($groupname = "$selectedgroupname")');
   }
 
   Future<List<Map<String, dynamic>>> deletechatlist() async {

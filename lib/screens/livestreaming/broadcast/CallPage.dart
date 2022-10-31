@@ -105,27 +105,27 @@ class _CallPageState extends State<CallPage> {
     _engine.destroy();
     super.dispose();
   }
-  var userAudio = [],userVideo = [];
 
+  var userAudio = [], userVideo = [];
 
   @override
   void initState() {
     super.initState();
-  //  localData();
+    //  localData();
     print('audio ${widget.audio}  &Video${widget.video}');
     muted = (widget.audio == '0') ? true : false;
     camera = (widget.video == '0') ? true : false;
     indexValue = 0;
     AppId = widget.app_id;
     channelName = widget.channelName;
-    print("APP ID  $AppId,channel ID $channelName  meeting Id ${widget.meetingid}, ${widget.id}");
+    print(
+        "APP ID  $AppId,channel ID $channelName  meeting Id ${widget.meetingid}, ${widget.id}");
     print("RTM User ${widget.rtmUser} && RTM Token ${widget.rtmToken}");
     if (widget.role != "host") {
       Timer.periodic(const Duration(seconds: 10), (timer) {
         _statusapi(widget.id);
       });
     }
-
 
     _createClient();
     fetchUserName();
@@ -137,32 +137,30 @@ class _CallPageState extends State<CallPage> {
   void _createClient() async {
     //  RTC
     _client = await AgoraRtmClient.createInstance(widget.app_id);
-    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) async{
-      RegExp fileExp = RegExp(
-          r"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)");
-      dynamic isfile = fileExp.hasMatch(message.text);
+    _client.onMessageReceived = (AgoraRtmMessage message, String peerId) async {
+      // RegExp fileExp =
+      //     RegExp(r"(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)");
+      // dynamic isfile = fileExp.hasMatch(message.text);
       print("Peer ID $peerId");
       print("onMessageReceived:${message.text}");
-      if(message.text == "mic_off") {
-
+      if (message.text == "mic_off") {
         setState(() {
           hostMute = true;
         });
         EasyLoading.showToast("You are muted by host.",
-            duration: Duration(seconds: 3),
-            toastPosition: EasyLoadingToastPosition.bottom
-        );
+            duration: const Duration(seconds: 3),
+            toastPosition: EasyLoadingToastPosition.bottom);
         await _engine.muteLocalAudioStream(true);
-      } else if(message.text == "mic_on") {
+      } else if (message.text == "mic_on") {
         setState(() {
           hostMute = false;
         });
         await _engine.muteLocalAudioStream(false);
-        EasyLoading.showToast("Host un-muted you.\n Now you can enable your mic.",
+        EasyLoading.showToast(
+            "Host un-muted you.\n Now you can enable your mic.",
             duration: Duration(seconds: 3),
-            toastPosition: EasyLoadingToastPosition.bottom
-        );
-      } else if(message.text == "videocam_off") {
+            toastPosition: EasyLoadingToastPosition.bottom);
+      } else if (message.text == "videocam_off") {
         setState(() {
           hostCamera = true;
         });
@@ -170,7 +168,7 @@ class _CallPageState extends State<CallPage> {
             duration: Duration(seconds: 3),
             toastPosition: EasyLoadingToastPosition.bottom);
         await _engine.muteLocalVideoStream(true);
-      } else if(message.text == "videocam_on") {
+      } else if (message.text == "videocam_on") {
         setState(() {
           hostCamera = false;
         });
@@ -178,7 +176,6 @@ class _CallPageState extends State<CallPage> {
         EasyLoading.showToast("You can enable your camera now",
             duration: Duration(seconds: 3),
             toastPosition: EasyLoadingToastPosition.bottom);
-
       }
     };
     initialize();
@@ -281,7 +278,7 @@ class _CallPageState extends State<CallPage> {
         _infoStrings.add(info);
       });
     }, joinChannelSuccess: (channel, uid, elapsed) {
-      setState((){
+      setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
         print("I am here");
         _infoStrings.add(info);
@@ -302,7 +299,7 @@ class _CallPageState extends State<CallPage> {
       });
     }, userJoined: (uid, elapsed) {
       RTMUser();
-      setState(()  {
+      setState(() {
         final info = 'userJoined: $uid';
         _infoStrings.add(info);
         _users.add(uid);
@@ -314,7 +311,7 @@ class _CallPageState extends State<CallPage> {
       setState(() {
         final info = 'userOffline: $uid , reason: $reason';
         _infoStrings.add(info);
-        if(uid==10000){
+        if (uid == 10000) {
           screenshareid = 0;
         }
         _users.remove(uid);
@@ -381,8 +378,11 @@ class _CallPageState extends State<CallPage> {
       Future.delayed(
           const Duration(milliseconds: 5000),
           () => {
-            setState(() {
-                  userNameList[(jsonData[i]['userId']).toString().split(":")[0].toString()] =
+                setState(() {
+                  userNameList[(jsonData[i]['userId'])
+                          .toString()
+                          .split(":")[0]
+                          .toString()] =
                       "${(jsonData[i]['userId']).toString().split(":")[1]}";
                 })
               });
@@ -458,35 +458,33 @@ class _CallPageState extends State<CallPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           GestureDetector(
-              onTap: (){
-                if(hostCamera == true){
+              onTap: () {
+                if (hostCamera == true) {
                   EasyLoading.showToast("Your camera disabled by host.",
                       duration: Duration(seconds: 5),
-                      toastPosition: EasyLoadingToastPosition.bottom
-                  );
-                } else{
+                      toastPosition: EasyLoadingToastPosition.bottom);
+                } else {
                   toggleCamera();
                 }
               },
               child: camera == true
-                 ? Image.asset(
-                   'assets/icons/svg/video_camera.png',
-                   height: 3.h,
-                    width: 3.h,
-                   )
+                  ? Image.asset(
+                      'assets/icons/svg/video_camera.png',
+                      height: 3.h,
+                      width: 3.h,
+                    )
                   : SvgPicture.asset(
                       'assets/icons/svg/video_camera.svg',
                       height: 3.h,
                       width: 3.h,
                     )),
           GestureDetector(
-              onTap: (){
-                if(hostMute == true){
+              onTap: () {
+                if (hostMute == true) {
                   EasyLoading.showToast("Your are muted by host",
                       duration: Duration(seconds: 5),
-                      toastPosition: EasyLoadingToastPosition.bottom
-                  );
-                } else{
+                      toastPosition: EasyLoadingToastPosition.bottom);
+                } else {
                   _onToggleMute();
                 }
               },
@@ -503,7 +501,7 @@ class _CallPageState extends State<CallPage> {
                     )),
           GestureDetector(
               onTap: () {
-                _onShareWithEmptyFields(context, widget.meetingid,'Meeting');
+                _onShareWithEmptyFields(context, widget.meetingid, 'Meeting');
               },
               child: Image.asset(
                 'assets/images/share.png',
@@ -736,12 +734,11 @@ class _CallPageState extends State<CallPage> {
       builder: (BuildContext context) {
         return StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
-
           return SingleChildScrollView(
             child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 10),
                 padding:
-                EdgeInsets.only(top: 10, bottom: 30, left: 20, right: 20),
+                    EdgeInsets.only(top: 10, bottom: 30, left: 20, right: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20),
@@ -773,40 +770,38 @@ class _CallPageState extends State<CallPage> {
                                           padding: EdgeInsets.all(10),
                                           child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               allMuted
                                                   ? Text(
-                                                "Mute All",
-                                                style: TextStyle(
-                                                    fontSize: 10.sp,
-                                                    letterSpacing: .5,
-                                                    color: allMuted
-
-                                                        ? Colors.red
-                                                    : Colors.white
-                                                ),
-                                              )
+                                                      "Mute All",
+                                                      style: TextStyle(
+                                                          fontSize: 10.sp,
+                                                          letterSpacing: .5,
+                                                          color: allMuted
+                                                              ? Colors.red
+                                                              : Colors.white),
+                                                    )
                                                   : Text(
-                                                "UnMute All",
-                                                style: TextStyle(
-                                                    fontSize: 10.sp,
-                                                    letterSpacing: .5,
-                                                    color: allMuted
-                                                        ? Colors.red
-                                                        : Colors.white
-                                                ),
-                                              ),
+                                                      "UnMute All",
+                                                      style: TextStyle(
+                                                          fontSize: 10.sp,
+                                                          letterSpacing: .5,
+                                                          color: allMuted
+                                                              ? Colors.red
+                                                              : Colors.white),
+                                                    ),
                                               allMuted
                                                   ? Image.asset(
-                                                'assets/icons/svg/mic_off.png',
-                                                height: 2.h,
-                                                width: 2.h,
-                                              ) :SvgPicture.asset(
-                                                'assets/icons/svg/mic_icon.svg',
-                                                height: 2.h,
-                                                width: 2.h,
-                                              )
+                                                      'assets/icons/svg/mic_off.png',
+                                                      height: 2.h,
+                                                      width: 2.h,
+                                                    )
+                                                  : SvgPicture.asset(
+                                                      'assets/icons/svg/mic_icon.svg',
+                                                      height: 2.h,
+                                                      width: 2.h,
+                                                    )
                                             ],
                                           ))),
                                 ),
@@ -835,7 +830,7 @@ class _CallPageState extends State<CallPage> {
                                           padding: EdgeInsets.all(10),
                                           child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 "Share link",
@@ -856,7 +851,7 @@ class _CallPageState extends State<CallPage> {
                                 onTap: () {
                                   setState(() {
                                     _onShareWithEmptyFields(
-                                        context, widget.meetingid,'Meeting');
+                                        context, widget.meetingid, 'Meeting');
                                   });
                                 }),
                             Divider(
@@ -874,7 +869,7 @@ class _CallPageState extends State<CallPage> {
                                           padding: EdgeInsets.all(10),
                                           child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 "Disconnect joiner",
@@ -915,7 +910,7 @@ class _CallPageState extends State<CallPage> {
                                           padding: EdgeInsets.all(10),
                                           child: Row(
                                             mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                                MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
                                                 "Record video",
@@ -954,13 +949,13 @@ class _CallPageState extends State<CallPage> {
                             borderRadius: BorderRadius.circular(20)),
                         child: Center(
                             child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text("Cancel",
-                                  style: TextStyle(
-                                      fontSize: 10.sp,
-                                      letterSpacing: .5,
-                                      color: Colors.white)),
-                            )),
+                          padding: EdgeInsets.all(10),
+                          child: Text("Cancel",
+                              style: TextStyle(
+                                  fontSize: 10.sp,
+                                  letterSpacing: .5,
+                                  color: Colors.white)),
+                        )),
                       ),
                       onTap: () {
                         Navigator.pop(context);
@@ -987,7 +982,7 @@ class _CallPageState extends State<CallPage> {
 
     List jsonData = jsonDecode(jsonArry);
     print("jsonData $jsonData");
-    for(int i = 0; i< jsonData.length; i++){
+    for (int i = 0; i < jsonData.length; i++) {
       userAudio.add(false);
       userVideo.add(false);
     }
@@ -1028,117 +1023,156 @@ class _CallPageState extends State<CallPage> {
                   height: 1.5.h,
                 ),
                 SizedBox(
-                  height: 48.h,
-                  child: SingleChildScrollView(
-                    child: ListView.separated(
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return Card(
-                              color: Color(0xff696969),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Padding(
-                                padding: EdgeInsets.all(10),
-                                child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "${(jsonData[index]['userId']).toString().split(":")[1]}",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 13.sp,
+                    height: 48.h,
+                    child: SingleChildScrollView(
+                      child: ListView.separated(
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            return Card(
+                                color: Color(0xff696969),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: Padding(
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "${(jsonData[index]['userId']).toString().split(":")[1]}",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 13.sp,
+                                        ),
                                       ),
-                                    ),
-                                    widget.role =="host"
-                                        ? Row(
-                                      children: [
-                                        GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                if(userVideo[index] == false){
-                                                  userVideo[index] = true;
-                                                  AgoraRtmMessage message = AgoraRtmMessage.fromText("videocam_off");
-                                                  _client.sendMessageToPeer((jsonData[index]
-                                                  ['userId']).toString(), message, true, false);
-                                                }else{
-                                                  userVideo[index] = false;
-                                                  AgoraRtmMessage message = AgoraRtmMessage.fromText("videocam_on");
-                                                  print("Peer ID ${(jsonData[index]
-                                                  ['userId']).toString()
-                                                  }");
-                                                  _client.sendMessageToPeer((jsonData[index]
-                                                  ['userId'])
-                                                      .toString(), message, true, false);
-                                                }
-                                                // _onToggleRemoteCamera(int
-                                                //     .parse((jsonData[index]
-                                                // ['userId'])
-                                                //     .toString()
-                                                //     .split(":")[0]));
-                                              });
-                                            },
-                                            child: userVideo[index] == false
-                                                ? SvgPicture.asset(
-                                              'assets/icons/svg/video_camera.svg',
-                                              height: 3.h,
-                                              width: 3.h,
+                                      widget.role == "host"
+                                          ? Row(
+                                              children: [
+                                                GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (userVideo[index] ==
+                                                            false) {
+                                                          userVideo[index] =
+                                                              true;
+                                                          AgoraRtmMessage
+                                                              message =
+                                                              AgoraRtmMessage
+                                                                  .fromText(
+                                                                      "videocam_off");
+                                                          _client.sendMessageToPeer(
+                                                              (jsonData[index][
+                                                                      'userId'])
+                                                                  .toString(),
+                                                              message,
+                                                              true,
+                                                              false);
+                                                        } else {
+                                                          userVideo[index] =
+                                                              false;
+                                                          AgoraRtmMessage
+                                                              message =
+                                                              AgoraRtmMessage
+                                                                  .fromText(
+                                                                      "videocam_on");
+                                                          print(
+                                                              "Peer ID ${(jsonData[index]['userId']).toString()}");
+                                                          _client.sendMessageToPeer(
+                                                              (jsonData[index][
+                                                                      'userId'])
+                                                                  .toString(),
+                                                              message,
+                                                              true,
+                                                              false);
+                                                        }
+                                                        // _onToggleRemoteCamera(int
+                                                        //     .parse((jsonData[index]
+                                                        // ['userId'])
+                                                        //     .toString()
+                                                        //     .split(":")[0]));
+                                                      });
+                                                    },
+                                                    child: userVideo[index] ==
+                                                            false
+                                                        ? SvgPicture.asset(
+                                                            'assets/icons/svg/video_camera.svg',
+                                                            height: 3.h,
+                                                            width: 3.h,
+                                                          )
+                                                        : Image.asset(
+                                                            'assets/icons/svg/video_camera.png',
+                                                            height: 3.h,
+                                                            width: 3.h,
+                                                          )),
+                                                SizedBox(width: 10),
+                                                GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if (userAudio[index] ==
+                                                            false) {
+                                                          userAudio[index] =
+                                                              true;
+                                                          AgoraRtmMessage
+                                                              message =
+                                                              AgoraRtmMessage
+                                                                  .fromText(
+                                                                      "mic_off");
+                                                          _client.sendMessageToPeer(
+                                                              (jsonData[index][
+                                                                      'userId'])
+                                                                  .toString(),
+                                                              message,
+                                                              true,
+                                                              false);
+                                                        } else {
+                                                          userAudio[index] =
+                                                              false;
+                                                          AgoraRtmMessage
+                                                              message =
+                                                              AgoraRtmMessage
+                                                                  .fromText(
+                                                                      "mic_on");
+                                                          _client.sendMessageToPeer(
+                                                              (jsonData[index][
+                                                                      'userId'])
+                                                                  .toString(),
+                                                              message,
+                                                              true,
+                                                              false);
+                                                        }
+                                                        // _onToggleRemoteMute(int
+                                                        //     .parse((jsonData[index]
+                                                        // ['userId'])
+                                                        //     .toString()
+                                                        //     .split(":")[0]));
+                                                      });
+                                                    },
+                                                    child: userAudio[index] ==
+                                                            false
+                                                        ? SvgPicture.asset(
+                                                            'assets/icons/svg/mic_icon.svg',
+                                                            height: 3.h,
+                                                            width: 3.h,
+                                                          )
+                                                        : Image.asset(
+                                                            'assets/icons/svg/mic_off.png',
+                                                            height: 3.h,
+                                                            width: 3.h,
+                                                          )),
+                                              ],
                                             )
-                                                : Image.asset(
-                                              'assets/icons/svg/video_camera.png',
-                                              height: 3.h,
-                                              width: 3.h,
-                                            )),
-                                        SizedBox(width: 10),
-                                        GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                if(userAudio[index] == false){
-                                                  userAudio[index] = true;
-                                                  AgoraRtmMessage message = AgoraRtmMessage.fromText("mic_off");
-                                                  _client.sendMessageToPeer((jsonData[index]
-                                                  ['userId'])
-                                                      .toString(), message, true, false);
-                                                }else{
-                                                  userAudio[index] = false;
-                                                  AgoraRtmMessage message = AgoraRtmMessage.fromText("mic_on");
-                                                  _client.sendMessageToPeer((jsonData[index]
-                                                  ['userId'])
-                                                      .toString(), message, true, false);
-                                                }
-                                                // _onToggleRemoteMute(int
-                                                //     .parse((jsonData[index]
-                                                // ['userId'])
-                                                //     .toString()
-                                                //     .split(":")[0]));
-                                              });
-                                            },
-                                            child: userAudio[index] == false
-                                                ? SvgPicture.asset(
-                                              'assets/icons/svg/mic_icon.svg',
-                                              height: 3.h,
-                                              width: 3.h,
-                                            )
-                                                : Image.asset(
-                                              'assets/icons/svg/mic_off.png',
-                                              height: 3.h,
-                                              width: 3.h,
-                                            )),
-                                      ],
-                                    )
-                                        : Container(),
-                                  ],
-                                ),
-                              ));
-                        },
-                        separatorBuilder: (_, __) => SizedBox(
-                          height: 1.h,
-                        ),
-                        itemCount: jsonData.length),
-                  )
-                )
+                                          : Container(),
+                                    ],
+                                  ),
+                                ));
+                          },
+                          separatorBuilder: (_, __) => SizedBox(
+                                height: 1.h,
+                              ),
+                          itemCount: jsonData.length),
+                    ))
               ],
             ),
           );
@@ -1161,9 +1195,7 @@ class _CallPageState extends State<CallPage> {
           itemCount: _userMap.length,
           scrollDirection: Axis.vertical,
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              childAspectRatio: 9/12,
-              crossAxisCount: 2
-          ),
+              childAspectRatio: 9 / 12, crossAxisCount: 2),
           itemBuilder: (BuildContext context, int index) {
             return Flex(
               direction: Axis.vertical,
@@ -1178,17 +1210,18 @@ class _CallPageState extends State<CallPage> {
                             child: Container(
                                 color: Colors.white,
                                 child: (_userMap.entries.elementAt(index).key ==
-                                    _localUid)
+                                        _localUid)
                                     ? RtcLocalView.SurfaceView()
                                     : RtcRemoteView.SurfaceView(
-                                    uid:
-                                    _userMap.entries.elementAt(index).key)),
+                                        uid: _userMap.entries
+                                            .elementAt(index)
+                                            .key)),
                             decoration: BoxDecoration(
                               border: Border.all(
                                   color: _userMap.entries
-                                      .elementAt(index)
-                                      .value
-                                      .isSpeaking
+                                          .elementAt(index)
+                                          .value
+                                          .isSpeaking
                                       ? Colors.blue
                                       : Colors.grey,
                                   width: 1),
@@ -1206,7 +1239,8 @@ class _CallPageState extends State<CallPage> {
                       ),
                       Container(
                         alignment: Alignment.bottomCenter,
-                        padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -1351,8 +1385,7 @@ class _CallPageState extends State<CallPage> {
                                   fontSize: 12.sp,
                                   color: Colors.white,
                                   fontFamily: 'Helvetica',
-                                  fontWeight: FontWeight.normal
-                              ),
+                                  fontWeight: FontWeight.normal),
                             ),
                           ],
                         );
@@ -1549,7 +1582,6 @@ class _CallPageState extends State<CallPage> {
       remoteMute = !remoteMute;
     });
     print('mute $remoteMute');
-
   }
 
   void _onToggleRemoteCamera(int joinerUID) {
@@ -1566,7 +1598,6 @@ class _CallPageState extends State<CallPage> {
       allMuted = !allMuted;
     });
     print('mute $allMuted');
-
   }
 
   void _onToggleVolume() {
@@ -1604,9 +1635,12 @@ class _CallPageState extends State<CallPage> {
                               if (value != null) {
                                 if (value['status'] == "successfull") {
                                   if (mounted) {
-                                    Navigator.pushAndRemoveUntil(context,
-                                        MaterialPageRoute(builder: (context) => BottomNavbar(index: 0)),
-                                            (Route<dynamic> route) => false);
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BottomNavbar(index: 0)),
+                                        (Route<dynamic> route) => false);
                                   }
                                 } else {
                                   EasyLoading.showToast(
@@ -1640,9 +1674,9 @@ class _CallPageState extends State<CallPage> {
                       .then((value) {
                     if (value != null) {
                       if (value.status == "successfull") {
-                          if (value.body.meeting.status == "scheduled") {
-                            Navigator.pop(context);
-                          }
+                        if (value.body.meeting.status == "scheduled") {
+                          Navigator.pop(context);
+                        }
                       } else {
                         EasyLoading.showToast(
                             "Something went wrong please logout and login again.",
@@ -1654,58 +1688,57 @@ class _CallPageState extends State<CallPage> {
             });
   }
 
-   _onShareWithEmptyFields(BuildContext context, String id,String type) async {
-    Helper.checkConnectivity().then((value) =>
-    {
-      if (value)
-        {
-          PreferenceConnector.getJsonToSharedPreference(
-              StringConstant.Userdata)
-              .then((value) =>
-          {
-            if (value != null)
-              {
-                userdata = jsonDecode(value.toString()),
-                localdata = PrefranceData.fromJson(userdata),
-
-                FlutterShare.share(
-                    title: 'Meeting Id',
-                    text: '${localdata.name} just invited you to a bvidya $type.\n'
-                        '$type code -$id\n'
-                        'To join, copy the code and enter it on the bvidya app or website.'
-                ),
-              }
-            else
-              {
-                Helper.showMessage(
-                    "Something went wrong please logout and login again.")
-              }
-          })
-        }
-
-    });
-
+  _onShareWithEmptyFields(BuildContext context, String id, String type) async {
+    Helper.checkConnectivity().then((value) => {
+          if (value)
+            {
+              PreferenceConnector.getJsonToSharedPreference(
+                      StringConstant.Userdata)
+                  .then((value) => {
+                        if (value != null)
+                          {
+                            userdata = jsonDecode(value.toString()),
+                            localdata = PrefranceData.fromJson(userdata),
+                            FlutterShare.share(
+                                title: 'Meeting Id',
+                                text:
+                                    '${localdata.name} just invited you to a bvidya $type.\n'
+                                    '$type code -$id\n'
+                                    'To join, copy the code and enter it on the bvidya app or website.'),
+                          }
+                        else
+                          {
+                            Helper.showMessage(
+                                "Something went wrong please logout and login again.")
+                          }
+                      })
+            }
+        });
   }
 
-  void audioply () async{
+  void audioply() async {
     ByteData bytes = await rootBundle.load(audioasset); //load sound from assets
-    Uint8List  soundbytes = bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
+    Uint8List soundbytes =
+        bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
     int result = await player.playBytes(soundbytes);
-    if(result == 1){ //play success
+    if (result == 1) {
+      //play success
       print("Sound playing successful.");
-    }else{
+    } else {
       print("Error while playing sound.");
     }
   }
 
   void localData() {
     Timer.periodic(const Duration(seconds: 2), (timer) {
-      PreferenceConnector.getJsonToSharedPreferenceechatscreen(StringConstant.chatscreen)
+      PreferenceConnector.getJsonToSharedPreferenceechatscreen(
+              StringConstant.chatscreen)
           .then((value) => {
-        if (value == "callscreen"){
-          Navigator.pop(context),
-        }
-      });
+                if (value == "callscreen")
+                  {
+                    Navigator.pop(context),
+                  }
+              });
     });
   }
 }

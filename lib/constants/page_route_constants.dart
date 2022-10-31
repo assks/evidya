@@ -1,5 +1,3 @@
-
-
 class PageRouteConstants {
   static const String home_screen = '/HomeScreeen';
   static const String splash_screen = '/SplashScreen';
@@ -14,13 +12,12 @@ class PageRouteConstants {
   static const String search_home = '/search_home';
   static const String statictics = '/statistics';
   static const String calender_screen = '/calender_screen';
-  static const String videoDetailscreen='/videoDetailscreen';
-  static const String bottom_navigaction='/bottom_navigaction';
-  static const String broadcast_screen='/BroadcastPage';
-  static const String schudle_meet_screen='/schudle_meet_screen';
-  static const String policy_screen='/policy';
-  static const String audiocallscreen='/audiocallscreen';
-
+  static const String videoDetailscreen = '/videoDetailscreen';
+  static const String bottom_navigaction = '/bottom_navigaction';
+  static const String broadcast_screen = '/BroadcastPage';
+  static const String schudle_meet_screen = '/schudle_meet_screen';
+  static const String policy_screen = '/policy';
+  // static const String audiocallscreen='/audiocallscreen';
 
   static const edit_profile = '/edit_profile';
   static const contact_list = '/contact_list';
